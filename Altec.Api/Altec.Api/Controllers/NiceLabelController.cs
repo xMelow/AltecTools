@@ -51,8 +51,8 @@ public class NiceLabelController : ControllerBase
     {
         try
         {
-            await _niceLabelClient.GetLabelPreview(label);
-            return Ok("Label preview");
+            var previewBytes = await _niceLabelClient.GetLabelPreview(label);
+            return File(previewBytes, "image/png");
         }
         catch (Exception ex)
         {

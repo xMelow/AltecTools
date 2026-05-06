@@ -49,8 +49,18 @@ public class NiceLabelClient : INiceLabelClient
         response.EnsureSuccessStatusCode();
     }
 
-    public Task GetLabelPreview(IFormFile labelFile)
+    public async Task<byte[]> GetLabelPreview(IFormFile labelFile)
     {
-        throw new NotImplementedException();
+        var fileStream = labelFile.OpenReadStream();
+        StreamContent streamContent = new StreamContent(fileStream);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, "/api/nicelabel/labelPreview");
+        request.Content = streamContent;
+        
+        var response = await _httpClient.SendAsync(request);
+        response.EnsureSuccessStatusCode();
+        
+        var result = await response.Content.ReadAsByteArrayAsync();
+        return result;
     }
 }
