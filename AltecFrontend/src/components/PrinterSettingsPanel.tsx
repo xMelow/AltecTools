@@ -37,18 +37,28 @@ export default function PrinterSettingsPanel({ ipAddress }: Props) {
         }
     }, [ipAddress])
 
+    const handleRefresh = () => {
+        if (ipAddress) settingsFetch.execute(() => getPrinterSettings(ipAddress))
+    }
+
     return (
         <div className="w-1/4 flex flex-col border rounded-2xl border-altec-teal bg-altec-white p-4 max-h-[75vh] overflow-y-auto">
-            <h3 className="text-lg font-semibold mb-2">Printer Settings</h3>
+            <div className="flex justify-between items-center mb-2">
+                <h3 className="text-lg font-semibold">Printer Settings</h3>
+                <button
+                    className="text-xs border border-altec-teal text-altec-teal px-2 py-0.5 rounded-lg hover:bg-altec-light transition-colors disabled:opacity-50"
+                    onClick={handleRefresh}
+                    disabled={settingsFetch.loading}
+                >
+                    Refresh
+                </button>
+            </div>
             <hr className="border-b border-altec-teal mb-3" />
 
             {settingsFetch.loading && <p className="text-sm text-altec-teal">Loading...</p>}
 
             {s ? (
                 <>
-                    <button>
-                        Refresh
-                    </button>
                     <SettingsSection title="Device">
                         <SettingRow label="Model" value={s.model} />
                         <SettingRow label="Serial" value={s.serial} />
