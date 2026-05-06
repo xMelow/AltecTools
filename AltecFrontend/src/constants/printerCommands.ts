@@ -61,7 +61,7 @@ export const TSPL_COMMAND_GROUPS: CommandGroup[] = [
     },
 ]
 
-export const DIAGTOOL_COMMAND_GROUPS: CommandGroup[] = [
+export const PRINTER_COMMAND_GROUPS: CommandGroup[] = [
     {
         label: "Calibration",
         commands: [
@@ -125,22 +125,29 @@ export const DIAGTOOL_COMMAND_GROUPS: CommandGroup[] = [
             { label: "Head Voltage", command: 'OUT GETSENSOR("HEAD VOLT")' },
         ],
     },
-    {
-        label: "Clock",
-        commands: [
-            { label: "Get Date/Time", command: 'OUT NOW$()' },
-        ],
-    },
-    {
+     {
         label: "System",
         commands: [
             { label: "Factory Reset", command: "INITIALPRINTER" },
             { label: "Restart Printer", command: "\x1B!C" },
+            { label: "Restart (Ignore AUTO.BAS)", command: "\x1B!Q" },
             { label: "Dump Mode", command: "~!D" },
             { label: "Files on Printer", command: "FILES" },
             { label: "Clear Buffer", command: "CLS" },
             { label: "Pause", command: "\x1B!P" },
             { label: "Resume", command: "\x1B!O" },
+        ],
+    },
+    {
+        label: "Clock",
+        commands: [
+            { label: "Get Date/Time", command: 'OUT NOW$()' },
+            { label: "Set Year", command: 'YEAR=25' },
+            { label: "Set Month", command: 'MONTH=01' },
+            { label: "Set Date", command: 'DATE=01' },
+            { label: "Set Hour", command: 'HOUR=00' },
+            { label: "Set Minute", command: 'MINUTE=00' },
+            { label: "Set Second", command: 'SECOND=00' },
         ],
     },
 ]

@@ -2,17 +2,18 @@ import { useState, useRef, useEffect } from "react"
 import { useParams, useLocation } from "react-router-dom"
 import { sendPrinterCommand } from "../api/printers"
 import { CommandTab, LogEntry } from "../types/printerTerminal"
-import { TSPL_COMMAND_GROUPS, DIAGTOOL_COMMAND_GROUPS } from "../constants/printerCommands"
-import PrinterSettingsPanel from "../components/PrinterSettingsPanel";
+import { TSPL_COMMAND_GROUPS, PRINTER_COMMAND_GROUPS } from "../constants/printerCommands"
+import PrinterSettingsPanel from "../components/PrinterSettingsPanel"
+import PrinterFilesTab from "../components/PrinterFilesTab"
 
 export default function PrinterDetailedScreen() {
     const { ipAddress } = useParams<{ ipAddress: string }>()
     const [commandInput, setCommandInput] = useState("")
     const [log, setLog] = useState<LogEntry[]>([])
     const [sending, setSending] = useState(false)
-    const [commandTab, setCommandTab] = useState<CommandTab>("diagtool")
+    const [commandTab, setCommandTab] = useState<CommandTab>("printer")
     const logEndRef = useRef<HTMLDivElement>(null)
-    const activeGroups = commandTab === "tspl" ? TSPL_COMMAND_GROUPS : DIAGTOOL_COMMAND_GROUPS
+    const activeGroups = commandTab === "tspl" ? TSPL_COMMAND_GROUPS : PRINTER_COMMAND_GROUPS
 
     useEffect(() => {
         logEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -38,10 +39,10 @@ export default function PrinterDetailedScreen() {
     }
 
     async function handleSend() {
-        const trimmed = commandInput.trim()
-        if (!ipAddress || !trimmed) return
+        const command = commandInput.trim()
+        if (!ipAddress || !command) return
         setCommandInput("")
-        await sendCommand(trimmed)
+        await sendCommand(command)
     }
 
     function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
@@ -59,7 +60,6 @@ export default function PrinterDetailedScreen() {
 
             <div className="flex gap-4 items-start">
 
-                {/* Command Buttons */}
                 <div className="w-1/5 flex flex-col border rounded-2xl border-altec-teal bg-altec-white p-4 overflow-y-auto max-h-[75vh]">
                     <h3 className="text-lg font-semibold mb-2">Commands</h3>
                     <hr className="border-b border-altec-teal mb-3" />
@@ -67,13 +67,13 @@ export default function PrinterDetailedScreen() {
                     <div className="flex gap-2 mb-3">
                         <button
                             className={`text-sm px-3 py-1 rounded-xl border border-altec-teal transition-colors ${
-                                commandTab === "diagtool"
+                                commandTab === "printer"
                                     ? "bg-altec-teal text-altec-white"
                                     : "bg-altec-white text-altec-teal hover:bg-altec-light"
                             }`}
-                            onClick={() => setCommandTab("diagtool")}
+                            onClick={() => setCommandTab("printer")}
                         >
-                            DiagTool
+                            Printer
                         </button>
                         <button
                             className={`text-sm px-3 py-1 rounded-xl border border-altec-teal transition-colors ${
@@ -85,32 +85,50 @@ export default function PrinterDetailedScreen() {
                         >
                             TSPL
                         </button>
+                        <button
+                            className={`text-sm px-3 py-1 rounded-xl border border-altec-teal transition-colors ${
+                                commandTab === "files"
+                                    ? "bg-altec-teal text-altec-white"
+                                    : "bg-altec-white text-altec-teal hover:bg-altec-light"
+                            }`}
+                            onClick={() => setCommandTab("files")}
+                        >
+                            Files
+                        </button>
                     </div>
 
-                    <div className="flex flex-col gap-4">
-                        {activeGroups.map(group => (
-                            <div key={group.label}>
-                                <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide mb-1.5">
-                                    {group.label}
-                                </p>
-                                <div className="flex flex-col gap-1">
-                                    {group.commands.map(cmd => (
-                                        <button
-                                            key={cmd.command}
-                                            className="text-left text-sm border border-altec-teal rounded-lg px-2 py-1.5 hover:bg-altec-light transition-colors disabled:opacity-40"
-                                            onClick={() => sendCommand(cmd.command)}
-                                            disabled={sending}
-                                        >
-                                            {cmd.label}
-                                        </button>
-                                    ))}
+                    {commandTab === "files" ? (
+                        <PrinterFilesTab
+                            ipAddress={ipAddress!}
+                            sending={sending}
+                            setSending={setSending}
+                            addLog={addLog}
+                        />
+                    ) : (
+                        <div className="flex flex-col gap-4">
+                            {activeGroups.map(group => (
+                                <div key={group.label}>
+                                    <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide mb-1.5">
+                                        {group.label}
+                                    </p>
+                                    <div className="flex flex-col gap-1">
+                                        {group.commands.map(cmd => (
+                                            <button
+                                                key={cmd.command}
+                                                className="text-left text-sm border border-altec-teal rounded-lg px-2 py-1.5 hover:bg-altec-light transition-colors disabled:opacity-40"
+                                                onClick={() => sendCommand(cmd.command)}
+                                                disabled={sending}
+                                            >
+                                                {cmd.label}
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
-                    </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
-                {/* Command Terminal */}
                 <div className="flex-1 flex flex-col border rounded-2xl border-altec-teal bg-altec-white p-4 max-h-[75vh]">
                     <div className="flex justify-between items-center mb-2">
                         <h3 className="text-lg font-semibold">Terminal</h3>
@@ -123,7 +141,6 @@ export default function PrinterDetailedScreen() {
                     </div>
                     <hr className="border-b border-altec-teal mb-3" />
 
-                    {/* Log output */}
                     <div className="flex-1 bg-altec-light rounded-xl p-3 font-mono text-sm overflow-y-auto mb-3 min-h-64">
                         {log.length === 0 && (
                             <p className="text-gray-400 text-xs">Send a command to see output here...</p>
@@ -144,7 +161,6 @@ export default function PrinterDetailedScreen() {
                         <div ref={logEndRef} />
                     </div>
 
-                    {/* Input area */}
                     <div className="flex gap-2">
                         <textarea
                             className="flex-1 border border-altec-teal rounded-xl p-2 text-sm font-mono resize-none bg-altec-white focus:outline-none focus:ring-1 focus:ring-altec-teal"

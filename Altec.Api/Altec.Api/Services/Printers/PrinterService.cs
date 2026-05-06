@@ -30,4 +30,10 @@ public class PrinterService : IPrinterService
         var ip = IPAddress.Parse(ipAddress);
         return await _printerDiscovery.SendPrinterCommand(ip, command);
     }
+
+    public async Task<string> SendFiles(string ipAddress, IEnumerable<(Stream stream, string fileName, string memory)> files)
+    {
+        var ip = IPAddress.Parse(ipAddress);
+        return await _printerDiscovery.SendPrinterFiles(ip, files);
+    }
 }
