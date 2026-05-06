@@ -44,3 +44,26 @@ export type PrinterSettings = {
 export type CommandResponse = {
     result: string
 }
+
+export type PrinterSettingsPanelProps = {
+    ipAddress: string | undefined
+}
+
+export type EditableSettings = {
+    speed: string
+    density: string
+    direction: string
+    ribbon: string
+    sensorType: string
+    labelWidth: string
+    labelHeight: string
+    gapSize: string
+    gapSizeOffset: string
+    gapOffset: string
+    blineSize: string
+    offset: string
+    shiftX: string
+    shiftY: string
+    countryCode: string
+    codePage: string
+}

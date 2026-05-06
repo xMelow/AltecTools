@@ -60,73 +60,78 @@ export default function PrinterDetailedScreen() {
 
             <div className="flex gap-4 items-start">
 
-                <div className="w-1/5 flex flex-col border rounded-2xl border-altec-teal bg-altec-white p-4 overflow-y-auto max-h-[75vh]">
-                    <h3 className="text-lg font-semibold mb-2">Commands</h3>
-                    <hr className="border-b border-altec-teal mb-3" />
-
-                    <div className="flex gap-2 mb-3">
-                        <button
-                            className={`text-sm px-3 py-1 rounded-xl border border-altec-teal transition-colors ${
-                                commandTab === "printer"
-                                    ? "bg-altec-teal text-altec-white"
-                                    : "bg-altec-white text-altec-teal hover:bg-altec-light"
-                            }`}
-                            onClick={() => setCommandTab("printer")}
-                        >
-                            Printer
-                        </button>
-                        <button
-                            className={`text-sm px-3 py-1 rounded-xl border border-altec-teal transition-colors ${
-                                commandTab === "tspl"
-                                    ? "bg-altec-teal text-altec-white"
-                                    : "bg-altec-white text-altec-teal hover:bg-altec-light"
-                            }`}
-                            onClick={() => setCommandTab("tspl")}
-                        >
-                            TSPL
-                        </button>
-                        <button
-                            className={`text-sm px-3 py-1 rounded-xl border border-altec-teal transition-colors ${
-                                commandTab === "files"
-                                    ? "bg-altec-teal text-altec-white"
-                                    : "bg-altec-white text-altec-teal hover:bg-altec-light"
-                            }`}
-                            onClick={() => setCommandTab("files")}
-                        >
-                            Files
-                        </button>
+                <div className="w-1/5 flex flex-col border rounded-2xl border-altec-teal bg-altec-white max-h-[75vh]">
+                    {/* Header — outside the scroll area */}
+                    <div className="px-4 pt-4 shrink-0">
+                        <h3 className="text-lg font-semibold mb-2">Commands</h3>
+                        <hr className="border-b border-altec-teal mb-3" />
+                        <div className="flex gap-2 mb-3">
+                            <button
+                                className={`text-sm px-3 py-1 rounded-xl border border-altec-teal transition-colors ${
+                                    commandTab === "printer"
+                                        ? "bg-altec-teal text-altec-white"
+                                        : "bg-altec-white text-altec-teal hover:bg-altec-light"
+                                }`}
+                                onClick={() => setCommandTab("printer")}
+                            >
+                                Printer
+                            </button>
+                            <button
+                                className={`text-sm px-3 py-1 rounded-xl border border-altec-teal transition-colors ${
+                                    commandTab === "tspl"
+                                        ? "bg-altec-teal text-altec-white"
+                                        : "bg-altec-white text-altec-teal hover:bg-altec-light"
+                                }`}
+                                onClick={() => setCommandTab("tspl")}
+                            >
+                                TSPL
+                            </button>
+                            <button
+                                className={`text-sm px-3 py-1 rounded-xl border border-altec-teal transition-colors ${
+                                    commandTab === "files"
+                                        ? "bg-altec-teal text-altec-white"
+                                        : "bg-altec-white text-altec-teal hover:bg-altec-light"
+                                }`}
+                                onClick={() => setCommandTab("files")}
+                            >
+                                Files
+                            </button>
+                        </div>
                     </div>
 
-                    {commandTab === "files" ? (
-                        <PrinterFilesTab
-                            ipAddress={ipAddress!}
-                            sending={sending}
-                            setSending={setSending}
-                            addLog={addLog}
-                        />
-                    ) : (
-                        <div className="flex flex-col gap-4">
-                            {activeGroups.map(group => (
-                                <div key={group.label}>
-                                    <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide mb-1.5">
-                                        {group.label}
-                                    </p>
-                                    <div className="flex flex-col gap-1">
-                                        {group.commands.map(cmd => (
-                                            <button
-                                                key={cmd.command}
-                                                className="text-left text-sm border border-altec-teal rounded-lg px-2 py-1.5 hover:bg-altec-light transition-colors disabled:opacity-40"
-                                                onClick={() => sendCommand(cmd.command)}
-                                                disabled={sending}
-                                            >
-                                                {cmd.label}
-                                            </button>
-                                        ))}
+                    {/* Scrollable content */}
+                    <div className="overflow-y-auto px-4 pb-4 grow">
+                        {commandTab === "files" ? (
+                            <PrinterFilesTab
+                                ipAddress={ipAddress!}
+                                sending={sending}
+                                setSending={setSending}
+                                addLog={addLog}
+                            />
+                        ) : (
+                            <div className="flex flex-col gap-4">
+                                {activeGroups.map(group => (
+                                    <div key={group.label}>
+                                        <p className="sticky top-0 z-10 bg-altec-white text-xs font-semibold text-altec-teal uppercase tracking-wide py-1 mb-1">
+                                            {group.label}
+                                        </p>
+                                        <div className="flex flex-col gap-1">
+                                            {group.commands.map(cmd => (
+                                                <button
+                                                    key={cmd.command}
+                                                    className="text-left text-sm border border-altec-teal rounded-lg px-2 py-1.5 hover:bg-altec-light transition-colors disabled:opacity-40"
+                                                    onClick={() => sendCommand(cmd.command)}
+                                                    disabled={sending}
+                                                >
+                                                    {cmd.label}
+                                                </button>
+                                            ))}
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
+                                ))}
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 <div className="flex-1 flex flex-col border rounded-2xl border-altec-teal bg-altec-white p-4 max-h-[75vh]">
