@@ -18,36 +18,34 @@ export default function PrintSerialNumbers() {
     }
     
     return (
-        <div className="border border-altec-teal py-2 rounded-xl p-2 bg-altec-white w-1/4">
-            <h2 className="text-xl font-semibold pt-2 mb-2">Serie nummers nieuwe printers</h2>
+        <div className="shadow-md rounded-2xl p-3 bg-white w-1/4">
+            <h2 className="text-xl font-semibold pt-1 mb-2 text-center">Serie nummers nieuwe printers</h2>
 
             <hr className="border-b border-altec-teal mb-4" />
 
             {error && <p className="text-red-500">{error}</p>}
 
-            <div className="flex flex-col gap-2">
-                <label
-                    className=" w-27 cursor-pointer bg-altec-teal text-white px-3 py-1.5 rounded-xl"
-                    htmlFor="excelFile"
-                >
-                    Select excel
+            <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide mb-1">File</p>
+            <div className="flex flex-col gap-2 mb-4">
+                <label className="text-sm text-altec-teal border border-dashed border-altec-teal rounded-xl p-2 hover:bg-altec-light transition-colors cursor-pointer text-center">
+                    {excelFile?.name ?? "+ Select excel"}
+                    <input
+                        type="file"
+                        accept=".xlsx"
+                        className="hidden"
+                        onChange={(e) => setExcelFile(e.target.files?.[0] ?? null)}
+                    />
                 </label>
-
-                <input
-                    id="excelFile"
-                    type="file"
-                    accept={".xlsx"}
-                    multiple
-                    className="hidden"
-                    onChange={(e) => setExcelFile(e.target.files?.[0] ?? null)}
-                />
-
-                <p>{excelFile?.name}</p>
             </div>
 
-            <div className="flex gap-2">
-                <label htmlFor="type">Printer Type:</label>
-                <select className="" name="type" id="type" onChange={(e) =>setPrinterType(e.target.value)} >
+            <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide mb-1">Printer Type</p>
+            <div className="flex flex-col gap-2 mb-4">
+                <select
+                    className="text-sm border border-altec-teal rounded-lg px-2 py-1.5 bg-altec-white focus:outline-none focus:ring-1 focus:ring-altec-teal"
+                    name="type"
+                    id="type"
+                    onChange={(e) => setPrinterType(e.target.value)}
+                >
                     <option value="ATP-300NL">ATP-300 Pro NL</option>
                     <option value="ATP-300BT">ATP-300 Pro BT</option>
                     <option value="ATP-600NL">ATP-600 Pro NL</option>
@@ -56,7 +54,10 @@ export default function PrintSerialNumbers() {
                 </select>
             </div>
 
-            <button 
+            <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide mb-1">Label Preview</p>
+            <div className="mb-4" />
+
+            <button
                 className="w-full border bg-altec-teal text-altec-white p-1.5 rounded-xl mt-2"
                 onClick={sendRequest} 
                 disabled={loading}

@@ -53,7 +53,7 @@ function SettingsSection({ title, children }: { title: string; children: React.R
     )
 }
 
-export default function PrinterSettingsPanel({ ipAddress }: PrinterSettingsPanelProps) {
+export default function PrinterSettingsPanel({ ipAddress, onNetworkName }: PrinterSettingsPanelProps) {
     const settingsFetch = useFetch<PrinterSettings>()
     const updateFetch = useFetch<CommandResponse>()
     const s = settingsFetch.result
@@ -69,6 +69,7 @@ export default function PrinterSettingsPanel({ ipAddress }: PrinterSettingsPanel
 
     useEffect(() => {
         if (s) {
+            if (s.networkName) onNetworkName?.(s.networkName)
             setEditable({
                 speed: String(s.speed),
                 density: String(s.density),
@@ -154,7 +155,7 @@ export default function PrinterSettingsPanel({ ipAddress }: PrinterSettingsPanel
                         <SettingsSection title="Network">
                             <SettingRow label="IP Address" value={s.ipAddressNet} />
                             <SettingRow label="MAC Address" value={s.macAddressNet} />
-                            <SettingRow label="Network Name" value={s.networkName} />
+                            <SettingRow label="DNS Name" value={s.networkName} />
                         </SettingsSection>
 
                         <SettingsSection title="TSPL">

@@ -34,91 +34,84 @@ export default function TsplScreen() {
     }
 
     return (
-        <div className="">
-            <h2 className="text-center text-3xl font-bold text-altec-teal mb-3">Label Preview</h2>
+        <div>
+            <h2 className="text-center text-3xl font-bold text-altec-teal mb-4">Label Preview</h2>
 
-            <div className="flex justify-around">
-                <div className="w-1/4 h-1/4 pl-5 pb-5 pr-5 flex flex-col border rounded-2xl border-altec-teal bg-altec-white justify-center">
-                    <h2 className="text-xl font-semibold pt-2 mb-2">TSPL Code</h2>
+            <div className="flex gap-4 items-start">
 
-                    <hr className="border-b border-altec-teal mb-4" />
-
-                  <textarea
-                      className="text-sm  bg-altec-white p-2 h-1/10"
-                      value={labelTspl}
-                      onChange={e => setLabelTspl(e.target.value)}
-                      placeholder="Enter TSPL code..."
-                      rows={25}
-                  />
-                </div>
-
-                <div className="w-1/4 h-1/4 pl-5 pb-5 pr-5 flex flex-col border rounded-2xl border-altec-teal bg-altec-white justify-center">
-                    <h2 className="text-xl font-semibold pt-2 mb-2">Settings</h2>
-
-                    <hr className="border-b border-altec-teal mb-4" />
-
-                    <div className="flex flex-col gap-2">
-                        <div className="flex items-center gap-2">
-                            <label
-                                htmlFor="showBlockOutline"
-                            >
-                                Show block outline
-                            </label>
-                            <input
-                                className=""
-                                type="checkbox"
-                                name="showBlockOutline"
-                                id="showBlockOutline"
-                                onChange={e => setBlockOutline(e.target.checked)}
-                            />
-                        </div>
-
-                        <div className="flex flex-col gap-2">
-                            <label
-                                className=" w-29 cursor-pointer bg-altec-teal text-white px-3 py-1.5 rounded-xl"
-                                htmlFor="labelImages"
-                            >
-                                Select image
-                            </label>
-                            <input
-                                id="labelImages"
-                                type="file"
-                                accept={"image/*"}
-                                multiple
-                                className="hidden"
-                                onChange={(e) => handleImageImport(e)}
-                            />
-                            {Object.keys(labelImages).map(key => (
-                                    <p className="text-sm text-altec-dark" key={key}>{key}</p>
-                                )
-                            )}
-                        </div>
-
+                {/* Settings panel */}
+                <div className="w-1/5 flex flex-col border rounded-2xl border-altec-teal bg-altec-white max-h-[75vh]">
+                    <div className="px-4 pt-4 shrink-0">
+                        <h3 className="text-lg font-semibold mb-2">Settings</h3>
+                        <hr className="border-b border-altec-teal mb-3" />
                     </div>
-                    <button
-                        className="border bg-altec-teal text-altec-white p-1.5 rounded-xl mt-2"
-                        onClick={handlePreview}
-                        disabled={loading}
-                    >
-                        {loading ? 'Loading...' : 'Preview'}
-                    </button>
+
+                    <div className="overflow-y-auto px-4 pb-4 grow flex flex-col gap-4">
+                        <div>
+                            <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide mb-2">Display</p>
+                            <div className="flex items-center justify-between">
+                                <label htmlFor="showBlockOutline" className="text-sm text-gray-600">Block outline</label>
+                                <input
+                                    type="checkbox"
+                                    name="showBlockOutline"
+                                    id="showBlockOutline"
+                                    onChange={e => setBlockOutline(e.target.checked)}
+                                />
+                            </div>
+                        </div>
+
+                        <div>
+                            <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide mb-2">Images</p>
+                            <label className="text-sm text-altec-teal border border-dashed border-altec-teal rounded-xl p-2 hover:bg-altec-light transition-colors cursor-pointer text-center block">
+                                {Object.keys(labelImages).length > 0 ? Object.keys(labelImages).join(", ") : "+ Select image"}
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    multiple
+                                    className="hidden"
+                                    onChange={(e) => handleImageImport(e)}
+                                />
+                            </label>
+                        </div>
+                    </div>
                 </div>
 
-                <div className="w-1/4 h-1/4 pl-5 pb-5 pr-5 flex flex-col border rounded-2xl border-altec-teal bg-altec-white justify-center">
-                    <h2 className="text-xl font-semibold pt-2 mb-2">Label Preview</h2>
+                <div className="flex-1 flex flex-col border rounded-2xl border-altec-teal bg-altec-white p-4 h-[75vh]">
+                    <div className="flex justify-between items-center mb-2">
+                        <h3 className="text-lg font-semibold">TSPL Code</h3>
+                        <button
+                            className="border bg-altec-teal text-altec-white px-4 py-1 rounded-xl text-sm disabled:opacity-50"
+                            onClick={handlePreview}
+                            disabled={loading}
+                        >
+                            {loading ? "Loading..." : "Preview"}
+                        </button>
+                    </div>
+                    <hr className="border-b border-altec-teal mb-3" />
 
-                    <hr className="border-b border-altec-teal mb-4" />
-
-                    {result
-                        ? <img
-                            className="border border-altec-dark rounded-sm"
-                            src={result}
-                            alt="Label preview"
-                        />
-                        : <p className=""></p>
-                    }
-                    {error && <p className="text-red-500">{error}</p>}
+                    <textarea
+                        className="flex-1 text-sm font-mono bg-altec-light rounded-xl p-3 resize-none focus:outline-none focus:ring-1 focus:ring-altec-teal"
+                        value={labelTspl}
+                        onChange={e => setLabelTspl(e.target.value)}
+                        placeholder="Enter TSPL code..."
+                    />
                 </div>
+
+                <div className="w-1/4 flex flex-col border rounded-2xl border-altec-teal bg-altec-white max-h-[75vh]">
+                    <div className="px-4 pt-4 shrink-0">
+                        <h3 className="text-lg font-semibold mb-2">Label Preview</h3>
+                        <hr className="border-b border-altec-teal mb-3" />
+                    </div>
+
+                    <div className="overflow-y-auto px-4 pb-4 grow">
+                        {error && <p className="text-sm text-red-500">{error}</p>}
+                        {result
+                            ? <img className="border border-altec-dark rounded-sm w-full" src={result} alt="Label preview" />
+                            : <p className="text-xs text-gray-400">Preview will appear here...</p>
+                        }
+                    </div>
+                </div>
+
             </div>
         </div>
     )

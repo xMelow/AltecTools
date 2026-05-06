@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react"
-import { useParams, useLocation } from "react-router-dom"
+import { useParams } from "react-router-dom"
 import { sendPrinterCommand } from "../api/printers"
 import { CommandTab, LogEntry } from "../types/printerTerminal"
 import { TSPL_COMMAND_GROUPS, PRINTER_COMMAND_GROUPS } from "../constants/printerCommands"
@@ -8,6 +8,7 @@ import PrinterFilesTab from "../components/PrinterFilesTab"
 
 export default function PrinterDetailedScreen() {
     const { ipAddress } = useParams<{ ipAddress: string }>()
+    const [dnsName, setDnsName] = useState<string>()
     const [commandInput, setCommandInput] = useState("")
     const [log, setLog] = useState<LogEntry[]>([])
     const [sending, setSending] = useState(false)
@@ -55,13 +56,12 @@ export default function PrinterDetailedScreen() {
     return (
         <div>
             <h2 className="text-center text-3xl font-bold text-altec-teal mb-4">
-                {ipAddress}
+                {dnsName ? `${dnsName} - ${ipAddress}` : ipAddress}
             </h2>
 
             <div className="flex gap-4 items-start">
 
                 <div className="w-1/5 flex flex-col border rounded-2xl border-altec-teal bg-altec-white max-h-[75vh]">
-                    {/* Header — outside the scroll area */}
                     <div className="px-4 pt-4 shrink-0">
                         <h3 className="text-lg font-semibold mb-2">Commands</h3>
                         <hr className="border-b border-altec-teal mb-3" />
@@ -99,7 +99,6 @@ export default function PrinterDetailedScreen() {
                         </div>
                     </div>
 
-                    {/* Scrollable content */}
                     <div className="overflow-y-auto px-4 pb-4 grow">
                         {commandTab === "files" ? (
                             <PrinterFilesTab
@@ -138,7 +137,7 @@ export default function PrinterDetailedScreen() {
                     <div className="flex justify-between items-center mb-2">
                         <h3 className="text-lg font-semibold">Terminal</h3>
                         <button
-                            className="text-xs text-gray-400 hover:text-red-400 transition-colors"
+                            className="text-xs border border-altec-teal text-altec-teal px-2 py-0.5 rounded-lg hover:bg-altec-light transition-colors disabled:opacity-50"
                             onClick={() => setLog([])}
                         >
                             Clear
@@ -186,7 +185,7 @@ export default function PrinterDetailedScreen() {
                     </div>
                 </div>
 
-                <PrinterSettingsPanel ipAddress={ipAddress} />
+                <PrinterSettingsPanel ipAddress={ipAddress} onNetworkName={setDnsName} />
 
             </div>
         </div>

@@ -47,6 +47,7 @@ export type CommandResponse = {
 
 export type PrinterSettingsPanelProps = {
     ipAddress: string | undefined
+    onNetworkName?: (name: string) => void
 }
 
 export type EditableSettings = {
