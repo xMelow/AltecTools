@@ -30,7 +30,6 @@ export default function PrinterDetailedScreen() {
         try {
             const res = await sendPrinterCommand(ipAddress, command)
             if (res.result) addLog("received", res.result)
-            // setSending(false)
         } catch (err) {
             addLog("error", err instanceof Error ? err.message : "Failed to send command")
         } finally {

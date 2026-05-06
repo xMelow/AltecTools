@@ -58,7 +58,7 @@ public class PrinterDiscovery
         return foundIps;
     }
 
-    private async Task<List<Printer>> GetPrinterDetails(IEnumerable<IPAddress> foundIps)
+    private async Task<List<Printer?>> GetPrinterDetails(IEnumerable<IPAddress> foundIps)
     {
         var printerTask = foundIps.Select(async ip =>
             {
@@ -306,10 +306,14 @@ public class PrinterDiscovery
         var data = Encoding.ASCII.GetBytes(command + "\r\n");
         await stream.WriteAsync(data, cts.Token);
 
-        await Task.Delay(500, cts.Token);
         var buffer = new byte[4096];
-        var bytesRead = await stream.ReadAsync(buffer, cts.Token);
+        var readTask = stream.ReadAsync(buffer, cts.Token).AsTask();
+        var timeoutTask = Task.Delay(TimeSpan.FromSeconds(1), cts.Token);
 
+        if (await Task.WhenAny(readTask, timeoutTask) != readTask)
+            return "Command sent successfully";
+
+        var bytesRead = await readTask;
         return Encoding.ASCII.GetString(buffer, 0, bytesRead);
     }
 }

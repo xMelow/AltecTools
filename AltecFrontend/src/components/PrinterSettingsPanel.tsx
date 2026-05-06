@@ -46,6 +46,9 @@ export default function PrinterSettingsPanel({ ipAddress }: Props) {
 
             {s ? (
                 <>
+                    <button>
+                        Refresh
+                    </button>
                     <SettingsSection title="Device">
                         <SettingRow label="Model" value={s.model} />
                         <SettingRow label="Serial" value={s.serial} />

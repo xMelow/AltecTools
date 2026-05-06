@@ -4,10 +4,7 @@ export const TSPL_COMMAND_GROUPS: CommandGroup[] = [
     {
         label: "Status & Diagnostics",
         commands: [
-            { label: "Status", command: "STATUS" },
-            { label: "Get Config", command: "GET CONFIG" },
             { label: "Self Test", command: "SELFTEST" },
-            { label: "Self Test Page", command: "SELFTEST PAGE" },
         ],
     },
     {
@@ -29,10 +26,9 @@ export const TSPL_COMMAND_GROUPS: CommandGroup[] = [
     {
         label: "Calibration",
         commands: [
-            { label: "Calibrate", command: "CALIBRATE" },
+            { label: "Auto Detect", command: "AUTODETECT" },
             { label: "Gap Detect", command: "GAPDETECT" },
             { label: "Black Mark Detect", command: "BLINEDETECT" },
-            { label: "Auto Detect", command: "AUTODETECT" },
         ],
     },
     {
@@ -69,41 +65,82 @@ export const DIAGTOOL_COMMAND_GROUPS: CommandGroup[] = [
     {
         label: "Calibration",
         commands: [
-            { label: "Calibrate Sensor", command: "AUTODETECT" },
-            { label: "Calibrate Gap Sensor", command: "GAPDETECT" },
-            { label: "Calibrate Black Mark Sensor", command: "BLINEDETECT" },
+            { label: "Auto Detect", command: "AUTODETECT" },
+            { label: "Gap Sensor Detect", command: "GAPDETECT" },
+            { label: "Black Mark Detect", command: "BLINEDETECT" },
+            { label: "Gap Sensor Auto", command: "SET GAP AUTO" },
         ],
     },
     {
-        label: "Print",
+        label: "Self Test Pages",
         commands: [
-            { label: "Print Test Page", command: "SELFTEST PAGE" },
-            { label: "Print Configuration", command: "SELFTEST" },
-            { label: "Feed Label", command: "FEED" },
+            { label: "Full Self Test", command: "SELFTEST" },
+            { label: "Print Head Pattern", command: "SELFTEST PATTERN" },
+            { label: "System Info", command: "SELFTEST SYSTEM" },
+            { label: "Ethernet Info", command: "SELFTEST ETHERNET" },
+            { label: "WiFi Info", command: "SELFTEST WLAN" },
+            { label: "RS232 Info", command: "SELFTEST RS232" },
+            { label: "Bluetooth Info", command: "SELFTEST BT" },
+        ],
+    },
+    {
+        label: "Paper Control",
+        commands: [
+            { label: "Feed Label", command: "FEED 25" },
             { label: "Form Feed", command: "FORMFEED" },
+            { label: "Home", command: "HOME" },
+            { label: "Cut", command: "CUT" },
+        ],
+    },
+    {
+        label: "Status",
+        commands: [
+            { label: "Quick Status", command: "\x1B!?" },
+            { label: "Full Status", command: "\x1B!S" },
+            { label: "Free Memory", command: "~!A" },
+            { label: "Mileage", command: "~!@" },
+            { label: "Files List", command: "~!F" },
+            { label: "Model Info", command: "~!T" },
+            { label: "Code Page Info", command: "~!I" },
         ],
     },
     {
         label: "Network",
         commands: [
-            { label: "Ethernet Setup", command: "GET ETHERNET" },
-            { label: "WiFi Setup", command: "GET WLAN" },
-            { label: "Set DHCP", command: "SET IP DHCP" },
+            { label: "Ethernet DHCP", command: "NET DHCP" },
+            { label: "WiFi DHCP", command: "WLAN DHCP" },
+            { label: "Print Ethernet Config", command: "SELFTEST ETHERNET" },
+            { label: "Print WiFi Config", command: "SELFTEST WLAN" },
+        ],
+    },
+    {
+        label: "Sensor",
+        commands: [
+            { label: "Read Gap Sensor", command: 'OUT GETSENSOR("GAP")' },
+            { label: "Read Black Mark Sensor", command: 'OUT GETSENSOR("BLINE")' },
+            { label: "Read Ribbon Sensor", command: 'OUT GETSENSOR("RIBBON")' },
+            { label: "Read Peel Sensor", command: 'OUT GETSENSOR("PEEL")' },
+            { label: "Head Open?", command: 'OUT GETSENSOR("HEAD UP")' },
+            { label: "Head Temp", command: 'OUT GETSENSOR("HEAD TEMP")' },
+            { label: "Head Voltage", command: 'OUT GETSENSOR("HEAD VOLT")' },
         ],
     },
     {
         label: "Clock",
         commands: [
-            { label: "RTC Setup", command: "GET RTC" },
+            { label: "Get Date/Time", command: 'OUT NOW$()' },
         ],
     },
     {
         label: "System",
         commands: [
-            { label: "Factory Default", command: "INITIALPRINTER" },
-            { label: "Reset Printer", command: "RESET" },
-            { label: "Dump Mode", command: "DUMP" },
+            { label: "Factory Reset", command: "INITIALPRINTER" },
+            { label: "Restart Printer", command: "\x1B!C" },
+            { label: "Dump Mode", command: "~!D" },
+            { label: "Files on Printer", command: "FILES" },
             { label: "Clear Buffer", command: "CLS" },
+            { label: "Pause", command: "\x1B!P" },
+            { label: "Resume", command: "\x1B!O" },
         ],
     },
 ]
