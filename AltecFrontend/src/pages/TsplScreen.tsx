@@ -39,7 +39,6 @@ export default function TsplScreen() {
 
             <div className="flex gap-4 items-start">
 
-                {/* Settings panel */}
                 <div className="w-1/5 flex flex-col border rounded-2xl border-altec-teal bg-altec-white max-h-[75vh]">
                     <div className="px-4 pt-4 shrink-0">
                         <h3 className="text-lg font-semibold mb-2">Settings</h3>

@@ -124,7 +124,6 @@ export default function PrinterSettingsPanel({ ipAddress, onNetworkName }: Print
 
     return (
         <div className="w-1/4 flex flex-col border rounded-2xl border-altec-teal bg-altec-white max-h-[75vh]">
-            {/* Header — outside the scroll area */}
             <div className="px-4 pt-4 shrink-0">
                 <div className="flex justify-between items-center mb-2">
                     <h3 className="text-lg font-semibold">Printer Settings</h3>
@@ -139,7 +138,6 @@ export default function PrinterSettingsPanel({ ipAddress, onNetworkName }: Print
                 <hr className="border-b border-altec-teal mb-3" />
             </div>
 
-            {/* Scrollable content */}
             <div className="overflow-y-auto px-4 grow">
                 {settingsFetch.loading && <p className="text-sm text-altec-teal">Loading...</p>}
 
@@ -193,7 +191,6 @@ export default function PrinterSettingsPanel({ ipAddress, onNetworkName }: Print
                 )}
             </div>
 
-            {/* Footer — outside the scroll area */}
             {s && editableSettings && (
                 <div className="px-4 pb-4 pt-2 shrink-0">
                     {updateFetch.error && (
