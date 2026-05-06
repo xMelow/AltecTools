@@ -3,7 +3,7 @@ export type CommandGroup = {
     commands: { label: string; command: string }[]
 }
 
-export type CommandTab = "tspl" | "diagtool"
+export type CommandTab = "tspl" | "printer" | "files"
 
 export type LogEntry = {
     type: "sent" | "received" | "error"

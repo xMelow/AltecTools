@@ -35,4 +35,30 @@ public class PrinterController : ControllerBase
         var response = await _printerService.SendCommand(ipAddress, request.Command);
         return Ok(new PrinterCommandResponse(response));
     }
+
+    [HttpPost("{ipAddress}/file")]
+    public async Task<IActionResult> SendFile(string ipAddress)
+    {
+        var fileNames = Request.Form["fileNames"].ToArray();
+        var memories = Request.Form["memories"].ToArray();
+
+        var entries = Request.Form.Files
+            .Select((file, i) => (
+                Stream: file.OpenReadStream(),
+                FileName: i < fileNames.Length ? fileNames[i] : file.FileName,
+                Memory: i < memories.Length ? memories[i] : string.Empty
+            ))
+            .ToList();
+
+        try
+        {
+            var response = await _printerService.SendFiles(ipAddress, entries.Select(e => (e.Stream, e.FileName, e.Memory)));
+            return Ok(new PrinterCommandResponse(response));
+        }
+        finally
+        {
+            foreach (var entry in entries)
+                await entry.Stream.DisposeAsync();
+        }
+    }
 }

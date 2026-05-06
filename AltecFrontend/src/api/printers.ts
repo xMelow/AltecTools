@@ -21,6 +21,24 @@ export async function getPrinterSettings(ipAddress: string): Promise<PrinterSett
     return await res.json()
 }
 
+export async function sendPrinterFile(ipAddress: string, entries: { file: File; fileName: string; memory: string }[]): Promise<CommandResponse> {
+    const formData = new FormData()
+    entries.forEach(({ file, fileName, memory }) => {
+        formData.append("files", file)
+        formData.append("fileNames", fileName)
+        formData.append("memories", memory)
+    })
+
+    const res = await fetch(`/api/printer/${encodeURIComponent(ipAddress)}/file`, {
+        method: "POST",
+        body: formData,
+    })
+
+    if (!res.ok) throw new Error("Failed to send file")
+
+    return await res.json()
+}
+
 export async function sendPrinterCommand(ipAddress: string, command: string): Promise<CommandResponse> {
     const res = await fetch(`/api/printer/${encodeURIComponent(ipAddress)}/command`, {
         method: "POST",

@@ -58,7 +58,7 @@ public class PrinterDiscovery
         return foundIps;
     }
 
-    private async Task<List<Printer>> GetPrinterDetails(IEnumerable<IPAddress> foundIps)
+    private async Task<List<Printer?>> GetPrinterDetails(IEnumerable<IPAddress> foundIps)
     {
         var printerTask = foundIps.Select(async ip =>
             {
@@ -295,6 +295,41 @@ public class PrinterDiscovery
         return 0;
     }
 
+    public async Task<string> SendPrinterFiles(IPAddress ip, IEnumerable<(Stream stream, string fileName, string memory)> files)
+    {
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+        using var client = new TcpClient();
+        await client.ConnectAsync(ip, PrinterPort, cts.Token);
+        using var tcpStream = client.GetStream();
+
+        foreach (var (stream, fileName, memory) in files)
+        {
+            var memPrefix = memory switch { "F" => "F,", "E" => "E,", _ => "" };
+            var ext = Path.GetExtension(fileName).ToUpperInvariant();
+
+            if (ext == ".BAS")
+            {
+                var header = Encoding.ASCII.GetBytes($"DOWNLOAD {memPrefix}\"{fileName}\"\r\n");
+                await tcpStream.WriteAsync(header, cts.Token);
+                await stream.CopyToAsync(tcpStream, cts.Token);
+                await tcpStream.WriteAsync(Encoding.ASCII.GetBytes("\r\nEOP\r\n"), cts.Token);
+            }
+            else
+            {
+                using var ms = new MemoryStream();
+                await stream.CopyToAsync(ms, cts.Token);
+                var fileBytes = ms.ToArray();
+                var header = Encoding.ASCII.GetBytes($"DOWNLOAD {memPrefix}\"{fileName}\",{fileBytes.Length},");
+                await tcpStream.WriteAsync(header, cts.Token);
+                await tcpStream.WriteAsync(fileBytes, cts.Token);
+                await tcpStream.WriteAsync(Encoding.ASCII.GetBytes("\r\n"), cts.Token);
+            }
+        }
+
+        await tcpStream.FlushAsync(cts.Token);
+        return "Command sent successfully";
+    }
+
     public async Task<string> SendPrinterCommand(IPAddress ip, string command)
     {
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
@@ -306,10 +341,14 @@ public class PrinterDiscovery
         var data = Encoding.ASCII.GetBytes(command + "\r\n");
         await stream.WriteAsync(data, cts.Token);
 
-        await Task.Delay(500, cts.Token);
         var buffer = new byte[4096];
-        var bytesRead = await stream.ReadAsync(buffer, cts.Token);
+        var readTask = stream.ReadAsync(buffer, cts.Token).AsTask();
+        var timeoutTask = Task.Delay(TimeSpan.FromSeconds(1), cts.Token);
 
+        if (await Task.WhenAny(readTask, timeoutTask) != readTask)
+            return "Command sent successfully";
+
+        var bytesRead = await readTask;
         return Encoding.ASCII.GetString(buffer, 0, bytesRead);
     }
 }
