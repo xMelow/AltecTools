@@ -1,4 +1,5 @@
-﻿using Altec.Api.Services.NiceLabel;
+﻿using System.Text.Json;
+using Altec.Api.Services.NiceLabel;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Altec.Api.Controllers;
@@ -47,17 +48,31 @@ public class NiceLabelController : ControllerBase
     }
 
     [HttpPost("labelPreview")]
-    public async Task<IActionResult> LabelPreview(IFormFile label)
+    public async Task<IActionResult> LabelPreview(IFormFile label, [FromForm] string variablesJson, [FromForm] int width, [FromForm] int height)
     {
+        if (width <= 0 || height <= 0) return BadRequest("Width and height must be greater then 0");
+
+        Dictionary<string, string>? variables;
+
         try
         {
-            await _niceLabelClient.GetLabelPreview(label);
-            return Ok("Label preview");
+            variables = JsonSerializer.Deserialize<Dictionary<string, string>>(variablesJson);
+        }
+        catch (JsonException)
+        {
+            return BadRequest("Invalid label variable data");
+        }
+
+        if (variables == null) return BadRequest("Invalid label variable data");
+
+        try
+        {
+            var previewBytes = await _niceLabelClient.GetLabelPreview(label, variables, width, height);
+            return File(previewBytes, "image/png");
         }
         catch (Exception ex)
         {
             return BadRequest($"Error creating label preview : {ex.Message}" );
         }
     }
-
 }

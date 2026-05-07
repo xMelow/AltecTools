@@ -18,10 +18,12 @@ public class AutomationService : IAutomationService
     public async Task PrintSerialNumbers(IFormFile excelFile, string printerType, string? printerName)
     {
         var excelData = ReadExcelData(excelFile, printerType);
-        var requestData = BuildPrintSerialRequest(excelData, printerName);
-        var request = new HttpRequestMessage(HttpMethod.Post, "/api/nicelabel/printLabelVariables");
-        request.Content = requestData;
-        
+        var requestData = BuildSerialNumbersContent(excelData, printerName);
+        var request = new HttpRequestMessage(HttpMethod.Post, "/api/nicelabel/printLabelVariables")
+        {
+            Content = requestData
+        };
+
         var response = await _httpClient.SendAsync(request);
         response.EnsureSuccessStatusCode();
     }
@@ -43,7 +45,7 @@ public class AutomationService : IAutomationService
         return serialNumbersList.OrderBy(serialData => int.Parse(new string(serialData.SerialNumber.Where(char.IsDigit).ToArray()))).ToList();
     }
     
-    private MultipartFormDataContent BuildPrintSerialRequest(List<SerialNumberData> serialNumbersList, string? printerName)
+    private MultipartFormDataContent BuildSerialNumbersContent(List<SerialNumberData> serialNumbersList, string? printerName)
     {
         var requestData = new MultipartFormDataContent();
         var fileStream = File.OpenRead(_config["LabelPaths:SerialNewPrintersLabel"]);
@@ -64,5 +66,24 @@ public class AutomationService : IAutomationService
             requestData.Add(new StringContent(printerName), "printerName");
         
         return requestData;
+    }
+
+    public async Task<byte[]> PreviewSerialNumbers(IFormFile excelFile, string printerType, int width, int height)
+    {
+        var excelData = ReadExcelData(excelFile, printerType);
+        var requestData = BuildSerialNumbersContent(excelData, null);
+        requestData.Add(new StringContent(width.ToString()), "width");
+        requestData.Add(new StringContent(height.ToString()), "height");
+        
+        var request = new HttpRequestMessage(HttpMethod.Post, "/api/nicelabel/LabelPreviewBatch")
+        {
+            Content = requestData
+        };
+
+        var response = await _httpClient.SendAsync(request);
+        response.EnsureSuccessStatusCode();
+        
+        var result = await response.Content.ReadAsByteArrayAsync();
+        return result;
     }
 }

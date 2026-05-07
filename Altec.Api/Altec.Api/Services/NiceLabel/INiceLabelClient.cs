@@ -4,5 +4,5 @@ public interface INiceLabelClient
 { 
     Task<IReadOnlyList<string>> GetVariables(IFormFile labelFile);
     Task PrintLabel(IFormFile labelFile,int quantity, string? printerIpAddress);
-    Task GetLabelPreview(IFormFile labelFile);
+    Task<byte[]> GetLabelPreview(IFormFile labelFile, Dictionary<string, string> variables, int width, int height);
 }

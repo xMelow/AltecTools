@@ -1,19 +1,29 @@
 import { useState } from "react"
-import { printSerialNumbers } from "../api/nicelabel"
+import { previewSerialNumbers, printSerialNumbers } from "../api/nicelabel"
 import { useFetch } from "../hooks/useFetch";
 import { SerialNumberRequest } from "../types/nicelabel";
 
 export default function PrintSerialNumbers() {
     const [excelFile, setExcelFile] = useState<File | null>(null)
     const [printerType, setPrinterType] = useState<string>("")
-    const {loading, error, result, execute} = useFetch<SerialNumberRequest>()
-
+    const { loading, error, result, execute } = useFetch<SerialNumberRequest>()
+    const { loading: previewLoading, error: previewError, result: previewUrl, execute: executePreview } = useFetch<string>() 
+ 
     async function sendRequest() {
         if (excelFile == null) return
 
         await execute(() => printSerialNumbers({
             excelFile: excelFile,
             type: printerType
+        }))
+    }
+
+    async function getLabelPreview(file: File) {
+        await executePreview(() => previewSerialNumbers({
+            excelFile: file,
+            type: printerType,
+            width: 100,
+            height: 100
         }))
     }
     
@@ -33,7 +43,11 @@ export default function PrintSerialNumbers() {
                         type="file"
                         accept=".xlsx"
                         className="hidden"
-                        onChange={(e) => setExcelFile(e.target.files?.[0] ?? null)}
+                        onChange={(e) => {
+                            const file = e.target.files?.[0] ?? null
+                            setExcelFile(file) 
+                            if (file) getLabelPreview(file)
+                        }}
                     />
                 </label>
             </div>
@@ -55,7 +69,14 @@ export default function PrintSerialNumbers() {
             </div>
 
             <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide mb-1">Label Preview</p>
-            <div className="mb-4" />
+            <div className="mb-4">
+                {previewLoading && <p className="text-xs text-gray-400">Loading preview...</p>}
+                {previewError && <p className="text-xs text-red-500">{previewError}</p>}
+                {previewUrl
+                    ? <img className="border border-altec-dark rounded-sm w-full" src={previewUrl} alt="Label preview" />
+                    : !previewLoading && <p className="text-xs text-gray-400">Preview will appear here...</p>
+                }
+            </div>
 
             <button
                 className="w-full border bg-altec-teal text-altec-white p-1.5 rounded-xl mt-2"

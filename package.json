@@ -1,0 +1,25 @@
+{
+  "name": "altectools",
+  "version": "1.0.0",
+  "description": "Internal tooling built for Altec to support day-to-day printing and label workflows.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "concurrently \"npm run dev --prefix ./AltecFrontend\" \"dotnet watch run --project ./Altec.Api/Altec.Api/Altec.Api.csproj\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xMelow/AltecTools.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/xMelow/AltecTools/issues"
+  },
+  "homepage": "https://github.com/xMelow/AltecTools#readme",
+  "dependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

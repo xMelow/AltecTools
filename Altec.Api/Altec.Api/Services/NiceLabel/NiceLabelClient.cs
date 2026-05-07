@@ -2,6 +2,7 @@
 using System.Text.Json;
 using Altec.Api.Record.NiceLabel;
 using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Drawing.Charts;
 using DocumentFormat.OpenXml.Office2010.ExcelAc;
 
 namespace Altec.Api.Services.NiceLabel;
@@ -36,9 +37,12 @@ public class NiceLabelClient : INiceLabelClient
         fileStream.Position = 0;
         StreamContent streamContent = new StreamContent(fileStream);
 
-        var content = new MultipartFormDataContent();
-        content.Add(streamContent, "label");
-        content.Add(new StringContent(quantity.ToString()), "quantity");
+        var content = new MultipartFormDataContent
+        {
+            { streamContent, "label" },
+            { new StringContent(quantity.ToString()), "quantity" }
+        };
+
         if (printerName != null)
             content.Add(new StringContent(printerName), "printerName");
         
@@ -49,8 +53,30 @@ public class NiceLabelClient : INiceLabelClient
         response.EnsureSuccessStatusCode();
     }
 
-    public Task GetLabelPreview(IFormFile labelFile)
+    public async Task<byte[]> GetLabelPreview(IFormFile labelFile, Dictionary<string, string> variables, int width, int height)
     {
-        throw new NotImplementedException();
+        var fileStream = labelFile.OpenReadStream();
+        StreamContent streamContent = new StreamContent(fileStream);
+
+        var json = JsonSerializer.Serialize(variables);
+
+        var content = new MultipartFormDataContent
+        {
+            { streamContent, "label" },
+            { new StringContent(json), "variables" },
+            { new StringContent(width.ToString()), "width" },
+            { new StringContent(height.ToString()), "height" }
+        };
+
+        var request = new HttpRequestMessage(HttpMethod.Post, "/api/nicelabel/labelPreview")
+        {
+            Content = content
+        };
+
+        var response = await _httpClient.SendAsync(request);
+        response.EnsureSuccessStatusCode();
+        
+        var result = await response.Content.ReadAsByteArrayAsync();
+        return result;
     }
 }
