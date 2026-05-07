@@ -75,5 +75,4 @@ public class NiceLabelController : ControllerBase
             return BadRequest($"Error creating label preview : {ex.Message}" );
         }
     }
-
 }

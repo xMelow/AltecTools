@@ -68,9 +68,11 @@ public class NiceLabelClient : INiceLabelClient
             { new StringContent(height.ToString()), "height" }
         };
 
-        var request = new HttpRequestMessage(HttpMethod.Post, "/api/nicelabel/labelPreview");
-        request.Content = content;
-        
+        var request = new HttpRequestMessage(HttpMethod.Post, "/api/nicelabel/labelPreview")
+        {
+            Content = content
+        };
+
         var response = await _httpClient.SendAsync(request);
         response.EnsureSuccessStatusCode();
         
