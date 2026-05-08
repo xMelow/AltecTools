@@ -32,16 +32,15 @@ public class AutomationController : ControllerBase
     }
 
     [HttpPost("serialNumbersLabelPreview")]
-    public async Task<IActionResult> SerialNumbersLabelPreview(IFormFile excelFile, [FromForm] string printerType, [FromForm] int width, [FromForm] int height)
+    public async Task<IActionResult> SerialNumbersLabelPreview(IFormFile excelFile, [FromForm] string printerType)
     {
         if (excelFile == null || excelFile.Length == 0) return BadRequest("Excel file must be present");
         if (printerType == null) return BadRequest("Printer Type must be present");
-        if (width <= 0 || height <= 0) return BadRequest("Width and height must be greater then 0");
 
         try
         {
-            var previewBytes = await _automationService.PreviewSerialNumbers(excelFile, printerType, width, height);
-            return File(previewBytes, "image/png");
+            var imageList = await _automationService.PreviewSerialNumbers(excelFile, printerType);
+            return Ok(imageList);
         }
         catch (Exception ex)
         {

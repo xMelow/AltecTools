@@ -68,12 +68,10 @@ public class AutomationService : IAutomationService
         return requestData;
     }
 
-    public async Task<byte[]> PreviewSerialNumbers(IFormFile excelFile, string printerType, int width, int height)
+    public async Task<List<string>> PreviewSerialNumbers(IFormFile excelFile, string printerType)
     {
         var excelData = ReadExcelData(excelFile, printerType);
         var requestData = BuildSerialNumbersContent(excelData, null);
-        requestData.Add(new StringContent(width.ToString()), "width");
-        requestData.Add(new StringContent(height.ToString()), "height");
         
         var request = new HttpRequestMessage(HttpMethod.Post, "/api/nicelabel/LabelPreviewBatch")
         {
@@ -83,7 +81,9 @@ public class AutomationService : IAutomationService
         var response = await _httpClient.SendAsync(request);
         response.EnsureSuccessStatusCode();
         
-        var result = await response.Content.ReadAsByteArrayAsync();
+        var result = await response.Content.ReadFromJsonAsync<List<string>>();
+        if (result == null) throw new InvalidOperationException("Failed to deserialize label preview response");
+
         return result;
     }
 }
