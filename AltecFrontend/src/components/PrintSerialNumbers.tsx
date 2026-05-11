@@ -1,13 +1,13 @@
 import { useState } from "react"
-import { previewSerialNumbers, printSerialNumbers } from "../api/nicelabel"
+import { previewSerialNumbers, printSerialNumbers } from "../api/automation"
 import { useFetch } from "../hooks/useFetch";
-import { SerialNumberRequest } from "../types/nicelabel";
+import { SerialNumberRequest } from "../types/automation";
 
 export default function PrintSerialNumbers() {
     const [excelFile, setExcelFile] = useState<File | null>(null)
     const [printerType, setPrinterType] = useState<string>("")
     const { loading, error, result, execute } = useFetch<SerialNumberRequest>()
-    const { loading: previewLoading, error: previewError, result: previewUrl, execute: executePreview } = useFetch<string>() 
+    const { loading: previewLoading, error: previewError, result: labelPreviews, execute: executePreview } = useFetch<string[]>() 
  
     async function sendRequest() {
         if (excelFile == null) return
@@ -18,12 +18,10 @@ export default function PrintSerialNumbers() {
         }))
     }
 
-    async function getLabelPreview(file: File) {
+    async function getLabelPreview(file: File, type: string) {
         await executePreview(() => previewSerialNumbers({
             excelFile: file,
-            type: printerType,
-            width: 100,
-            height: 100
+            type: type,
         }))
     }
     
@@ -46,7 +44,7 @@ export default function PrintSerialNumbers() {
                         onChange={(e) => {
                             const file = e.target.files?.[0] ?? null
                             setExcelFile(file) 
-                            if (file) getLabelPreview(file)
+                            if (file) getLabelPreview(file, printerType)
                         }}
                     />
                 </label>
@@ -58,7 +56,11 @@ export default function PrintSerialNumbers() {
                     className="text-sm border border-altec-teal rounded-lg px-2 py-1.5 bg-altec-white focus:outline-none focus:ring-1 focus:ring-altec-teal"
                     name="type"
                     id="type"
-                    onChange={(e) => setPrinterType(e.target.value)}
+                    onChange={(e) => {
+                        const newType = e.target.value
+                        setPrinterType(newType)
+                        if (excelFile != null) getLabelPreview(excelFile!, newType)
+                    }}
                 >
                     <option value="ATP-300NL">ATP-300 Pro NL</option>
                     <option value="ATP-300BT">ATP-300 Pro BT</option>
@@ -72,10 +74,13 @@ export default function PrintSerialNumbers() {
             <div className="mb-4">
                 {previewLoading && <p className="text-xs text-gray-400">Loading preview...</p>}
                 {previewError && <p className="text-xs text-red-500">{previewError}</p>}
-                {previewUrl
-                    ? <img className="border border-altec-dark rounded-sm w-full" src={previewUrl} alt="Label preview" />
-                    : !previewLoading && <p className="text-xs text-gray-400">Preview will appear here...</p>
-                }
+                {labelPreviews?.length ? (
+                    labelPreviews.map((imageBase64, index) => (
+                        <img key={index} className="border border-altec-dark rounded-sm w-full" src={"data:image/png;base64," + imageBase64} alt="Label preview" />
+                    ))
+                ) : (
+                    !previewLoading && <p className="text-xs text-gray-400">Preview will appear here...</p>
+                )}
             </div>
 
             <button

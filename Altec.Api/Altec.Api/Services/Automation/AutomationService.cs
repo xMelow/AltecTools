@@ -1,6 +1,10 @@
-﻿using System.Text.Json;
+﻿using System.Diagnostics;
+using System.Text.Json;
 using Altec.Api.Record.NiceLabel;
 using ClosedXML.Excel;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Processing;
 
 namespace Altec.Api.Services.Automation;
 
@@ -70,10 +74,11 @@ public class AutomationService : IAutomationService
 
     public async Task<List<string>> PreviewSerialNumbers(IFormFile excelFile, string printerType)
     {
-        var excelData = ReadExcelData(excelFile, printerType);
+        const int labelsPerPage = 10;
+        var excelData = ReadExcelData(excelFile, printerType).Take(labelsPerPage).ToList();
         var requestData = BuildSerialNumbersContent(excelData, null);
         
-        var request = new HttpRequestMessage(HttpMethod.Post, "/api/nicelabel/LabelPreviewBatch")
+        var request = new HttpRequestMessage(HttpMethod.Post, "/api/nicelabel/labelPreviewBatch")
         {
             Content = requestData
         };
@@ -81,9 +86,38 @@ public class AutomationService : IAutomationService
         var response = await _httpClient.SendAsync(request);
         response.EnsureSuccessStatusCode();
         
-        var result = await response.Content.ReadFromJsonAsync<List<string>>();
+        var result = await response.Content.ReadFromJsonAsync<List<byte[]>>();
+
         if (result == null) throw new InvalidOperationException("Failed to deserialize label preview response");
 
+        var labelPreviews = ComposeLabelsIntoPages(result, labelsPerPage);
+
+        return labelPreviews;
+    }
+
+    private List<string> ComposeLabelsIntoPages(List<byte[]> labelImages, int labelsPerPage)
+    {
+        var pages = labelImages.Chunk(labelsPerPage);
+        List<string> result = new List<string>();
+
+        foreach (var pageChunk in pages)
+        {   
+            using var ms = new MemoryStream();  
+            using var firstLabel = Image.Load(pageChunk[0]);
+            int labelWidth = firstLabel.Width;
+            int labelHeight = firstLabel.Height;
+
+            using var page = new Image<Rgba32>(labelWidth, labelHeight * labelsPerPage);
+
+            for (int i = 0; i < pageChunk.Length; i++)
+            {
+                using var labelImage = Image.Load(pageChunk[i]);
+                int yPosition = i * labelHeight;
+                page.Mutate(ctx => ctx.DrawImage(labelImage, new Point(0, yPosition), 1f));
+            }       
+            page.SaveAsPng(ms);    
+            result.Add(Convert.ToBase64String(ms.ToArray()));           
+        }
         return result;
     }
 }

@@ -6,7 +6,5 @@ export type SerialNumberRequest = {
 
 export type PreviewSerialNumbersRequest = {
     excelFile: File,
-    type: string,
-    width: number,
-    height: number
+    type: string
 }

@@ -1,4 +1,4 @@
-import { PreviewSerialNumbersRequest, SerialNumberRequest } from "../types/nicelabel";
+import { PreviewSerialNumbersRequest, SerialNumberRequest } from "../types/automation";
 
 export async function printSerialNumbers(body: SerialNumberRequest) {
     const formData = new FormData()
@@ -15,12 +15,10 @@ export async function printSerialNumbers(body: SerialNumberRequest) {
     return await res.json()
 }
 
-export async function previewSerialNumbers(body: PreviewSerialNumbersRequest): Promise<string> {
+export async function previewSerialNumbers(body: PreviewSerialNumbersRequest): Promise<string[]> {
     const formData = new FormData()
     formData.append('excelFile', body.excelFile)
     formData.append('printerType', body.type)
-    formData.append('width', body.width.toString())
-    formData.append('height', body.height.toString())
 
     const res = await fetch(`/api/automation/serialNumbersLabelPreview`, {
         method: 'POST',
@@ -29,6 +27,5 @@ export async function previewSerialNumbers(body: PreviewSerialNumbersRequest): P
 
     if (!res.ok) throw new Error("Failed to get serial numbers label preview")
 
-    const blob = await res.blob()
-    return URL.createObjectURL(blob)
+    return await res.json()
 }
