@@ -5,7 +5,7 @@ import { SerialNumberRequest } from "../types/automation";
 
 export default function PrintSerialNumbers() {
     const [excelFile, setExcelFile] = useState<File | null>(null)
-    const [printerType, setPrinterType] = useState<string>("")
+    const [printerType, setPrinterType] = useState<string>("ATP-300NL")
     const { loading, error, result, execute } = useFetch<SerialNumberRequest>()
     const { loading: previewLoading, error: previewError, result: labelPreviews, execute: executePreview } = useFetch<string[]>() 
  
