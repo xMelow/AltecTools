@@ -1,4 +1,5 @@
 using Altec.Api.Domain.Printers;
+using Altec.Api.Record.Printers;
 
 namespace Altec.Api.Test.Domain.printers;
 
@@ -9,8 +10,11 @@ public class PrinterDiscoveryTest
     [Fact]
     public void ParseSettings_WithValidResponse_ReturnsPrinterInfo()
     {
-        var response = "DPI=300\nMODEL=ATP-300 PRO\n...";
+        var response = "DPI=300\nMODEL=ATP-300";
 
-        _parser.ParseSettings(response);
+        var settings = _parser.ParseSettings(response);
+
+        Assert.Equal(300, settings.Dpi);
+        Assert.Equal("ATP-300", settings.Model);
     }
 }
