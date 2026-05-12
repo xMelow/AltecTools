@@ -49,4 +49,34 @@ public class PrinterDiscoveryTest
 
         Assert.Equal("76 mm", result.BlineSize);
     }
+
+    [Fact]
+    public void ParseSettings_BlineSizeMm_ConvertsToMm()
+    {
+        var response = "DPI=300\nBLINE SIZE=76mm";
+
+        var result = _parser.ParseSettings(response);
+
+        Assert.Equal("76 mm", result.BlineSize);
+    }
+
+    [Fact]
+    public void ParseSettings_BlineSizeIsEmpty_DefaultsToZeroMm()
+    {
+        var response = "DPI=300\nBLINE SIZE=";
+
+        var result = _parser.ParseSettings(response);
+
+        Assert.Equal("0 mm", result.BlineSize);
+    }
+
+    [Fact]
+    public void ParseSettings_BlineSizeIsMissing_DefaultsToZeroMm()
+    {
+        var response = "DPI=300";
+
+        var result = _parser.ParseSettings(response);
+
+        Assert.Equal("0 mm", result.BlineSize);
+    }
 }
