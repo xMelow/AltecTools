@@ -19,7 +19,7 @@ public class PrinterDiscoveryTest
     }
 
     [Fact]
-    public void ParseSEttings_GapSizeWithNoPart_GapSizeOfssetDefaultsToZero()
+    public void ParseSettings_GapSizeWithNoPart_GapSizeOfssetDefaultsToZero()
     {
         var response = "DPI=300\nGAP SIZE=48";
 
@@ -30,7 +30,7 @@ public class PrinterDiscoveryTest
     }
 
     [Fact]
-    public void ParseSEttings_GapSizeIsZero_GapSizeOfssetDefaultsToZero()
+    public void ParseSettings_GapSizeIsZero_GapSizeOfssetDefaultsToZero()
     {
         var response = "DPI=300\nGAP SIZE=48,0";
 
@@ -38,5 +38,15 @@ public class PrinterDiscoveryTest
 
         Assert.Equal("0 mm", result.GapSizeOffset);
         Assert.Equal("4.06 mm", result.GapSize);
+    }
+
+    [Fact]
+    public void ParseSettings_BlineSizeInch_ConvertsToMm()
+    {
+        var response = "DPI=300\nBLINE SIZE=3inch";
+
+        var result = _parser.ParseSettings(response);
+
+        Assert.Equal("76 mm", result.BlineSize);
     }
 }

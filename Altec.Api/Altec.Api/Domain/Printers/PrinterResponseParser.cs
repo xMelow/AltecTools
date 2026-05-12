@@ -66,26 +66,26 @@ public class PrinterResponseParser
         return $"{Math.Round(d * 25.4 / dpi / 1000.0, 2).ToString(CultureInfo.InvariantCulture)} m";
     }
 
-    private int ParseMm(string value)
+    private string ParseMm(string value)
     {
         value = value.Trim();
         if (value.EndsWith("inch", StringComparison.OrdinalIgnoreCase))
         {
             var num = value[..^4].Trim();
             if (double.TryParse(num, NumberStyles.Float, CultureInfo.InvariantCulture, out var inches))
-                return (int)Math.Round(inches * 25.4);
+                return $"{Math.Round(inches * 25.4).ToString(CultureInfo.InvariantCulture)} mm";
         }
         else if (value.EndsWith("mm", StringComparison.OrdinalIgnoreCase))
         {
             var num = value[..^2].Trim();
             if (double.TryParse(num, NumberStyles.Float, CultureInfo.InvariantCulture, out var mm))
-                return (int)Math.Round(mm);
+                return $"{Math.Round(mm).ToString(CultureInfo.InvariantCulture)} mm";
         }
         else if (double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out var raw))
         {
-            return (int)raw;
+            return $"{raw} mm";
         }
-        return 0;
+        return "0 mm";
     }
 
     private int ParseInt(string? value)

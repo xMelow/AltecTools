@@ -17,7 +17,7 @@ public record PrinterInfo(
     string LabelHeight,
     string GapSize,
     string GapSizeOffset,
-    int BlineSize,
+    string BlineSize,
     string Direction,
     string Ribbon,
     int Offset,
