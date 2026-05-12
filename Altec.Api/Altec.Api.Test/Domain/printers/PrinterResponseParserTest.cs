@@ -12,9 +12,31 @@ public class PrinterDiscoveryTest
     {
         var response = "DPI=300\nMODEL=ATP-300";
 
-        var settings = _parser.ParseSettings(response);
+        var result = _parser.ParseSettings(response);
 
-        Assert.Equal(300, settings.Dpi);
-        Assert.Equal("ATP-300", settings.Model);
+        Assert.Equal(300, result.Dpi);
+        Assert.Equal("ATP-300", result.Model);
+    }
+
+    [Fact]
+    public void ParseSEttings_GapSizeWithNoPart_GapSizeOfssetDefaultsToZero()
+    {
+        var response = "DPI=300\nGAP SIZE=48";
+
+        var result = _parser.ParseSettings(response);
+
+        Assert.Equal("0 mm", result.GapSizeOffset);
+        Assert.Equal("4.06 mm", result.GapSize);
+    }
+
+    [Fact]
+    public void ParseSEttings_GapSizeIsZero_GapSizeOfssetDefaultsToZero()
+    {
+        var response = "DPI=300\nGAP SIZE=48,0";
+
+        var result = _parser.ParseSettings(response);
+
+        Assert.Equal("0 mm", result.GapSizeOffset);
+        Assert.Equal("4.06 mm", result.GapSize);
     }
 }

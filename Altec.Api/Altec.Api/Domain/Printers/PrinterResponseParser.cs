@@ -52,18 +52,18 @@ public class PrinterResponseParser
             CodePage: Get("CODEPAGE"),
             GapOffset: ParseInt(Get("GAP OFFSET"))
         );
-    }    
+    }
 
     private string ParseDimensionDots(string value, int dpi)
     {
         if (dpi == 0 || !int.TryParse(value.Trim(), out var d)) return "0 mm";
-        return $"{Math.Round(d * 25.4 / dpi, 2)} mm";
+        return $"{Math.Round(d * 25.4 / dpi, 2).ToString(CultureInfo.InvariantCulture)} mm";
     }
 
     private string DotsToM(string dots, int dpi)
     {
         if (dpi == 0 || !int.TryParse(dots.Trim(), out var d)) return "0 m";
-        return $"{Math.Round(d * 25.4 / dpi / 1000.0, 2)} m";
+        return $"{Math.Round(d * 25.4 / dpi / 1000.0, 2).ToString(CultureInfo.InvariantCulture)} m";
     }
 
     private int ParseMm(string value)
