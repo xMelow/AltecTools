@@ -45,9 +45,9 @@ public class PrinterResponseParser
             BlineSize: ParseMm(Get("BLINE SIZE")),
             Direction: Get("DIRECTION"),
             Ribbon: Get("RIBBON"),
-            Offset: ParseInt(Get("OFFSET")),
-            ShiftX: ParseInt(Get("SHIFT X")),
-            ShiftY: ParseInt(Get("SHIFT Y")),
+            Offset: ParseMm(Get("OFFSET")),
+            ShiftX: ParseMm(Get("SHIFT X")),
+            ShiftY: ParseMm(Get("SHIFT Y")),
             CountryCode: Get("COUNTRY CODE"),
             CodePage: Get("CODEPAGE"),
             GapOffset: ParseInt(Get("GAP OFFSET"))

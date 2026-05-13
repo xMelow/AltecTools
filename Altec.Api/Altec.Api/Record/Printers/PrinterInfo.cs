@@ -20,9 +20,9 @@ public record PrinterInfo(
     string BlineSize,
     string Direction,
     string Ribbon,
-    int Offset,
-    int ShiftX,
-    int ShiftY,
+    string Offset,
+    string ShiftX,
+    string ShiftY,
     string CountryCode,
     string CodePage,
     int GapOffset
