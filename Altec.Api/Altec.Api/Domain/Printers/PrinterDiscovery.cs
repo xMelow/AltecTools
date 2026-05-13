@@ -201,6 +201,8 @@ public class PrinterDiscovery
                 "END"
         );
         var response = await SendPrinterCommand(ip, program);
+
+        Console.WriteLine(response);
         
         return _parser.ParseSettings(response);
     }

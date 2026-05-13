@@ -23,6 +23,7 @@ public class PrinterResponseParser
 
         var gapParts = Get("GAP SIZE").Split(',');
         var gapSize = ParseDimensionDots(gapParts[0], dpi);
+        var blineSize = ParseDimensionDots(Get("BLINE SIZE"), dpi);
         var gapSizeOffset = gapParts.Length > 1 ? ParseDimensionDots(gapParts[1], dpi) : "0 mm";
 
         return new PrinterInfo(
@@ -42,15 +43,15 @@ public class PrinterResponseParser
             LabelHeight: labelHeight,
             GapSize: gapSize,
             GapSizeOffset: gapSizeOffset,
-            BlineSize: ParseMm(Get("BLINE SIZE")),
+            BlineSize: blineSize,
             Direction: Get("DIRECTION"),
             Ribbon: Get("RIBBON"),
-            Offset: ParseMm(Get("OFFSET")),
-            ShiftX: ParseMm(Get("SHIFT X")),
-            ShiftY: ParseMm(Get("SHIFT Y")),
+            Offset: ParseDimensionDots(Get("OFFSET"), dpi),
+            ShiftX: ParseDimensionDots(Get("SHIFT X"), dpi),
+            ShiftY: ParseDimensionDots(Get("SHIFT Y"), dpi),
             CountryCode: Get("COUNTRY CODE"),
             CodePage: Get("CODEPAGE"),
-            GapOffset: ParseInt(Get("GAP OFFSET"))
+            GapOffset: ParseDimensionDots(Get("GAP OFFSET"), dpi)
         );
     }
 

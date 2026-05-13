@@ -25,5 +25,5 @@ public record PrinterInfo(
     string ShiftY,
     string CountryCode,
     string CodePage,
-    int GapOffset
+    string GapOffset
 );

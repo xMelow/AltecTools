@@ -25,7 +25,7 @@ public class PrinterDiscoveryTest
             "PAPER SIZE=1200\n" +
             "PAPER WIDTH=400\n" +
             "GAP SIZE=48,0\n" +
-            "BLINE SIZE=0mm\n" +
+            "BLINE SIZE=0\n" +
             "DIRECTION=0\n" +
             "RIBBON=RIBBON\n" +
             "OFFSET=0\n" +
@@ -34,7 +34,7 @@ public class PrinterDiscoveryTest
             "SPEED=4\n" +
             "COUNTRY CODE=001\n" +
             "CODEPAGE=850\n" +
-            "GAP OFFSET=0";
+            "GAP OFFSET=118";
         var result = _parser.ParseSettings(response);
 
         Assert.Equal(300, result.Dpi);
@@ -61,8 +61,7 @@ public class PrinterDiscoveryTest
         Assert.Equal(4, result.Speed);
         Assert.Equal("001", result.CountryCode);
         Assert.Equal("850", result.CodePage);
-        Assert.Equal(0, result.GapOffset);
-
+        Assert.Equal("9.99 mm", result.GapOffset);
     }
 
     [Fact]
