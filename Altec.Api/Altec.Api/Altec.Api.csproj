@@ -4,8 +4,6 @@
         <TargetFramework>net9.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
-        <PlatformTarget>x86</PlatformTarget>
-        <Prefer32Bit>true</Prefer32Bit>
     </PropertyGroup>
 
     <ItemGroup>
@@ -15,15 +13,6 @@
         <PackageReference Include="SkiaSharp" Version="3.119.3-preview.1.1" />
         <PackageReference Include="ZXing.Net" Version="0.16.11" />
         <PackageReference Include="ZXing.Net.Bindings.SkiaSharp" Version="0.16.22" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <Reference Include="SDK.NET">
-            <HintPath>C:\Program Files\NiceLabel\NiceLabel 10\bin.net\SDK.NET.dll</HintPath>
-        </Reference>
-        <Reference Include="SDK.NET.Interface">
-            <HintPath>C:\Program Files\NiceLabel\NiceLabel 10\bin.net\SDK.NET.Interface.dll</HintPath>
-        </Reference>
     </ItemGroup>
 
 </Project>
