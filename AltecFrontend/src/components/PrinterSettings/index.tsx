@@ -1,57 +1,8 @@
 import {useEffect, useState} from "react";
-import {useFetch} from "../hooks/useFetch";
-import {CommandResponse, EditableSettings, PrinterSettings, PrinterSettingsPanelProps} from "../types/printer";
-import {getPrinterSettings, sendPrinterCommand} from "../api/printers";
-
-function SettingRow({ label, value }: { label: string; value: string | number }) {
-    return (
-        <div className="flex justify-between items-center py-1.5 border-b border-altec-light last:border-0">
-            <span className="text-gray-500 text-sm">{label}</span>
-            <span className="font-medium text-sm text-right ml-4">{value}</span>
-        </div>
-    )
-}
-
-function EditableRow({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
-    return (
-        <div className="flex justify-between items-center py-1.5 border-b border-altec-light last:border-0">
-            <span className="text-gray-500 text-sm shrink-0">{label}</span>
-            <input
-                className="font-medium text-sm text-right ml-4 border border-altec-light rounded px-1.5 py-0.5 w-28 focus:outline-none focus:border-altec-teal bg-altec-light"
-                value={value}
-                onChange={e => onChange(e.target.value)}
-            />
-        </div>
-    )
-}
-
-function SelectRow({ label, value, options, onChange }: { label: string; value: string; options: string[]; onChange: (v: string) => void }) {
-    return (
-        <div className="flex justify-between items-center py-1.5 border-b border-altec-light last:border-0">
-            <span className="text-gray-500 text-sm shrink-0">{label}</span>
-            <select
-                className="font-medium text-sm text-right ml-4 border border-altec-light rounded px-1.5 py-0.5 w-28 focus:outline-none focus:border-altec-teal bg-altec-light"
-                value={value}
-                onChange={e => onChange(e.target.value)}
-            >
-                {options.map(opt => (
-                    <option key={opt} value={opt}>{opt}</option>
-                ))}
-            </select>
-        </div>
-    )
-}
-
-function SettingsSection({ title, children }: { title: string; children: React.ReactNode }) {
-    return (
-        <div className="mb-4">
-            <p className="sticky top-0 z-10 bg-altec-white text-xs font-semibold text-altec-teal uppercase tracking-wide py-1 mb-1">{title}</p>
-            <div className="flex flex-col">
-                {children}
-            </div>
-        </div>
-    )
-}
+import {useFetch} from "../../hooks/useFetch";
+import {CommandResponse, EditableSettings, PrinterSettings, PrinterSettingsPanelProps} from "../../types/printer";
+import {getPrinterSettings, sendPrinterCommand} from "../../api/printers";
+import { EditableRow, SelectRow, SettingRow, SettingsSection } from "./parts";
 
 export default function PrinterSettingsPanel({ ipAddress, onNetworkName }: PrinterSettingsPanelProps) {
     const settingsFetch = useFetch<PrinterSettings>()
@@ -91,15 +42,15 @@ export default function PrinterSettingsPanel({ ipAddress, onNetworkName }: Print
         }
     }, [s])
 
-    const set = (key: keyof EditableSettings) => (value: string) =>
-        setEditable(prev => prev ? { ...prev, [key]: value } : prev)
-
     useEffect(() => {
         if (!updateFetch.result) return
         setShowSuccess(true)
         const timer = setTimeout(() => setShowSuccess(false), 3000)
         return () => clearTimeout(timer)
     }, [updateFetch.result])
+
+    const set = (key: keyof EditableSettings) => (value: string) =>
+        setEditable(prev => prev ? { ...prev, [key]: value } : prev)
 
     const handleRefresh = () => {
         if (ipAddress) settingsFetch.execute(() => getPrinterSettings(ipAddress))
@@ -164,7 +115,7 @@ export default function PrinterSettingsPanel({ ipAddress, onNetworkName }: Print
                         </SettingsSection>
 
                         <SettingsSection title="Label">
-                            <SelectRow label="Sensor Type" value={editableSettings.sensorType} options={['GAP', 'MARK']} onChange={set('sensorType')} />
+                            <SelectRow label="Sensor Type" value={editableSettings.sensorType} options={['GAP', 'MARK', 'CONTINU']} onChange={set('sensorType')} />
                             <EditableRow label="Label Width" value={editableSettings.labelWidth} onChange={set('labelWidth')} />
                             <EditableRow label="Label Height" value={editableSettings.labelHeight} onChange={set('labelHeight')} />
                             <EditableRow label="Gap Size" value={editableSettings.gapSize} onChange={set('gapSize')} />
