@@ -51,7 +51,6 @@ public class PrinterDiscoveryTest
         Assert.Equal("101.6 mm", result.LabelHeight);
         Assert.Equal("33.87 mm", result.LabelWidth);
         Assert.Equal("4.06 mm", result.GapSize);
-        Assert.Equal("0 mm", result.GapSizeOffset);
         Assert.Equal("0 mm", result.BlineSize);
         Assert.Equal("0", result.Direction);
         Assert.Equal("RIBBON", result.Ribbon);
@@ -77,10 +76,10 @@ public class PrinterDiscoveryTest
     [Fact]
     public void ParseSettings_GapSizeWithNoPart_GapSizeOfssetDefaultsToZero()
     {
-        var response = "DPI=300\nGAP SIZE=48";
+        var response = "DPI=300\nGAP=48";
         var result = _parser.ParseSettings(response);
 
-        Assert.Equal("0 mm", result.GapSizeOffset);
+        Assert.Equal("0 mm", result.GapOffset);
         Assert.Equal("4.06 mm", result.GapSize);
     }
 
@@ -90,7 +89,7 @@ public class PrinterDiscoveryTest
         var response = "DPI=300\nGAP SIZE=48,0";
         var result = _parser.ParseSettings(response);
 
-        Assert.Equal("0 mm", result.GapSizeOffset);
+        Assert.Equal("0 mm", result.GapOffset);
         Assert.Equal("4.06 mm", result.GapSize);
     }
 

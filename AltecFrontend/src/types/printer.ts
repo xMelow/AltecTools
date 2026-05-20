@@ -14,31 +14,37 @@ export type Printer = {
 }
 
 export type PrinterSettings = {
-    dpi: number,
     model: string,
     serial: string,
     version: string,
+    checkSum: string,
+    dpi: number,
+    printerStatus: string,
     mileage: string,
     labelCounter: number,
+    cutterCounter: number,
     macAddressNet: string,
     ipAddressNet: string,
     networkName: string,
     sensorType: string,
+    headOpenSensor: string,
+    gapSize: number,
+    gapOffset: number,
     speed: number,
     density: number,
     labelWidth: string,
     labelHeight: string,
-    gapSize: string,
-    gapSizeOffset: string,
     blineSize: number,
-    direction: string,
+    direction: number,
+    mirror: number,
     ribbon: string,
     offset: number,
     shiftX: number,
     shiftY: number,
+    referenceX: number,
+    referenceY: number,
     countryCode: string,
     codePage: string,
-    gapOffset: number,
 }
 
 export type CommandResponse = {
@@ -51,20 +57,22 @@ export type PrinterSettingsPanelProps = {
 }
 
 export type EditableSettings = {
-    speed: string
-    density: string
-    direction: string
-    ribbon: string
-    sensorType: string
-    labelWidth: string
-    labelHeight: string
-    gapSize: string
-    gapSizeOffset: string
-    gapOffset: string
-    blineSize: string
-    offset: string
-    shiftX: string
-    shiftY: string
-    countryCode: string
-    codePage: string
+    speed: string,
+    density: string,
+    labelWidth: string,
+    labelHeight: string,
+    blineSize: string,
+    direction: string,
+    mirror: number,
+    ribbon: string,
+    sensorType: string,
+    gapSize: string,
+    gapOffset: string,
+    offset: string,
+    shiftX: string,
+    shiftY: string,
+    referenceX: number,
+    referenceY: number,
+    countryCode: string,
+    codePage: string,
 }

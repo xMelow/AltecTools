@@ -7,7 +7,7 @@ export function SettingRow({ label, value }: { label: string; value: string | nu
     )
 }
 
-export function EditableRow({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+export function EditableRow({ label, value, onChange, unit }: { label: string; value: string; unit?: string; onChange: (v: string) => void }) {
     return (
         <div className="flex justify-between items-center py-1.5 border-b border-altec-light last:border-0">
             <span className="text-gray-500 text-sm shrink-0">{label}</span>
@@ -16,6 +16,7 @@ export function EditableRow({ label, value, onChange }: { label: string; value: 
                 value={value}
                 onChange={e => onChange(e.target.value)}
             />
+            <span>{unit}</span>
         </div>
     )
 }

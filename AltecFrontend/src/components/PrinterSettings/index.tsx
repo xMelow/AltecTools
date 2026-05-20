@@ -24,18 +24,20 @@ export default function PrinterSettingsPanel({ ipAddress, onNetworkName }: Print
             setEditable({
                 speed: String(s.speed),
                 density: String(s.density),
-                direction: s.direction,
-                ribbon: s.ribbon,
-                sensorType: s.sensorType,
                 labelWidth: s.labelWidth,
                 labelHeight: s.labelHeight,
-                gapSize: s.gapSize,
-                gapSizeOffset: s.gapSizeOffset,
-                gapOffset: String(s.gapOffset),
                 blineSize: String(s.blineSize),
+                direction: String(s.direction),
+                mirror: s.mirror,
+                ribbon: s.ribbon,
+                sensorType: s.sensorType,
+                gapSize: String(s.gapSize),
+                gapOffset: String(s.gapOffset),
                 offset: String(s.offset),
                 shiftX: String(s.shiftX),
                 shiftY: String(s.shiftY),
+                referenceX: s.referenceX,
+                referenceY: s.referenceY,
                 countryCode: s.countryCode,
                 codePage: s.codePage,
             })
@@ -61,12 +63,15 @@ export default function PrinterSettingsPanel({ ipAddress, onNetworkName }: Print
         const commands = [
             `SPEED ${editableSettings.speed}`,
             `DENSITY ${editableSettings.density}`,
-            `DIRECTION ${editableSettings.direction}`,
-            `SET RIBBON ${editableSettings.ribbon}`,
             `SIZE ${editableSettings.labelWidth},${editableSettings.labelHeight}`,
-            `GAP ${editableSettings.gapSize},${editableSettings.gapSizeOffset}`,
-            `BLINE ${editableSettings.blineSize},0`,
+            `BLINE ${editableSettings.blineSize},${editableSettings.gapOffset}`,
+            `DIRECTION ${editableSettings.direction}, ${editableSettings.mirror}`,
+            `SET RIBBON ${editableSettings.ribbon}`,
+            // sensorType
+            `GAP ${editableSettings.gapSize},${editableSettings.gapOffset}`,
             `OFFSET ${editableSettings.offset}`,
+            `SHIFT ${editableSettings.shiftX}, ${editableSettings.shiftY}`,
+            `REFERENCE ${editableSettings.referenceX},${editableSettings.referenceY}`,
             `COUNTRY ${editableSettings.countryCode}`,
             `CODEPAGE ${editableSettings.codePage}`,
         ].join('\r\n')
@@ -98,7 +103,9 @@ export default function PrinterSettingsPanel({ ipAddress, onNetworkName }: Print
                             <SettingRow label="Model" value={s.model} />
                             <SettingRow label="Serial" value={s.serial} />
                             <SettingRow label="Version" value={s.version} />
+                            <SettingRow label="Check Sum" value={s.checkSum} />
                             <SettingRow label="DPI" value={s.dpi} />
+                            <SettingRow label="Printer Status" value={s.printerStatus} />
                         </SettingsSection>
 
                         <SettingsSection title="Network">
@@ -110,26 +117,30 @@ export default function PrinterSettingsPanel({ ipAddress, onNetworkName }: Print
                         <SettingsSection title="TSPL">
                             <SelectRow label="Speed" value={editableSettings.speed} options={['1', '2', '3', '4', '5', '6']} onChange={set('speed')} />
                             <SelectRow label="Density" value={editableSettings.density} options={['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']} onChange={set('density')} />
+                            {/* update Direction with 2 inputs direction and mirror */}
                             <EditableRow label="Direction" value={editableSettings.direction} onChange={set('direction')} />
+                            {/* Change to a Select row with On and OFF value but update the setting with 1 or 0 */}
                             <EditableRow label="Ribbon" value={editableSettings.ribbon} onChange={set('ribbon')} />
                         </SettingsSection>
 
                         <SettingsSection title="Label">
-                            <SelectRow label="Sensor Type" value={editableSettings.sensorType} options={['GAP', 'MARK', 'CONTINU']} onChange={set('sensorType')} />
+                            <SelectRow label="Sensor Type" value={editableSettings.sensorType} options={['GAP', 'MARK', 'CONTINUOUS']} onChange={set('sensorType')} />
                             <EditableRow label="Label Width" value={editableSettings.labelWidth} onChange={set('labelWidth')} />
                             <EditableRow label="Label Height" value={editableSettings.labelHeight} onChange={set('labelHeight')} />
                             <EditableRow label="Gap Size" value={editableSettings.gapSize} onChange={set('gapSize')} />
-                            <EditableRow label="Gap Size Offset" value={editableSettings.gapSizeOffset} onChange={set('gapSizeOffset')} />
                             <EditableRow label="Gap Offset" value={editableSettings.gapOffset} onChange={set('gapOffset')} />
                             <EditableRow label="Bline Size" value={editableSettings.blineSize} onChange={set('blineSize')} />
                             <EditableRow label="Offset" value={editableSettings.offset} onChange={set('offset')} />
                             <EditableRow label="Shift X" value={editableSettings.shiftX} onChange={set('shiftX')} />
                             <EditableRow label="Shift Y" value={editableSettings.shiftY} onChange={set('shiftY')} />
+                            <EditableRow label="Reference X" value={String(editableSettings.referenceX)} onChange={set('referenceX')} />
+                            <EditableRow label="Reference Y" value={String(editableSettings.referenceY)} onChange={set('referenceY')} />
                         </SettingsSection>
 
                         <SettingsSection title="Counters">
                             <SettingRow label="Mileage" value={s.mileage} />
                             <SettingRow label="Label Counter" value={s.labelCounter} />
+                            <SettingRow label="Cutter Counter" value={s.cutterCounter} />
                         </SettingsSection>
 
                         <SettingsSection title="Locale">
