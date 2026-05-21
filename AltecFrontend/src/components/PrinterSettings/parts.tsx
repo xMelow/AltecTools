@@ -11,22 +11,29 @@ export function EditableRow({ label, value, onChange, unit }: { label: string; v
     return (
         <div className="flex justify-between items-center py-1.5 border-b border-altec-light last:border-0">
             <span className="text-gray-500 text-sm shrink-0">{label}</span>
-            <input
-                className="font-medium text-sm text-right ml-4 border border-altec-light rounded px-1.5 py-0.5 w-28 focus:outline-none focus:border-altec-teal bg-altec-light"
-                value={value}
-                onChange={e => onChange(e.target.value)}
-            />
-            <span>{unit}</span>
+            <div className="flex items-center">
+                <input
+                    className="font-medium text-sm text-right border border-altec-light rounded px-1.5 py-0.5 w-20 focus:outline-none focus:border-altec-teal bg-altec-light"
+                    value={value}
+                    onChange={e => onChange(e.target.value)}
+                />
+                {unit
+                ? <span className="ml-2">{unit}</span>
+
+                : null
+                }
+            </div>
+            
         </div>
     )
 }
 
-export function SelectRow({ label, value, options, onChange }: { label: string; value: string; options: string[]; onChange: (v: string) => void }) {
+export function SelectRow({ label, value, width, options, onChange }: { label: string; value: string; width?: number; options: string[]; onChange: (v: string) => void }) {
     return (
         <div className="flex justify-between items-center py-1.5 border-b border-altec-light last:border-0">
             <span className="text-gray-500 text-sm shrink-0">{label}</span>
             <select
-                className="font-medium text-sm text-right ml-4 border border-altec-light rounded px-1.5 py-0.5 w-28 focus:outline-none focus:border-altec-teal bg-altec-light"
+                className={`font-medium text-sm text-right ml-4 border border-altec-light rounded px-1.5 py-0.5 w-${width ?? '29'} focus:outline-none focus:border-altec-teal bg-altec-light`}
                 value={value}
                 onChange={e => onChange(e.target.value)}
             >

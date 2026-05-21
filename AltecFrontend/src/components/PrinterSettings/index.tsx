@@ -115,8 +115,8 @@ export default function PrinterSettingsPanel({ ipAddress, onNetworkName }: Print
                         </SettingsSection>
 
                         <SettingsSection title="TSPL">
-                            <SelectRow label="Speed" value={editableSettings.speed} options={['1', '2', '3', '4', '5', '6']} onChange={set('speed')} />
-                            <SelectRow label="Density" value={editableSettings.density} options={['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']} onChange={set('density')} />
+                            <SelectRow label="Speed" value={editableSettings.speed} width={20} options={['1', '2', '3', '4', '5', '6']} onChange={set('speed')} />
+                            <SelectRow label="Density" value={editableSettings.density} width={20} options={['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']} onChange={set('density')} />
                             {/* update Direction with 2 inputs direction and mirror */}
                             <EditableRow label="Direction" value={editableSettings.direction} onChange={set('direction')} />
                             {/* Change to a Select row with On and OFF value but update the setting with 1 or 0 */}
@@ -125,16 +125,16 @@ export default function PrinterSettingsPanel({ ipAddress, onNetworkName }: Print
 
                         <SettingsSection title="Label">
                             <SelectRow label="Sensor Type" value={editableSettings.sensorType} options={['GAP', 'MARK', 'CONTINUOUS']} onChange={set('sensorType')} />
-                            <EditableRow label="Label Width" value={editableSettings.labelWidth} onChange={set('labelWidth')} />
-                            <EditableRow label="Label Height" value={editableSettings.labelHeight} onChange={set('labelHeight')} />
-                            <EditableRow label="Gap Size" value={editableSettings.gapSize} onChange={set('gapSize')} />
-                            <EditableRow label="Gap Offset" value={editableSettings.gapOffset} onChange={set('gapOffset')} />
-                            <EditableRow label="Bline Size" value={editableSettings.blineSize} onChange={set('blineSize')} />
-                            <EditableRow label="Offset" value={editableSettings.offset} onChange={set('offset')} />
-                            <EditableRow label="Shift X" value={editableSettings.shiftX} onChange={set('shiftX')} />
-                            <EditableRow label="Shift Y" value={editableSettings.shiftY} onChange={set('shiftY')} />
-                            <EditableRow label="Reference X" value={String(editableSettings.referenceX)} onChange={set('referenceX')} />
-                            <EditableRow label="Reference Y" value={String(editableSettings.referenceY)} onChange={set('referenceY')} />
+                            <EditableRow label="Label Width" value={editableSettings.labelWidth} onChange={set('labelWidth')} unit="mm"/>
+                            <EditableRow label="Label Height" value={editableSettings.labelHeight} onChange={set('labelHeight')} unit="mm"/>
+                            <EditableRow label="Gap Size" value={editableSettings.gapSize} onChange={set('gapSize')} unit="mm"/>
+                            <EditableRow label="Gap Offset" value={editableSettings.gapOffset} onChange={set('gapOffset')} unit="mm"/>
+                            <EditableRow label="Bline Size" value={editableSettings.blineSize} onChange={set('blineSize')} unit="mm"/>
+                            <EditableRow label="Offset" value={editableSettings.offset} onChange={set('offset')} unit="mm"/>
+                            <EditableRow label="Shift X" value={editableSettings.shiftX} onChange={set('shiftX')} unit="mm"/>
+                            <EditableRow label="Shift Y" value={editableSettings.shiftY} onChange={set('shiftY')} unit="mm"/>
+                            <EditableRow label="Reference X" value={String(editableSettings.referenceX)} onChange={set('referenceX')} unit="mm"/>
+                            <EditableRow label="Reference Y" value={String(editableSettings.referenceY)} onChange={set('referenceY')} unit="mm"/>
                         </SettingsSection>
 
                         <SettingsSection title="Counters">

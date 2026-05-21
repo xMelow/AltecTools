@@ -21,9 +21,6 @@ public class PrinterResponseParser
         var labelWidth = ParseDimensionDots(Get("PAPER WIDTH"), dpi);
         var labelHeight = ParseDimensionDots(Get("PAPER SIZE"), dpi);
 
-        var gapParts = Get("GAP SIZE").Split(',');
-        var gapSize = ParseDimensionDots(gapParts[0], dpi);
-
         return new PrinterInfo(
             Model: Get("MODEL"),
             Serial: Get("SERIAL"),
