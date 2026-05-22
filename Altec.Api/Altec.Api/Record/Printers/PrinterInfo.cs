@@ -25,7 +25,7 @@ public record PrinterInfo(
     double BlineSize,
     int Direction,
     int Mirror,
-    bool Ribbon,
+    int Ribbon,
     int Offset,
     int ShiftX,
     int ShiftY,

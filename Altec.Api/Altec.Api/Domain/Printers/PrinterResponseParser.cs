@@ -45,7 +45,7 @@ public class PrinterResponseParser
             BlineSize: ParseDimensionDots(Get("BLINE SIZE"), dpi),
             Direction: ParseInt(Get("DIRECTION")),
             Mirror: ParseInt(Get("MIRROR")),
-            Ribbon: ParseOnOrOff(Get("RIBBON")),
+            Ribbon: ParseInt(Get("RIBBON")),
             Offset: (int)Math.Round(ParseDimensionDots(Get("OFFSET"), dpi)),
             ShiftX: (int)Math.Round(ParseDimensionDots(Get("SHIFT X"), dpi)),
             ShiftY: (int)Math.Round(ParseDimensionDots(Get("SHIFT Y"), dpi)),
@@ -76,16 +76,22 @@ public class PrinterResponseParser
 
     private string ParsePrinterStatus(string value)
     {
-        return "Ready";
+        switch (value)
+        {
+            case "@@@@":
+                return "Ready";
+            case "@@@`":
+                return "Head Open";
+            case "@@@A":
+                return "Paper empty";
+            case "@@@B":
+                return "Paper jam";
+            case "@@@D":
+                return "Ribbon empty";
+            case "@@@H":
+                return "Rippon jam";
+            default:
+                return "Unkown";
+        }
     }
-
-    private bool ParseOnOrOff(string value)
-    {
-        if (!int.TryParse(value?.Trim(), out var number))
-            number = 0;
-
-        if (number == 0) return false;
-        return true;
-    }
-
 }
