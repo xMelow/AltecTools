@@ -21,43 +21,46 @@ public class PrinterResponseParser
         var labelWidth = ParseDimensionDots(Get("PAPER WIDTH"), dpi);
         var labelHeight = ParseDimensionDots(Get("PAPER SIZE"), dpi);
 
-        var gapParts = Get("GAP SIZE").Split(',');
-        var gapSize = ParseDimensionDots(gapParts[0], dpi);
-        var gapSizeOffset = gapParts.Length > 1 ? ParseDimensionDots(gapParts[1], dpi) : "0 mm";
-
         return new PrinterInfo(
-            Dpi: dpi,
             Model: Get("MODEL"),
             Serial: Get("SERIAL"),
             Version: Get("VERSION"),
+            CheckSum: Get("CHECK SUM"),
+            Dpi: dpi,
+            PrinterStatus: ParsePrinterStatus(Get("PRINTER STATUS")),
             Mileage: DotsToM(Get("MILAGE"), dpi),
             LabelCounter: ParseInt(Get("LABEL COUNTER")),
+            CutterCounter: ParseInt(Get("CUT COUNTER")),
             MacAddressNet: Get("MAC ADDRESS NET"),
             IpAddressNet: Get("IP ADDRESS NET"),
-            NetworkName: Get("NAME"),
+            DnsName: Get("NAME"),
             SensorType: Get("SENSOR TYPE"),
+            HeadOpenSensor: Get("CARRIAGE"),
+            GapSize: ParseDimensionDots(Get("GAP SIZE"), dpi),
+            GapOffset: ParseDimensionDots(Get("GAP OFFSET"), dpi),
+            PostPrint: ParsePostPrint(Get("POST PRINT")),
             Speed: ParseInt(Get("SPEED")),
             Density: ParseInt(Get("DENSITY")),
             LabelWidth: labelWidth,
             LabelHeight: labelHeight,
-            GapSize: gapSize,
-            GapSizeOffset: gapSizeOffset,
-            BlineSize: ParseMm(Get("BLINE SIZE")),
-            Direction: Get("DIRECTION"),
-            Ribbon: Get("RIBBON"),
-            Offset: ParseMm(Get("OFFSET")),
-            ShiftX: ParseMm(Get("SHIFT X")),
-            ShiftY: ParseMm(Get("SHIFT Y")),
-            CountryCode: Get("COUNTRY CODE"),
-            CodePage: Get("CODEPAGE"),
-            GapOffset: ParseInt(Get("GAP OFFSET"))
+            BlineSize: ParseDimensionDots(Get("BLINE SIZE"), dpi),
+            Direction: ParseInt(Get("DIRECTION")),
+            Mirror: ParseInt(Get("MIRROR")),
+            Ribbon: ParseInt(Get("RIBBON")),
+            Offset: (int)Math.Round(ParseDimensionDots(Get("OFFSET"), dpi)),
+            ShiftX: (int)Math.Round(ParseDimensionDots(Get("SHIFT X"), dpi)),
+            ShiftY: (int)Math.Round(ParseDimensionDots(Get("SHIFT Y"), dpi)),
+            ReferenceX: (int)Math.Round(ParseDimensionDots(Get("REFERENCE X"), dpi)),
+            ReferenceY: (int)Math.Round(ParseDimensionDots(Get("REFERENCE Y"), dpi)),
+            CountryCode: ParseInt(Get("COUNTRY CODE")),
+            CodePage: ParseInt(Get("CODEPAGE"))
         );
     }
 
-    private string ParseDimensionDots(string value, int dpi)
+    private double ParseDimensionDots(string value, int dpi)
     {
-        if (dpi == 0 || !int.TryParse(value.Trim(), out var d)) return "0 mm";
-        return $"{Math.Round(d * 25.4 / dpi, 2).ToString(CultureInfo.InvariantCulture)} mm";
+        if (dpi == 0 || !int.TryParse(value.Trim(), out var d)) return 0;
+        return Math.Round(d * 25.4 / dpi, 2);
     }
 
     private string DotsToM(string dots, int dpi)
@@ -66,31 +69,47 @@ public class PrinterResponseParser
         return $"{Math.Round(d * 25.4 / dpi / 1000.0, 2).ToString(CultureInfo.InvariantCulture)} m";
     }
 
-    private string ParseMm(string value)
-    {
-        value = value.Trim();
-        if (value.EndsWith("inch", StringComparison.OrdinalIgnoreCase))
-        {
-            var num = value[..^4].Trim();
-            if (double.TryParse(num, NumberStyles.Float, CultureInfo.InvariantCulture, out var inches))
-                return $"{Math.Round(inches * 25.4).ToString(CultureInfo.InvariantCulture)} mm";
-        }
-        else if (value.EndsWith("mm", StringComparison.OrdinalIgnoreCase))
-        {
-            var num = value[..^2].Trim();
-            if (double.TryParse(num, NumberStyles.Float, CultureInfo.InvariantCulture, out var mm))
-                return $"{Math.Round(mm).ToString(CultureInfo.InvariantCulture)} mm";
-        }
-        else if (double.TryParse(value, NumberStyles.Float, CultureInfo.InvariantCulture, out var raw))
-        {
-            return $"{raw} mm";
-        }
-        return "0 mm";
-    }
-
     private int ParseInt(string? value)
     {
         if (int.TryParse(value?.Trim(), out var result)) return result;
         return 0;
+    }
+
+    private string ParsePrinterStatus(string value)
+    {
+        switch (value)
+        {
+            case "@@@@":
+                return "Ready";
+            case "@@@`":
+                return "Head Open";
+            case "@@@A":
+                return "Paper empty";
+            case "@@@B":
+                return "Paper jam";
+            case "@@@D":
+                return "Ribbon empty";
+            case "@@@H":
+                return "Rippon jam";
+            default:
+                return "Unkown";
+        }
+    }
+
+    private string ParsePostPrint(string value)
+    {
+        switch (value.Trim())
+        {
+            case "CUT OFF":
+                return "Cutter";
+            case "NONE":
+                return "Off";
+            case "TEAR OFF":
+                return "Tear";
+            case "PEEL OFF":
+                return "Peel";
+            default:
+                return "Unkown";
+        }
     }
 }

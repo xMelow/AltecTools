@@ -7,38 +7,45 @@ export type PrinterResponse = {
 }
 
 export type Printer = {
-    dnsName: string,
+    networkName: string,
     ipAddress: string,
     printerModel: string,
     port: number,
 }
 
 export type PrinterSettings = {
-    dpi: number,
     model: string,
     serial: string,
     version: string,
+    checkSum: string,
+    dpi: number,
+    printerStatus: string,
     mileage: string,
     labelCounter: number,
+    cutterCounter: number,
     macAddressNet: string,
     ipAddressNet: string,
-    networkName: string,
+    dnsName: string,
     sensorType: string,
+    headOpenSensor: string,
+    gapSize: number,
+    gapOffset: number,
+    postPrint: string,
     speed: number,
     density: number,
-    labelWidth: string,
-    labelHeight: string,
-    gapSize: string,
-    gapSizeOffset: string,
+    labelWidth: number,
+    labelHeight: number,
     blineSize: number,
-    direction: string,
-    ribbon: string,
+    direction: number,
+    mirror: number,
+    ribbon: number,
     offset: number,
     shiftX: number,
     shiftY: number,
-    countryCode: string,
-    codePage: string,
-    gapOffset: number,
+    referenceX: number,
+    referenceY: number,
+    countryCode: number,
+    codePage: number,
 }
 
 export type CommandResponse = {
@@ -51,20 +58,23 @@ export type PrinterSettingsPanelProps = {
 }
 
 export type EditableSettings = {
-    speed: string
-    density: string
-    direction: string
-    ribbon: string
-    sensorType: string
-    labelWidth: string
-    labelHeight: string
-    gapSize: string
-    gapSizeOffset: string
-    gapOffset: string
-    blineSize: string
-    offset: string
-    shiftX: string
-    shiftY: string
-    countryCode: string
-    codePage: string
+    postPrint: string,
+    speed: number,
+    density: number,
+    labelWidth: number,
+    labelHeight: number,
+    blineSize: number,
+    direction: number,
+    mirror: number,
+    ribbon: number,
+    sensorType: string,
+    gapSize: number,
+    gapOffset: number,
+    offset: number,
+    shiftX: number,
+    shiftY: number,
+    referenceX: number,
+    referenceY: number,
+    countryCode: number,
+    codePage: number,
 }

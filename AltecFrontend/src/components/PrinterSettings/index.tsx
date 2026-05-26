@@ -1,57 +1,8 @@
 import {useEffect, useState} from "react";
-import {useFetch} from "../hooks/useFetch";
-import {CommandResponse, EditableSettings, PrinterSettings, PrinterSettingsPanelProps} from "../types/printer";
-import {getPrinterSettings, sendPrinterCommand} from "../api/printers";
-
-function SettingRow({ label, value }: { label: string; value: string | number }) {
-    return (
-        <div className="flex justify-between items-center py-1.5 border-b border-altec-light last:border-0">
-            <span className="text-gray-500 text-sm">{label}</span>
-            <span className="font-medium text-sm text-right ml-4">{value}</span>
-        </div>
-    )
-}
-
-function EditableRow({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
-    return (
-        <div className="flex justify-between items-center py-1.5 border-b border-altec-light last:border-0">
-            <span className="text-gray-500 text-sm shrink-0">{label}</span>
-            <input
-                className="font-medium text-sm text-right ml-4 border border-altec-light rounded px-1.5 py-0.5 w-28 focus:outline-none focus:border-altec-teal bg-altec-light"
-                value={value}
-                onChange={e => onChange(e.target.value)}
-            />
-        </div>
-    )
-}
-
-function SelectRow({ label, value, options, onChange }: { label: string; value: string; options: string[]; onChange: (v: string) => void }) {
-    return (
-        <div className="flex justify-between items-center py-1.5 border-b border-altec-light last:border-0">
-            <span className="text-gray-500 text-sm shrink-0">{label}</span>
-            <select
-                className="font-medium text-sm text-right ml-4 border border-altec-light rounded px-1.5 py-0.5 w-28 focus:outline-none focus:border-altec-teal bg-altec-light"
-                value={value}
-                onChange={e => onChange(e.target.value)}
-            >
-                {options.map(opt => (
-                    <option key={opt} value={opt}>{opt}</option>
-                ))}
-            </select>
-        </div>
-    )
-}
-
-function SettingsSection({ title, children }: { title: string; children: React.ReactNode }) {
-    return (
-        <div className="mb-4">
-            <p className="sticky top-0 z-10 bg-altec-white text-xs font-semibold text-altec-teal uppercase tracking-wide py-1 mb-1">{title}</p>
-            <div className="flex flex-col">
-                {children}
-            </div>
-        </div>
-    )
-}
+import {useFetch} from "../../hooks/useFetch";
+import {CommandResponse, EditableSettings, PrinterSettings, PrinterSettingsPanelProps} from "../../types/printer";
+import {getPrinterSettings, sendPrinterCommand} from "../../api/printers";
+import { EditableRow, SelectRow, SettingRow, SettingsSection} from "./parts";
 
 export default function PrinterSettingsPanel({ ipAddress, onNetworkName }: PrinterSettingsPanelProps) {
     const settingsFetch = useFetch<PrinterSettings>()
@@ -69,30 +20,30 @@ export default function PrinterSettingsPanel({ ipAddress, onNetworkName }: Print
 
     useEffect(() => {
         if (s) {
-            if (s.networkName) onNetworkName?.(s.networkName)
+            if (s.dnsName) onNetworkName?.(s.dnsName)
             setEditable({
-                speed: String(s.speed),
-                density: String(s.density),
-                direction: s.direction,
-                ribbon: s.ribbon,
-                sensorType: s.sensorType,
+                postPrint: s.postPrint,
+                speed: s.speed,
+                density: s.density,
                 labelWidth: s.labelWidth,
                 labelHeight: s.labelHeight,
+                blineSize: s.blineSize,
+                direction: s.direction,
+                mirror: s.mirror,
+                ribbon: s.ribbon,
+                sensorType: s.sensorType,
                 gapSize: s.gapSize,
-                gapSizeOffset: s.gapSizeOffset,
-                gapOffset: String(s.gapOffset),
-                blineSize: String(s.blineSize),
-                offset: String(s.offset),
-                shiftX: String(s.shiftX),
-                shiftY: String(s.shiftY),
+                gapOffset: s.gapOffset,
+                offset: s.offset,
+                shiftX: s.shiftX,
+                shiftY: s.shiftY,
+                referenceX: s.referenceX,
+                referenceY: s.referenceY,   
                 countryCode: s.countryCode,
                 codePage: s.codePage,
             })
         }
     }, [s])
-
-    const set = (key: keyof EditableSettings) => (value: string) =>
-        setEditable(prev => prev ? { ...prev, [key]: value } : prev)
 
     useEffect(() => {
         if (!updateFetch.result) return
@@ -101,25 +52,48 @@ export default function PrinterSettingsPanel({ ipAddress, onNetworkName }: Print
         return () => clearTimeout(timer)
     }, [updateFetch.result])
 
+    const set = (key: keyof EditableSettings) => (value: string | number) =>
+        setEditable(prev => prev ? { ...prev, [key]: value } : prev)
+
     const handleRefresh = () => {
         if (ipAddress) settingsFetch.execute(() => getPrinterSettings(ipAddress))
     }
 
     const handleUpdate = () => {
         if (!ipAddress || !editableSettings) return
+
+        let updateSensorType = setSensorType(editableSettings.sensorType, editableSettings.gapSize, editableSettings.gapOffset)
+        let postPrint = setPostPrint(editableSettings.postPrint)
+        
         const commands = [
             `SPEED ${editableSettings.speed}`,
             `DENSITY ${editableSettings.density}`,
-            `DIRECTION ${editableSettings.direction}`,
+            `SIZE ${editableSettings.labelWidth} mm,${editableSettings.labelHeight} mm`,
+            `${updateSensorType}`,
+            `DIRECTION ${editableSettings.direction}, ${editableSettings.mirror}`,
             `SET RIBBON ${editableSettings.ribbon}`,
-            `SIZE ${editableSettings.labelWidth},${editableSettings.labelHeight}`,
-            `GAP ${editableSettings.gapSize},${editableSettings.gapSizeOffset}`,
-            `BLINE ${editableSettings.blineSize},0`,
             `OFFSET ${editableSettings.offset}`,
+            `SHIFT ${editableSettings.shiftX}, ${editableSettings.shiftY}`,
+            `REFERENCE ${editableSettings.referenceX},${editableSettings.referenceY}`,
             `COUNTRY ${editableSettings.countryCode}`,
             `CODEPAGE ${editableSettings.codePage}`,
+            ...postPrint
         ].join('\r\n')
         updateFetch.execute(() => sendPrinterCommand(ipAddress, commands))
+    }
+
+    const setSensorType = (sensorType: string, gapSize: number, gapOffset: number) => {
+        if (sensorType == "GAP") return `GAP ${gapSize} mm,${gapOffset} mm`
+        if (sensorType == "BLINE") return `BLINE ${gapSize} mm,${gapOffset} mm`
+        if (sensorType == "CONTINUOUS") return `GAP 0 mm,0 mm`
+    }
+
+    const setPostPrint = (postPrint: string): string[] => {
+        if (postPrint == "Tear Off") return ["SET CUTTER OFF", "SET PEEL OFF", "SET TEAR ON"]
+        if (postPrint == "Cutter") return ["SET PEEL OFF", "SET TEAR OFF", "SET CUTTER ON"]
+        if (postPrint == "Peel") return ["SET CUTTER OFF", "SET TEAR OFF", "SET PEEL ON"]
+        if (postPrint == "Off") return ["SET CUTTER OFF", "SET PEEL OFF", "SET TEAR OFF"]
+        return []
     }
 
     return (
@@ -144,41 +118,46 @@ export default function PrinterSettingsPanel({ ipAddress, onNetworkName }: Print
                 {s && editableSettings ? (
                     <>
                         <SettingsSection title="Device">
+                            <SettingRow label="Printer Status" value={s.printerStatus} />
                             <SettingRow label="Model" value={s.model} />
                             <SettingRow label="Serial" value={s.serial} />
                             <SettingRow label="Version" value={s.version} />
+                            <SettingRow label="Check Sum" value={s.checkSum} />
                             <SettingRow label="DPI" value={s.dpi} />
                         </SettingsSection>
 
                         <SettingsSection title="Network">
                             <SettingRow label="IP Address" value={s.ipAddressNet} />
                             <SettingRow label="MAC Address" value={s.macAddressNet} />
-                            <SettingRow label="DNS Name" value={s.networkName} />
+                            <SettingRow label="DNS Name" value={s.dnsName} />
                         </SettingsSection>
 
                         <SettingsSection title="TSPL">
-                            <SelectRow label="Speed" value={editableSettings.speed} options={['1', '2', '3', '4', '5', '6']} onChange={set('speed')} />
-                            <SelectRow label="Density" value={editableSettings.density} options={['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']} onChange={set('density')} />
-                            <EditableRow label="Direction" value={editableSettings.direction} onChange={set('direction')} />
-                            <EditableRow label="Ribbon" value={editableSettings.ribbon} onChange={set('ribbon')} />
+                            <SelectRow label="Speed" value={editableSettings.speed} width={20} options={['1', '2', '3', '4', '5', '6']} onChange={set('speed')} />
+                            <SelectRow label="Density" value={editableSettings.density} width={20} options={['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']} onChange={set('density')} />
+                            <SelectRow label="Direction" value={editableSettings.direction === 0 ? "Normal" : "Reversed"} options={["Normal", "Reversed"]} width={20} onChange={v => set('direction')(v === "Normal" ? 0 : 1)} />
+                            <SelectRow label="Mirror" value={editableSettings.mirror === 1 ? "Yes" : "No"} options={["Yes", "No"]} width={20} onChange={v => set('mirror')(v === "Yes" ? 1 : 0)} />
+                            <SelectRow label="Ribbon" value={editableSettings.ribbon === 1 ? "On" : "Off"} options={["On", "Off"]} width={20} onChange={v => set('ribbon')(v === "On" ? "YES" : "NO")} />
                         </SettingsSection>
 
                         <SettingsSection title="Label">
-                            <SelectRow label="Sensor Type" value={editableSettings.sensorType} options={['GAP', 'MARK']} onChange={set('sensorType')} />
-                            <EditableRow label="Label Width" value={editableSettings.labelWidth} onChange={set('labelWidth')} />
-                            <EditableRow label="Label Height" value={editableSettings.labelHeight} onChange={set('labelHeight')} />
-                            <EditableRow label="Gap Size" value={editableSettings.gapSize} onChange={set('gapSize')} />
-                            <EditableRow label="Gap Size Offset" value={editableSettings.gapSizeOffset} onChange={set('gapSizeOffset')} />
-                            <EditableRow label="Gap Offset" value={editableSettings.gapOffset} onChange={set('gapOffset')} />
-                            <EditableRow label="Bline Size" value={editableSettings.blineSize} onChange={set('blineSize')} />
-                            <EditableRow label="Offset" value={editableSettings.offset} onChange={set('offset')} />
-                            <EditableRow label="Shift X" value={editableSettings.shiftX} onChange={set('shiftX')} />
-                            <EditableRow label="Shift Y" value={editableSettings.shiftY} onChange={set('shiftY')} />
+                            <SelectRow label="Post Print Action" width={20} value={editableSettings.postPrint} options={['Tear Off', 'Cutter', 'Peel', 'Off']} onChange={set('postPrint')} />
+                            <SelectRow label="Sensor Type" width={20} value={editableSettings.sensorType} options={['GAP', 'BLINE', 'CONTINUOUS']} onChange={set('sensorType')} />
+                            <EditableRow label="Label Width" value={editableSettings.labelWidth} onChange={set('labelWidth')} unit="mm"/>
+                            <EditableRow label="Label Height" value={editableSettings.labelHeight} onChange={set('labelHeight')} unit="mm"/>
+                            <EditableRow label="Gap Size" value={editableSettings.gapSize} onChange={set('gapSize')} unit="mm"/>
+                            <EditableRow label="Gap Offset" value={editableSettings.gapOffset} onChange={set('gapOffset')} unit="mm"/>
+                            <EditableRow label="Offset" value={editableSettings.offset} onChange={set('offset')} unit="mm"/>
+                            <EditableRow label="Shift X" value={editableSettings.shiftX} onChange={set('shiftX')} unit="mm"/>
+                            <EditableRow label="Shift Y" value={editableSettings.shiftY} onChange={set('shiftY')} unit="mm"/>
+                            <EditableRow label="Reference X" value={editableSettings.referenceX} onChange={set('referenceX')} unit="mm"/>
+                            <EditableRow label="Reference Y" value={editableSettings.referenceY} onChange={set('referenceY')} unit="mm"/>
                         </SettingsSection>
 
                         <SettingsSection title="Counters">
                             <SettingRow label="Mileage" value={s.mileage} />
                             <SettingRow label="Label Counter" value={s.labelCounter} />
+                            <SettingRow label="Cutter Counter" value={s.cutterCounter} />
                         </SettingsSection>
 
                         <SettingsSection title="Locale">

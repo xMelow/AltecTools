@@ -1,4 +1,6 @@
-﻿using Altec.Api.Record.Printers;
+﻿using System.IO;
+using System.Net.Sockets;
+using Altec.Api.Record.Printers;
 using Altec.Api.Services.Printers;
 using Microsoft.AspNetCore.Mvc;
 
@@ -25,15 +27,38 @@ public class PrinterController : ControllerBase
     [HttpGet("{ipAddress}/settings")]
     public async Task<IActionResult> GetPrinterSettings(string ipAddress)
     {
-        var info = await _printerService.GetPrinterInfo(ipAddress);
-        return Ok(info);
+        try
+        {
+            var info = await _printerService.GetPrinterInfo(ipAddress);
+            Console.WriteLine(info);
+            return Ok(info);
+        }
+        catch (OperationCanceledException)
+        {
+            return StatusCode(503, "Printer is unreachable");
+        }
+        catch (SocketException)
+        {
+            return StatusCode(503, "Printer is unreachable");
+        }
+        catch (IOException)
+        {
+            return StatusCode(503, "Printer is unreachable");
+        }
     }
 
     [HttpPost("{ipAddress}/command")]
     public async Task<IActionResult> SendCommand(string ipAddress, [FromBody] PrinterCommandRequest request)
     {
-        var response = await _printerService.SendCommand(ipAddress, request.Command);
-        return Ok(new PrinterCommandResponse(response));
+        try
+        {
+            var response = await _printerService.SendCommand(ipAddress, request.Command);
+            return Ok(new PrinterCommandResponse(response));
+        } 
+        catch (Exception ex)
+        {
+            return BadRequest($"Error sending command to printer : {ex.Message}" );
+        }
     }
 
     [HttpPost("{ipAddress}/file")]

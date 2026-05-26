@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom"
 import { sendPrinterCommand } from "../api/printers"
 import { CommandTab, LogEntry } from "../types/printerTerminal"
 import { TSPL_COMMAND_GROUPS, PRINTER_COMMAND_GROUPS } from "../constants/printerCommands"
-import PrinterSettingsPanel from "../components/PrinterSettingsPanel"
+import PrinterSettingsPanel from "../components/PrinterSettings"
 import PrinterFilesTab from "../components/PrinterFilesTab"
 
 export default function PrinterDetailedScreen() {
