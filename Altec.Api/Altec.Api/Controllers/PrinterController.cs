@@ -30,6 +30,7 @@ public class PrinterController : ControllerBase
         try
         {
             var info = await _printerService.GetPrinterInfo(ipAddress);
+            Console.WriteLine(info);
             return Ok(info);
         }
         catch (OperationCanceledException)

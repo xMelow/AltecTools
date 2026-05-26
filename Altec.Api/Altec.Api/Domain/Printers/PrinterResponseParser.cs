@@ -38,6 +38,7 @@ public class PrinterResponseParser
             HeadOpenSensor: Get("CARRIAGE"),
             GapSize: ParseDimensionDots(Get("GAP SIZE"), dpi),
             GapOffset: ParseDimensionDots(Get("GAP OFFSET"), dpi),
+            PostPrint: ParsePostPrint(Get("POST PRINT")),
             Speed: ParseInt(Get("SPEED")),
             Density: ParseInt(Get("DENSITY")),
             LabelWidth: labelWidth,
@@ -90,6 +91,23 @@ public class PrinterResponseParser
                 return "Ribbon empty";
             case "@@@H":
                 return "Rippon jam";
+            default:
+                return "Unkown";
+        }
+    }
+
+    private string ParsePostPrint(string value)
+    {
+        switch (value.Trim())
+        {
+            case "CUT OFF":
+                return "Cutter";
+            case "NONE":
+                return "Off";
+            case "TEAR OFF":
+                return "Tear";
+            case "PEEL OFF":
+                return "Peel";
             default:
                 return "Unkown";
         }

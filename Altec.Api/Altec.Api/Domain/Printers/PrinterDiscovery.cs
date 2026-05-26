@@ -188,6 +188,7 @@ public class PrinterDiscovery
                 "OUT \"GAP SIZE=\";GETSETTING$(\"CONFIG\",\"TSPL\",\"GAP SIZE\")",
                 "OUT \"GAP OFFSET=\";GETSETTING$(\"CONFIG\",\"TSPL\",\"GAP OFFSET\")",
                 "OUT \"BLINE SIZE=\";GETSETTING$(\"CONFIG\",\"TSPL\",\"BLINE SIZE\")",
+                "OUT \"POST PRINT=\";GETSETTING$(\"CONFIG\",\"TSPL\",\"PRINT MODE\")",
                 "OUT \"SPEED=\";GETSETTING$(\"CONFIG\",\"TSPL\",\"SPEED\")",
                 "OUT \"DENSITY=\";GETSETTING$(\"CONFIG\",\"TSPL\",\"DENSITY\")", 
                 "OUT \"PAPER SIZE=\";GETSETTING$(\"CONFIG\",\"TSPL\",\"PAPER SIZE\")",
@@ -204,10 +205,8 @@ public class PrinterDiscovery
                 "OUT \"CODEPAGE=\";GETSETTING$(\"CONFIG\",\"TSPL\",\"CODEPAGE\")",
                 "END"
         );
-        var response = await SendPrinterCommand(ip, program);
-
-        Console.WriteLine(response);
         
+        var response = await SendPrinterCommand(ip, program);        
         return _parser.ParseSettings(response);
     }
 

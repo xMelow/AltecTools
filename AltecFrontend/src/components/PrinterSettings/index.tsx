@@ -16,13 +16,13 @@ export default function PrinterSettingsPanel({ ipAddress, onNetworkName }: Print
         if (ipAddress) {
             settingsFetch.execute(() => getPrinterSettings(ipAddress))
         }
-        console.log(settingsFetch);
     }, [ipAddress])
 
     useEffect(() => {
         if (s) {
             if (s.dnsName) onNetworkName?.(s.dnsName)
             setEditable({
+                postPrint: s.postPrint,
                 speed: s.speed,
                 density: s.density,
                 labelWidth: s.labelWidth,
@@ -38,7 +38,7 @@ export default function PrinterSettingsPanel({ ipAddress, onNetworkName }: Print
                 shiftX: s.shiftX,
                 shiftY: s.shiftY,
                 referenceX: s.referenceX,
-                referenceY: s.referenceY,
+                referenceY: s.referenceY,   
                 countryCode: s.countryCode,
                 codePage: s.codePage,
             })
@@ -62,10 +62,8 @@ export default function PrinterSettingsPanel({ ipAddress, onNetworkName }: Print
     const handleUpdate = () => {
         if (!ipAddress || !editableSettings) return
 
-        let updateSensorType
-        if (editableSettings.sensorType == "BLINE") updateSensorType = `BLINE ${editableSettings.gapSize} mm,${editableSettings.gapOffset} mm`
-        else if (editableSettings.sensorType == "CONTINUOUS") updateSensorType = `GAP 0 mm,0 mm`
-        else if  (editableSettings.sensorType == "GAP") updateSensorType = `GAP ${editableSettings.gapSize} mm,${editableSettings.gapOffset} mm`
+        let updateSensorType = setSensorType(editableSettings.sensorType, editableSettings.gapSize, editableSettings.gapOffset)
+        let postPrint = setPostPrint(editableSettings.postPrint)
         
         const commands = [
             `SPEED ${editableSettings.speed}`,
@@ -79,8 +77,23 @@ export default function PrinterSettingsPanel({ ipAddress, onNetworkName }: Print
             `REFERENCE ${editableSettings.referenceX},${editableSettings.referenceY}`,
             `COUNTRY ${editableSettings.countryCode}`,
             `CODEPAGE ${editableSettings.codePage}`,
+            ...postPrint
         ].join('\r\n')
         updateFetch.execute(() => sendPrinterCommand(ipAddress, commands))
+    }
+
+    const setSensorType = (sensorType: string, gapSize: number, gapOffset: number) => {
+        if (sensorType == "GAP") return `GAP ${gapSize} mm,${gapOffset} mm`
+        if (sensorType == "BLINE") return `BLINE ${gapSize} mm,${gapOffset} mm`
+        if (sensorType == "CONTINUOUS") return `GAP 0 mm,0 mm`
+    }
+
+    const setPostPrint = (postPrint: string): string[] => {
+        if (postPrint == "Tear Off") return ["SET CUTTER OFF", "SET PEEL OFF", "SET TEAR ON"]
+        if (postPrint == "Cutter") return ["SET PEEL OFF", "SET TEAR OFF", "SET CUTTER ON"]
+        if (postPrint == "Peel") return ["SET CUTTER OFF", "SET TEAR OFF", "SET PEEL ON"]
+        if (postPrint == "Off") return ["SET CUTTER OFF", "SET PEEL OFF", "SET TEAR OFF"]
+        return []
     }
 
     return (
@@ -128,7 +141,8 @@ export default function PrinterSettingsPanel({ ipAddress, onNetworkName }: Print
                         </SettingsSection>
 
                         <SettingsSection title="Label">
-                            <SelectRow label="Sensor Type" value={editableSettings.sensorType} options={['GAP', 'BLINE', 'CONTINUOUS']} onChange={set('sensorType')} />
+                            <SelectRow label="Post Print Action" width={20} value={editableSettings.postPrint} options={['Tear Off', 'Cutter', 'Peel', 'Off']} onChange={set('postPrint')} />
+                            <SelectRow label="Sensor Type" width={20} value={editableSettings.sensorType} options={['GAP', 'BLINE', 'CONTINUOUS']} onChange={set('sensorType')} />
                             <EditableRow label="Label Width" value={editableSettings.labelWidth} onChange={set('labelWidth')} unit="mm"/>
                             <EditableRow label="Label Height" value={editableSettings.labelHeight} onChange={set('labelHeight')} unit="mm"/>
                             <EditableRow label="Gap Size" value={editableSettings.gapSize} onChange={set('gapSize')} unit="mm"/>

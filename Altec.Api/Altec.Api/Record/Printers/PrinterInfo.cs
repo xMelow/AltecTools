@@ -17,6 +17,7 @@ public record PrinterInfo(
     string DnsName,
     double GapOffset,
     string SensorType,
+    string PostPrint,
     int Speed,
     int Density,
     double LabelWidth,

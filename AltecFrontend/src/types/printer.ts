@@ -30,6 +30,7 @@ export type PrinterSettings = {
     headOpenSensor: string,
     gapSize: number,
     gapOffset: number,
+    postPrint: string,
     speed: number,
     density: number,
     labelWidth: number,
@@ -57,6 +58,7 @@ export type PrinterSettingsPanelProps = {
 }
 
 export type EditableSettings = {
+    postPrint: string,
     speed: number,
     density: number,
     labelWidth: number,
