@@ -30,20 +30,11 @@ public class PrinterController : ControllerBase
         try
         {
             var info = await _printerService.GetPrinterInfo(ipAddress);
-            Console.WriteLine(info);
             return Ok(info);
         }
-        catch (OperationCanceledException)
+         catch (Exception ex)
         {
-            return StatusCode(503, "Printer is unreachable");
-        }
-        catch (SocketException)
-        {
-            return StatusCode(503, "Printer is unreachable");
-        }
-        catch (IOException)
-        {
-            return StatusCode(503, "Printer is unreachable");
+            return BadRequest($"Error sending command to printer : {ex.Message}" );
         }
     }
 

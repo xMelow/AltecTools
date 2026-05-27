@@ -132,7 +132,13 @@ export default function PrinterSettingsPanel({ ipAddress, onNetworkName }: Print
                             <SettingRow label="DNS Name" value={s.dnsName} />
                         </SettingsSection>
 
-                        <SettingsSection title="TSPL">
+                        <SettingsSection title="Counters">
+                            <SettingRow label="Mileage" value={s.mileage} />
+                            <SettingRow label="Label Counter" value={s.labelCounter} />
+                            <SettingRow label="Cutter Counter" value={s.cutterCounter} />
+                        </SettingsSection>
+
+                        <SettingsSection title="Print">
                             <SelectRow label="Speed" value={editableSettings.speed} width={20} options={['1', '2', '3', '4', '5', '6']} onChange={set('speed')} />
                             <SelectRow label="Density" value={editableSettings.density} width={20} options={['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']} onChange={set('density')} />
                             <SelectRow label="Direction" value={editableSettings.direction === 0 ? "Normal" : "Reversed"} options={["Normal", "Reversed"]} width={20} onChange={v => set('direction')(v === "Normal" ? 0 : 1)} />
@@ -152,12 +158,6 @@ export default function PrinterSettingsPanel({ ipAddress, onNetworkName }: Print
                             <EditableRow label="Shift Y" value={editableSettings.shiftY} onChange={set('shiftY')} unit="mm"/>
                             <EditableRow label="Reference X" value={editableSettings.referenceX} onChange={set('referenceX')} unit="mm"/>
                             <EditableRow label="Reference Y" value={editableSettings.referenceY} onChange={set('referenceY')} unit="mm"/>
-                        </SettingsSection>
-
-                        <SettingsSection title="Counters">
-                            <SettingRow label="Mileage" value={s.mileage} />
-                            <SettingRow label="Label Counter" value={s.labelCounter} />
-                            <SettingRow label="Cutter Counter" value={s.cutterCounter} />
                         </SettingsSection>
 
                         <SettingsSection title="Locale">
