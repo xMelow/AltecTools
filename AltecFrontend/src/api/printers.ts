@@ -35,7 +35,6 @@ export async function sendPrinterFile(ipAddress: string, entries: { file: File; 
     })
 
     if (!res.ok) throw new Error("Failed to send file")
-
     return await res.json()
 }
 
@@ -47,6 +46,6 @@ export async function sendPrinterCommand(ipAddress: string, command: string): Pr
     })
 
     if (!res.ok) throw new Error("Failed to send command")
-
+        
     return await res.json()
 }

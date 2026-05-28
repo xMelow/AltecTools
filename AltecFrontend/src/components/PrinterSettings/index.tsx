@@ -23,6 +23,10 @@ export default function PrinterSettingsPanel({ ipAddress, onNetworkName }: Print
     useEffect(() => {
         if (s) {
             if (s.dnsName) onNetworkName?.(s.dnsName)
+            if (s.sensorType == "CONTINUOUS") {
+                s.gapSize = 0
+                s.gapOffset = 0
+            }
             setEditable({
                 postPrint: s.postPrint,
                 speed: s.speed,
@@ -81,13 +85,14 @@ export default function PrinterSettingsPanel({ ipAddress, onNetworkName }: Print
             `CODEPAGE ${editableSettings.codePage}`,
             ...postPrint
         ].join('\r\n')
+
         updateFetch.execute(() => sendPrinterCommand(ipAddress, commands))
     }
 
     const setSensorType = (sensorType: string, gapSize: number, gapOffset: number) => {
         if (sensorType == "GAP") return `GAP ${gapSize} mm,${gapOffset} mm`
         if (sensorType == "BLINE") return `BLINE ${gapSize} mm,${gapOffset} mm`
-        if (sensorType == "CONTINUOUS") return `GAP 0 mm,0 mm`
+        if (sensorType == "CONTINUOUS") return `GAP 0,0`
     }
 
     const setPostPrint = (postPrint: string): string[] => {

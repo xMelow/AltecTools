@@ -206,7 +206,7 @@ public class PrinterDiscovery
                 "END"
         );
         
-        var response = await SendPrinterCommand(ip, program);        
+        var response = await SendPrinterCommand(ip, program);  
         return _parser.ParseSettings(response);
     }
 
