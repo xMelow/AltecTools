@@ -131,7 +131,7 @@ export default function PrinterSettingsPanel({ ipAddress, onNetworkName }: Print
                         <SettingsSection title="Device">
                             <SettingRow label="Printer Status" value={s.printerStatus} />
                             <SettingRow label="Model" value={s.model} />
-                            <SettingRow label="Serial" value={s.serial} />
+                            <SettingRow label="Serial Number" value={s.serial} />
                             <SettingRow label="Version" value={s.version} />
                             <SettingRow label="Check Sum" value={s.checkSum} />
                             <SettingRow label="DPI" value={s.dpi} />
@@ -159,7 +159,7 @@ export default function PrinterSettingsPanel({ ipAddress, onNetworkName }: Print
 
                         <SettingsSection title="Label">
                             <SelectRow label="Post Print Action" width={20} value={editableSettings.postPrint} options={['Tear Off', 'Cutter', 'Peel', 'Off']} onChange={set('postPrint')} />
-                            <SelectRow label="Sensor Type" width={20} value={editableSettings.sensorType} options={['GAP', 'BLINE', 'CONTINUOUS']} onChange={set('sensorType')} />
+                            <SelectRow label="Sensor Type" width={30} value={editableSettings.sensorType} options={['GAP', 'BLINE', 'CONTINUOUS']} onChange={set('sensorType')} />
                             <EditableRow label="Label Width" value={editableSettings.labelWidth} onChange={set('labelWidth')} unit="mm"/>
                             <EditableRow label="Label Height" value={editableSettings.labelHeight} onChange={set('labelHeight')} unit="mm"/>
                             <EditableRow label="Gap Size" value={editableSettings.gapSize} onChange={set('gapSize')} unit="mm"/>

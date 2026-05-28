@@ -17,6 +17,7 @@ export default function ExportPrinterSettings({ printerSettings, editableSetting
         Label: true, 
         Locale: true
     })
+    const [fileName, setFileName] = useState(`settings-${printerSettings.dnsName}.txt`)
 
     const sectionsData = [
         {
@@ -27,7 +28,7 @@ export default function ExportPrinterSettings({ printerSettings, editableSetting
                     value: printerSettings.model
                 },
                 {
-                    label: "Serial",
+                    label: "Serial Number",
                     value: printerSettings.serial
                 },
                 {
@@ -188,30 +189,59 @@ export default function ExportPrinterSettings({ printerSettings, editableSetting
         const url = URL.createObjectURL(blob)
         const a = document.createElement('a')
         a.href = url;
-        a.download = "settings.txt";
+        a.download = fileName;
         a.click();
         URL.revokeObjectURL(url);
     }
 
     return (
-        // TODO 4: the modal UI
-        // - dark overlay behind
-        // - white box in the center
-        // - title "Export Settings"
-        // - list of sections with checkboxes
-        // - Cancel and Export buttons
-        <div className="fixed inset-0 bg-black/60">
-            <h2>Export Settings</h2>
-            {Object.entries(sections).map(([key, value]) => (
-                <div key={key}>
-                    <input type="checkbox" id={key} name={key} checked={value} onChange={() => setSections(prev => ({ ...prev, [key]: !prev[key] }))} />
-                    <label htmlFor={key}>{key}</label>
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+            <div className="bg-altec-white border border-altec-teal rounded-2xl p-6 w-80 flex flex-col gap-4">
+                <div>
+                    <h2 className="text-lg font-semibold text-altec-dark mb-2">Export Settings</h2>
+                    <hr className="border-b border-altec-teal"/>
                 </div>
-            ))}
 
-            <div>
-                <button onClick={exportSettings}>Export</button>
-                <button onClick={closePopUp}>Cancel</button>
+                <div className="flex flex-col gap-2">
+                    {Object.entries(sections).map(([key, value]) => (
+                        <div key={key} className="flex items-center gap-2">
+                            <input
+                                type="checkbox"
+                                id={key}
+                                name={key}
+                                checked={value}
+                                onChange={() => setSections(prev => ({ ...prev, [key]: !prev[key] }))}
+                                className="accent-altec-teal w-4 h-4 cursor-pointer"
+                            />
+                            <label htmlFor={key} className="text-sm cursor-pointer">{key}</label>
+                        </div>
+                    ))}
+
+                    <div className="flex flex-col gap-1 mt-2">
+                        <label className="text-xs text-gray-500">File name</label>
+                        <input
+                            type="text"
+                            value={fileName}
+                            onChange={(e) => setFileName(e.target.value)}
+                            className="text-sm border border-altec-teal rounded-lg px-2 py-1 outline-none focus:ring-1 focus:ring-altec-teal bg-altec-white"
+                        />
+                    </div>
+                </div>
+
+                <div className="flex justify-end gap-2 pt-2">
+                    <button
+                        className="text-xs border border-altec-teal text-altec-teal px-3 py-1 rounded-lg hover:bg-altec-light transition-colors"
+                        onClick={closePopUp}
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        className="text-xs bg-altec-teal text-white px-3 py-1 rounded-lg hover:opacity-90 transition-opacity"
+                        onClick={exportSettings}
+                    >
+                        Export
+                    </button>
+                </div>
             </div>
         </div>
     )
