@@ -9,6 +9,7 @@ type ExportPrinterSettingsProps = {
 
 export default function ExportPrinterSettings({ printerSettings, editableSettings, closePopUp }: ExportPrinterSettingsProps) {
 
+    const [fileName, setFileName] = useState(`settings-${printerSettings.dnsName}.txt`)
     const [sections, setSections] = useState<Record<string, boolean>>({
         Device: true, 
         Network: true, 
@@ -17,7 +18,6 @@ export default function ExportPrinterSettings({ printerSettings, editableSetting
         Label: true, 
         Locale: true
     })
-    const [fileName, setFileName] = useState(`settings-${printerSettings.dnsName}.txt`)
 
     const sectionsData = [
         {
