@@ -123,6 +123,27 @@ public class AutomationService : IAutomationService
 
     public async Task PrintSdCardLabel(string orderNumber, string version, int amount)
     {
-        throw new NotImplementedException();
+        var requestData = new MultipartFormDataContent();
+        var fileStream = File.OpenRead(_config["LabelPaths:Sdkaart"]);
+        var variables = new Dictionary<string, string>
+        {
+          ["Order nummer"] = orderNumber,
+          ["Versie"] = version,
+          ["Aantal"] = amount.ToString()
+        };
+
+        var json = JsonSerializer.Serialize(variables);
+        requestData.Add(new StringContent(json), "variables");
+                
+        StreamContent labelStream = new StreamContent(fileStream);
+        requestData.Add(labelStream, "label");
+            
+        var request = new HttpRequestMessage(HttpMethod.Post, "/api/nicelabel/printLabelVariables")
+        {
+            Content = requestData
+        };
+
+        var response = await _httpClient.SendAsync(request);
+        response.EnsureSuccessStatusCode();
     }
 }
