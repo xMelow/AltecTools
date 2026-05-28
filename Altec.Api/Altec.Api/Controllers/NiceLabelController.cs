@@ -34,7 +34,7 @@ public class NiceLabelController : ControllerBase
     public async Task<IActionResult> Print(IFormFile label, [FromForm] int quantity, [FromForm] string? printerName)
     {
         if (label == null || label.Length == 0) return BadRequest("Label file needs to be present");
-        if (quantity == null) return BadRequest("Quantity must be present");
+        if (quantity == 0) return BadRequest("Quantity must be higher then zero");
         
         try
         {
@@ -51,7 +51,6 @@ public class NiceLabelController : ControllerBase
     public async Task<IActionResult> LabelPreview(IFormFile label, [FromForm] string variablesJson, [FromForm] int width, [FromForm] int height)
     {
         if (width <= 0 || height <= 0) return BadRequest("Width and height must be greater then 0");
-
         Dictionary<string, string>? variables;
 
         try

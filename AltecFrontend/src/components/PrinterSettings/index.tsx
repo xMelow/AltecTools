@@ -3,6 +3,7 @@ import {useFetch} from "../../hooks/useFetch";
 import {CommandResponse, EditableSettings, PrinterSettings, PrinterSettingsPanelProps} from "../../types/printer";
 import {getPrinterSettings, sendPrinterCommand} from "../../api/printers";
 import { EditableRow, SelectRow, SettingRow, SettingsSection} from "./parts";
+import ExportPrinterSettings from "../ExportPrinterSetttings";
 
 export default function PrinterSettingsPanel({ ipAddress, onNetworkName }: PrinterSettingsPanelProps) {
     const settingsFetch = useFetch<PrinterSettings>()
@@ -11,6 +12,7 @@ export default function PrinterSettingsPanel({ ipAddress, onNetworkName }: Print
 
     const [editableSettings, setEditable] = useState<EditableSettings | null>(null)
     const [showSuccess, setShowSuccess] = useState(false)
+    const [showExport, setShowExport] = useState(false)
 
     useEffect(() => {
         if (ipAddress) {
@@ -101,13 +103,22 @@ export default function PrinterSettingsPanel({ ipAddress, onNetworkName }: Print
             <div className="px-4 pt-4 shrink-0">
                 <div className="flex justify-between items-center mb-2">
                     <h3 className="text-lg font-semibold">Printer Settings</h3>
-                    <button
-                        className="text-xs border border-altec-teal text-altec-teal px-2 py-0.5 rounded-lg hover:bg-altec-light transition-colors disabled:opacity-50"
-                        onClick={handleRefresh}
-                        disabled={settingsFetch.loading}
-                    >
-                        Refresh
-                    </button>
+                    <div>
+                        <button
+                            className="mr-2 text-xs border border-altec-teal text-altec-teal px-2 py-0.5 rounded-lg hover:bg-altec-light transition-colors disabled:opacity-50"
+                            onClick={() => setShowExport(true)}
+                        >
+                            Export
+                        </button>
+                        {showExport && <ExportPrinterSettings printerSettings={s!} editableSettings={editableSettings!} closePopUp={() => setShowExport(false)} /> }
+                        <button
+                            className="text-xs border border-altec-teal text-altec-teal px-2 py-0.5 rounded-lg hover:bg-altec-light transition-colors disabled:opacity-50"
+                            onClick={handleRefresh}
+                            disabled={settingsFetch.loading}
+                        >
+                            Refresh
+                        </button>
+                    </div>
                 </div>
                 <hr className="border-b border-altec-teal mb-3" />
             </div>
@@ -120,7 +131,7 @@ export default function PrinterSettingsPanel({ ipAddress, onNetworkName }: Print
                         <SettingsSection title="Device">
                             <SettingRow label="Printer Status" value={s.printerStatus} />
                             <SettingRow label="Model" value={s.model} />
-                            <SettingRow label="Serial" value={s.serial} />
+                            <SettingRow label="Serial Number" value={s.serial} />
                             <SettingRow label="Version" value={s.version} />
                             <SettingRow label="Check Sum" value={s.checkSum} />
                             <SettingRow label="DPI" value={s.dpi} />
@@ -132,7 +143,13 @@ export default function PrinterSettingsPanel({ ipAddress, onNetworkName }: Print
                             <SettingRow label="DNS Name" value={s.dnsName} />
                         </SettingsSection>
 
-                        <SettingsSection title="TSPL">
+                        <SettingsSection title="Counters">
+                            <SettingRow label="Mileage" value={s.mileage} />
+                            <SettingRow label="Label Counter" value={s.labelCounter} />
+                            <SettingRow label="Cutter Counter" value={s.cutterCounter} />
+                        </SettingsSection>
+
+                        <SettingsSection title="Print">
                             <SelectRow label="Speed" value={editableSettings.speed} width={20} options={['1', '2', '3', '4', '5', '6']} onChange={set('speed')} />
                             <SelectRow label="Density" value={editableSettings.density} width={20} options={['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12']} onChange={set('density')} />
                             <SelectRow label="Direction" value={editableSettings.direction === 0 ? "Normal" : "Reversed"} options={["Normal", "Reversed"]} width={20} onChange={v => set('direction')(v === "Normal" ? 0 : 1)} />
@@ -142,7 +159,7 @@ export default function PrinterSettingsPanel({ ipAddress, onNetworkName }: Print
 
                         <SettingsSection title="Label">
                             <SelectRow label="Post Print Action" width={20} value={editableSettings.postPrint} options={['Tear Off', 'Cutter', 'Peel', 'Off']} onChange={set('postPrint')} />
-                            <SelectRow label="Sensor Type" width={20} value={editableSettings.sensorType} options={['GAP', 'BLINE', 'CONTINUOUS']} onChange={set('sensorType')} />
+                            <SelectRow label="Sensor Type" width={30} value={editableSettings.sensorType} options={['GAP', 'BLINE', 'CONTINUOUS']} onChange={set('sensorType')} />
                             <EditableRow label="Label Width" value={editableSettings.labelWidth} onChange={set('labelWidth')} unit="mm"/>
                             <EditableRow label="Label Height" value={editableSettings.labelHeight} onChange={set('labelHeight')} unit="mm"/>
                             <EditableRow label="Gap Size" value={editableSettings.gapSize} onChange={set('gapSize')} unit="mm"/>
@@ -152,12 +169,6 @@ export default function PrinterSettingsPanel({ ipAddress, onNetworkName }: Print
                             <EditableRow label="Shift Y" value={editableSettings.shiftY} onChange={set('shiftY')} unit="mm"/>
                             <EditableRow label="Reference X" value={editableSettings.referenceX} onChange={set('referenceX')} unit="mm"/>
                             <EditableRow label="Reference Y" value={editableSettings.referenceY} onChange={set('referenceY')} unit="mm"/>
-                        </SettingsSection>
-
-                        <SettingsSection title="Counters">
-                            <SettingRow label="Mileage" value={s.mileage} />
-                            <SettingRow label="Label Counter" value={s.labelCounter} />
-                            <SettingRow label="Cutter Counter" value={s.cutterCounter} />
                         </SettingsSection>
 
                         <SettingsSection title="Locale">
