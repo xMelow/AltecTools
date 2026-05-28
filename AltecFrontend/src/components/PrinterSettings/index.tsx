@@ -3,6 +3,7 @@ import {useFetch} from "../../hooks/useFetch";
 import {CommandResponse, EditableSettings, PrinterSettings, PrinterSettingsPanelProps} from "../../types/printer";
 import {getPrinterSettings, sendPrinterCommand} from "../../api/printers";
 import { EditableRow, SelectRow, SettingRow, SettingsSection} from "./parts";
+import ExportPrinterSettings from "../ExportPrinterSetttings";
 
 export default function PrinterSettingsPanel({ ipAddress, onNetworkName }: PrinterSettingsPanelProps) {
     const settingsFetch = useFetch<PrinterSettings>()
@@ -11,6 +12,7 @@ export default function PrinterSettingsPanel({ ipAddress, onNetworkName }: Print
 
     const [editableSettings, setEditable] = useState<EditableSettings | null>(null)
     const [showSuccess, setShowSuccess] = useState(false)
+    const [showExport, setShowExport] = useState(false)
 
     useEffect(() => {
         if (ipAddress) {
@@ -101,20 +103,22 @@ export default function PrinterSettingsPanel({ ipAddress, onNetworkName }: Print
             <div className="px-4 pt-4 shrink-0">
                 <div className="flex justify-between items-center mb-2">
                     <h3 className="text-lg font-semibold">Printer Settings</h3>
-                    <button
-                        className="text-xs border border-altec-teal text-altec-teal px-2 py-0.5 rounded-lg hover:bg-altec-light transition-colors disabled:opacity-50"
-                        onClick={handleRefresh}
-                        disabled={settingsFetch.loading}
-                    >
-                        Export
-                    </button>
-                    <button
-                        className="text-xs border border-altec-teal text-altec-teal px-2 py-0.5 rounded-lg hover:bg-altec-light transition-colors disabled:opacity-50"
-                        onClick={handleRefresh}
-                        disabled={settingsFetch.loading}
-                    >
-                        Refresh
-                    </button>
+                    <div>
+                        <button
+                            className="mr-2 text-xs border border-altec-teal text-altec-teal px-2 py-0.5 rounded-lg hover:bg-altec-light transition-colors disabled:opacity-50"
+                            onClick={() => setShowExport(true)}
+                        >
+                            Export
+                        </button>
+                        {showExport && <ExportPrinterSettings printerSettings={s!} editableSettings={editableSettings!} closePopUp={() => setShowExport(false)} /> }
+                        <button
+                            className="text-xs border border-altec-teal text-altec-teal px-2 py-0.5 rounded-lg hover:bg-altec-light transition-colors disabled:opacity-50"
+                            onClick={handleRefresh}
+                            disabled={settingsFetch.loading}
+                        >
+                            Refresh
+                        </button>
+                    </div>
                 </div>
                 <hr className="border-b border-altec-teal mb-3" />
             </div>

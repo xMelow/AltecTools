@@ -200,7 +200,7 @@ export default function ExportPrinterSettings({ printerSettings, editableSetting
         // - title "Export Settings"
         // - list of sections with checkboxes
         // - Cancel and Export buttons
-        <div>
+        <div className="fixed inset-0 bg-black/60">
             <h2>Export Settings</h2>
             {Object.entries(sections).map(([key, value]) => (
                 <div key={key}>
