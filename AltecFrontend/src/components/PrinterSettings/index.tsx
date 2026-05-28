@@ -106,6 +106,13 @@ export default function PrinterSettingsPanel({ ipAddress, onNetworkName }: Print
                         onClick={handleRefresh}
                         disabled={settingsFetch.loading}
                     >
+                        Export
+                    </button>
+                    <button
+                        className="text-xs border border-altec-teal text-altec-teal px-2 py-0.5 rounded-lg hover:bg-altec-light transition-colors disabled:opacity-50"
+                        onClick={handleRefresh}
+                        disabled={settingsFetch.loading}
+                    >
                         Refresh
                     </button>
                 </div>
