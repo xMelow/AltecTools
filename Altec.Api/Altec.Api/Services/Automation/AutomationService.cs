@@ -120,4 +120,9 @@ public class AutomationService : IAutomationService
         }
         return result;
     }
+
+    public async Task PrintSdCardLabel(string orderNumber, string version, int amount)
+    {
+        throw new NotImplementedException();
+    }
 }

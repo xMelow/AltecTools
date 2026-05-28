@@ -1,4 +1,5 @@
 ﻿using Altec.Api.Services.Automation;
+using DocumentFormat.OpenXml.Drawing.Charts;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Altec.Api.Controllers;
@@ -23,7 +24,7 @@ public class AutomationController : ControllerBase
         try
         {
             await _automationService.PrintSerialNumbers(excelFile, printerType, printerName);
-            return Ok();
+            return Ok("Labels printed");
         }
         catch (Exception ex)
         {
@@ -41,6 +42,23 @@ public class AutomationController : ControllerBase
         {
             var imageList = await _automationService.PreviewSerialNumbers(excelFile, printerType);
             return Ok(imageList);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest($"Error: {ex.Message}");
+        }
+    }
+
+     [HttpPost("sdcard")]
+    public async Task<IActionResult> SdCard(string orderNumber, string version, int amount)
+    {
+        if (orderNumber == null || orderNumber.Length == 0) return BadRequest("Order number must be present");
+        if (amount == 0) return BadRequest("Amount can't be zero");
+
+        try
+        {
+            await _automationService.PrintSdCardLabel(orderNumber, version, amount);
+            return Ok("Labels printed");
         }
         catch (Exception ex)
         {
