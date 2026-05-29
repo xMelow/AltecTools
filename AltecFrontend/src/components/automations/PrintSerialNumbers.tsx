@@ -88,7 +88,7 @@ export default function PrintSerialNumbers() {
                 onClick={sendRequest} 
                 disabled={loading}
             >
-                {loading ? 'Loading...' : 'Print Labels'}
+                {loading ? 'Loading...' : 'Print'}
             </button>
         </div>
     )

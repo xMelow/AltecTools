@@ -6,7 +6,7 @@ export default function AutomationsScreen() {
         <div>
             <h1 className="text-center text-3xl font-bold text-altec-teal mb-3">Automations</h1>
 
-            <div className="">
+            <div className="flex gap-5">
                 <PrintSerialNumbers />
                 <PrintSdCard />
             </div>

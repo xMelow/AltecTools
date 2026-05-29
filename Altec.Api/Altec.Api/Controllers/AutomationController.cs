@@ -49,7 +49,7 @@ public class AutomationController : ControllerBase
         }
     }
 
-     [HttpPost("sdcard")]
+     [HttpPost("sdCard")]
     public async Task<IActionResult> SdCard([FromForm] string orderNumber, [FromForm] string version, [FromForm] int amount)
     {
         if (orderNumber == null || orderNumber.Length == 0) return BadRequest("Order number must be present");
