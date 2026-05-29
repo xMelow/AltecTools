@@ -147,4 +147,35 @@ public class AutomationService : IAutomationService
         var response = await _httpClient.SendAsync(request);
         response.EnsureSuccessStatusCode();
     }
+
+    public async Task<string> SdCardLabelPreview(string orderNumber, string version)
+    {
+        var requestData = new MultipartFormDataContent();
+        var fileStream = File.OpenRead(_config["LabelPaths:SdCard"]);
+        var variables = new Dictionary<string, string>
+        {
+          ["Order nummer"] = orderNumber,
+          ["Versie"] = version,
+        };
+
+        var json = JsonSerializer.Serialize(variables.ToList());
+        requestData.Add(new StringContent(json), "variables");
+                
+        StreamContent labelStream = new StreamContent(fileStream);
+        requestData.Add(labelStream, "label");
+            
+        var request = new HttpRequestMessage(HttpMethod.Post, "/api/nicelabel/labelPreviewBatch")
+        {
+            Content = requestData
+        };
+
+        var response = await _httpClient.SendAsync(request);
+        response.EnsureSuccessStatusCode();
+
+        var result = await response.Content.ReadFromJsonAsync<byte[]>();
+
+        if (result == null) throw new InvalidOperationException("Failed to deserialize label preview response");
+
+        return result.ToString();
+    }
 }

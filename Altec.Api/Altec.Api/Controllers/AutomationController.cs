@@ -49,7 +49,7 @@ public class AutomationController : ControllerBase
         }
     }
 
-     [HttpPost("sdCard")]
+    [HttpPost("sdCard")]
     public async Task<IActionResult> SdCard([FromForm] string orderNumber, [FromForm] string version, [FromForm] int amount)
     {
         if (orderNumber == null || orderNumber.Length == 0) return BadRequest("Order number must be present");
@@ -59,6 +59,22 @@ public class AutomationController : ControllerBase
         {
             await _automationService.PrintSdCardLabel(orderNumber, version, amount);
             return Ok("Labels printed");
+        }
+        catch (Exception ex)
+        {
+            return BadRequest($"Error: {ex.Message}");
+        }
+    }
+
+    [HttpPost("sdCardPreview")]
+    public async Task<IActionResult> SdCardPreview([FromForm] string orderNumber, [FromForm] string version)
+    {
+        if (orderNumber == null || orderNumber.Length == 0) return BadRequest("Order number must be present");
+
+        try
+        {
+            var labelPreview = await _automationService.SdCardLabelPreview(orderNumber, version);
+            return Ok(labelPreview);
         }
         catch (Exception ex)
         {

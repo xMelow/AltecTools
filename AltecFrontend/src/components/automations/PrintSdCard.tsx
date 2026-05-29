@@ -21,7 +21,7 @@ export default function PrintSdCard() {
         }))
     }
 
-    function getLabelPreview() {
+    function getLabelPreview(orderNumber: number, version: string, amount: number) {
         if (orderNumber == null || version == null || amount == null || amount == 0) return
 
         executePreview(() => previewSdCardLabel({
@@ -47,7 +47,12 @@ export default function PrintSdCard() {
                     id="orderNumber" 
                     name="orderNumber"
                     value={orderNumber}
-                    onChange={(e) => setOrderNumber(Number(e.target.value))} />
+                    onChange={(e) => {
+                            const orderNumber = Number(e.target.value)
+                            setOrderNumber(orderNumber) 
+                            getLabelPreview(orderNumber, version, amount)
+                        }}
+                    />
 
                 <label className="text-xs font-semibold text-altec-teal uppercase tracking-wide mb-1">Version</label>
                 <input 
@@ -56,7 +61,12 @@ export default function PrintSdCard() {
                     id="version" 
                     name="version" 
                     value={version}
-                    onChange={(e) => setVersion(e.target.value)} />
+                    onChange={(e) => {
+                            const version = e.target.value
+                            setVersion(version)
+                            if (orderNumber != null) getLabelPreview(orderNumber, version, amount)
+                        }}
+                    />
 
                 <label className="text-xs font-semibold text-altec-teal uppercase tracking-wide mb-1">Amount</label>
                 <input 
@@ -65,7 +75,12 @@ export default function PrintSdCard() {
                     id="amount" 
                     name="amount"
                     value={amount}
-                    onChange={(e) => setAmount(Number(e.target.value))} />
+                    onChange={(e) => { 
+                            const amount = Number(e.target.value)
+                            setAmount(amount)
+                            if (orderNumber != null) getLabelPreview(orderNumber, version, amount)
+                        }}
+                    />
             </div>
 
             <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide mb-1">Label Preview</p>
