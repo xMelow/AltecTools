@@ -124,15 +124,16 @@ public class AutomationService : IAutomationService
     public async Task PrintSdCardLabel(string orderNumber, string version, int amount)
     {
         var requestData = new MultipartFormDataContent();
-        var fileStream = File.OpenRead(_config["LabelPaths:Sdkaart"]);
+        var fileStream = File.OpenRead(_config["LabelPaths:SdCard"]);
         var variables = new Dictionary<string, string>
         {
           ["Order nummer"] = orderNumber,
           ["Versie"] = version,
-          ["Aantal"] = amount.ToString()
         };
 
-        var json = JsonSerializer.Serialize(variables);
+        var data = Enumerable.Repeat(variables, amount).ToList();
+
+        var json = JsonSerializer.Serialize(data);
         requestData.Add(new StringContent(json), "variables");
                 
         StreamContent labelStream = new StreamContent(fileStream);
