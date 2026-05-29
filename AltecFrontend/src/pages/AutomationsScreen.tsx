@@ -1,4 +1,5 @@
-import PrintSerialNumbers from "../components/PrintSerialNumbers"
+import PrintSdCard from "../components/automations/PrintSdCard"
+import PrintSerialNumbers from "../components/automations/PrintSerialNumbers"
 
 export default function AutomationsScreen() {
     return (
@@ -7,6 +8,7 @@ export default function AutomationsScreen() {
 
             <div className="">
                 <PrintSerialNumbers />
+                <PrintSdCard />
             </div>
         </div>
     )

@@ -1,7 +1,7 @@
 import { useState } from "react"
-import { previewSerialNumbers, printSerialNumbers } from "../api/automation"
-import { useFetch } from "../hooks/useFetch";
-import { SerialNumberRequest } from "../types/automation";
+import { previewSerialNumbers, printSerialNumbers } from "../../api/automation"
+import { useFetch } from "../../hooks/useFetch";
+import { SerialNumberRequest } from "../../types/automation";
 
 export default function PrintSerialNumbers() {
     const [excelFile, setExcelFile] = useState<File | null>(null)
