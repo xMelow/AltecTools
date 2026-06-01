@@ -44,7 +44,7 @@ export default function PrintSdCard() {
     }, [orderNumber, version])
 
     return (
-        <div className="shadow-md rounded-2xl p-3 bg-white w-1/4">
+        <div className="shadow-md rounded-2xl p-3 bg-white w-1/4 border border-altec-teal">
             <h2 className="text-xl font-semibold pt-1 mb-2 text-center">Sd Kaart</h2>
 
             <hr className="border-b border-altec-teal mb-4" />
