@@ -8,7 +8,7 @@ export default function PrintSdCard() {
     const [orderNumber, setOrderNumber] = useState<number>()
     const [version, setVersion] = useState<string>("v1")
     const [amount, setAmount] = useState<number>(1)
-    const { loading, error, result, execute } = useFetch<SdCardRequest>()
+    const { loading, error, result, execute } = useFetch<string>()
      const { loading: previewLoading, error: previewError, result: labelPreview, execute: executePreview } = useFetch<string>()
 
     function sendRequest() {
@@ -36,8 +36,6 @@ export default function PrintSdCard() {
             <h2 className="text-xl font-semibold pt-1 mb-2 text-center">Sd Kaart</h2>
 
             <hr className="border-b border-altec-teal mb-4" />
-
-            {error && <p className="text-red-500">{error}</p>}
 
             <div className="flex flex-col gap-2 mb-4">
                 <label className="text-xs font-semibold text-altec-teal uppercase tracking-wide mb-1">Order nummer</label>
@@ -85,12 +83,17 @@ export default function PrintSdCard() {
 
             <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide mb-1">Label Preview</p>
             <div className="mb-4">
+                {previewLoading && <p className="text-xs text-gray-400">Loading preview...</p>}
+                {previewError && <p className="text-xs text-red-500">{previewError}</p>}
                 {labelPreview ? (
-                    <img className="border border-altec-dark rounded-sm w-full" src={labelPreview} alt="Label preview" />
+                    <img className="border border-altec-dark rounded-sm w-full" src={"data:image/png;base64," + labelPreview} alt="Label preview" />
                 ) : (
                     !previewLoading && <p className="text-xs text-gray-400">Preview will appear here...</p>
                 )}
             </div>
+
+            {error && <p className="text-red-500">{error}</p>}
+            {result && <p className="text-green-500">{result}</p>}
 
             <button
                 className="w-full border bg-altec-teal text-altec-white p-1.5 rounded-xl mt-2"

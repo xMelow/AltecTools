@@ -158,7 +158,9 @@ public class AutomationService : IAutomationService
           ["Versie"] = version,
         };
 
-        var json = JsonSerializer.Serialize(variables.ToList());
+        var data = new List<Dictionary<string,string>> { variables };
+
+        var json = JsonSerializer.Serialize(data);
         requestData.Add(new StringContent(json), "variables");
                 
         StreamContent labelStream = new StreamContent(fileStream);
@@ -172,10 +174,10 @@ public class AutomationService : IAutomationService
         var response = await _httpClient.SendAsync(request);
         response.EnsureSuccessStatusCode();
 
-        var result = await response.Content.ReadFromJsonAsync<byte[]>();
+        var result = await response.Content.ReadFromJsonAsync<List<byte[]>>();
 
         if (result == null) throw new InvalidOperationException("Failed to deserialize label preview response");
 
-        return result.ToString();
+        return Convert.ToBase64String(result[0]);
     }
 }

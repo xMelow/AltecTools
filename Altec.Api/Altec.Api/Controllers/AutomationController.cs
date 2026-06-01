@@ -52,7 +52,7 @@ public class AutomationController : ControllerBase
     [HttpPost("sdCard")]
     public async Task<IActionResult> SdCard([FromForm] string orderNumber, [FromForm] string version, [FromForm] int amount)
     {
-        if (orderNumber == null || orderNumber.Length == 0) return BadRequest("Order number must be present");
+        if (string.IsNullOrEmpty(orderNumber)) return BadRequest("Order number must be present");
         if (amount == 0) return BadRequest("Amount can't be zero");
 
         try
@@ -69,12 +69,12 @@ public class AutomationController : ControllerBase
     [HttpPost("sdCardPreview")]
     public async Task<IActionResult> SdCardPreview([FromForm] string orderNumber, [FromForm] string version)
     {
-        if (orderNumber == null || orderNumber.Length == 0) return BadRequest("Order number must be present");
+        if (string.IsNullOrEmpty(orderNumber)) return BadRequest("Order number must be present");
 
         try
         {
             var labelPreview = await _automationService.SdCardLabelPreview(orderNumber, version);
-            return Ok(labelPreview);
+            return Ok(new { image = labelPreview });
         }
         catch (Exception ex)
         {

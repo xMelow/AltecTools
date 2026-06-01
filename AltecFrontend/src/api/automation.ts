@@ -30,7 +30,7 @@ export async function previewSerialNumbers(body: SerialNumberRequest): Promise<s
     return await res.json()
 }
 
-export async function printSdCard(body: SdCardRequest) {
+export async function printSdCard(body: SdCardRequest): Promise<string> {
     const formData = new FormData()
     formData.append('orderNumber', body.orderNumber.toString())
     formData.append('version', body.version)
@@ -43,14 +43,13 @@ export async function printSdCard(body: SdCardRequest) {
 
     if (!res.ok) throw new Error("Failed to print SD card label")
 
-    return await res.json()
+    return await res.text()
 }
 
 export async function previewSdCardLabel(body: SdCardRequest): Promise<string> {
     const formData = new FormData()
     formData.append('orderNumber', body.orderNumber.toString())
     formData.append('version', body.version)
-    formData.append('amount', body.amount.toString())
 
     const res = await fetch(`/api/automation/sdCardPreview`, {
         method: 'POST',
@@ -59,5 +58,7 @@ export async function previewSdCardLabel(body: SdCardRequest): Promise<string> {
 
     if (!res.ok) throw new Error("Failed to get SD Card preview")
 
-    return await res.json()
+    const data = await res.json()
+
+    return data.image
 }
