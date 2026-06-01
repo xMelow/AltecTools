@@ -120,4 +120,64 @@ public class AutomationService : IAutomationService
         }
         return result;
     }
+
+    public async Task PrintSdCardLabel(string orderNumber, string version, int amount)
+    {
+        var requestData = new MultipartFormDataContent();
+        var fileStream = File.OpenRead(_config["LabelPaths:SdCard"]);
+        var variables = new Dictionary<string, string>
+        {
+          ["Order nummer"] = orderNumber,
+          ["Versie"] = version,
+        };
+
+        var data = Enumerable.Repeat(variables, amount).ToList();
+
+        var json = JsonSerializer.Serialize(data);
+        requestData.Add(new StringContent(json), "variables");
+                
+        StreamContent labelStream = new StreamContent(fileStream);
+        requestData.Add(labelStream, "label");
+            
+        var request = new HttpRequestMessage(HttpMethod.Post, "/api/nicelabel/printLabelVariables")
+        {
+            Content = requestData
+        };
+
+        var response = await _httpClient.SendAsync(request);
+        response.EnsureSuccessStatusCode();
+    }
+
+    public async Task<string> SdCardLabelPreview(string orderNumber, string version)
+    {
+        var requestData = new MultipartFormDataContent();
+        var fileStream = File.OpenRead(_config["LabelPaths:SdCard"]);
+        var variables = new Dictionary<string, string>
+        {
+          ["Order nummer"] = orderNumber,
+          ["Versie"] = version,
+        };
+
+        var data = new List<Dictionary<string,string>> { variables };
+
+        var json = JsonSerializer.Serialize(data);
+        requestData.Add(new StringContent(json), "variables");
+                
+        StreamContent labelStream = new StreamContent(fileStream);
+        requestData.Add(labelStream, "label");
+            
+        var request = new HttpRequestMessage(HttpMethod.Post, "/api/nicelabel/labelPreviewBatch")
+        {
+            Content = requestData
+        };
+
+        var response = await _httpClient.SendAsync(request);
+        response.EnsureSuccessStatusCode();
+
+        var result = await response.Content.ReadFromJsonAsync<List<byte[]>>();
+
+        if (result == null) throw new InvalidOperationException("Failed to deserialize label preview response");
+
+        return Convert.ToBase64String(result[0]);
+    }
 }
