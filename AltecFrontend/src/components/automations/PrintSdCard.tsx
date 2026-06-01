@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useFetch } from "../../hooks/useFetch"
 import { SdCardRequest } from "../../types/automation"
 import { previewSdCardLabel, printSdCard } from "../../api/automation"
@@ -30,6 +30,18 @@ export default function PrintSdCard() {
             amount: amount
         }))
     }
+
+    useEffect(() => {
+      if (orderNumber == null) return
+
+      const timer = setTimeout(() => {
+          getLabelPreview(orderNumber, version, amount)
+      }, 500)
+
+      return () => {
+          clearTimeout(timer)
+      }
+    }, [orderNumber, version])
 
     return (
         <div className="shadow-md rounded-2xl p-3 bg-white w-1/4">
