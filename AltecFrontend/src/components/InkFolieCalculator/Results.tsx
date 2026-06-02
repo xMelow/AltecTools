@@ -1,5 +1,5 @@
-import type {CalculationResult} from "../types/label.ts";
-import LabelBreakdownTable from "./LabelBreakDownTable.tsx";
+import type {CalculationResult} from "../../types/label";
+import LabelBreakdownTable from "./LabelBreakDownTable";
 
 type ResultsProps = {
     calculationResult: CalculationResult

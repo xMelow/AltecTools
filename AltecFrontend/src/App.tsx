@@ -1,10 +1,11 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import HomeScreen from './pages/HomeScreen'
 import Navbar from './components/Navbar'
-import TsplScreen from './pages/TsplScreen'
+import TsplScreen from './pages/TsplPreviewScreen'
 import PrinterScreen from './pages/PrinterScreen'
 import AutomationsScreen from './pages/AutomationsScreen'
 import PrinterDetailedScreen from "./pages/PrinterDetailedScreen";
+import InktFolieCalculatorScreen from './pages/InkFolieCalculatorScreen'
 
 export default function App() {
   return (
@@ -24,6 +25,7 @@ export default function App() {
                       <Route path='/printers' element={<PrinterScreen />} />
                       <Route path='/automations' element={<AutomationsScreen />} />
                       <Route path='/printers/:ipAddress' element={<PrinterDetailedScreen />} />
+                      <Route path='/tools/ink-calculator' element={<InktFolieCalculatorScreen />} />
                   </Routes>
               </main>
             </div>

@@ -1,4 +1,4 @@
-import type {Label, LabelOrder} from "../types/label.ts";
+import type {Label, LabelOrder} from "../../types/label";
 
 type LabelCardProps = {
     labelOrder: LabelOrder,

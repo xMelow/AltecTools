@@ -1,5 +1,5 @@
-import type {Label, LabelOrder} from "../types/label.ts";
-import LabelCard from "./LabelCard.tsx";
+import type {Label, LabelOrder} from "../../types/label";
+import LabelCard from "./LabelCard";
 
 type LabelListProps = {
     labelOrders: LabelOrder[],

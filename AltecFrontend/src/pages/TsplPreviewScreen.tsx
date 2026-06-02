@@ -35,7 +35,7 @@ export default function TsplScreen() {
 
     return (
         <div>
-            <h2 className="text-center text-3xl font-bold text-altec-teal mb-4">Label Preview</h2>
+            <h2 className="text-center text-3xl font-bold text-altec-teal mb-4">TSPL Preview</h2>
 
             <div className="flex gap-4 items-start">
 

@@ -1,4 +1,4 @@
-import type {LabelBreakdown} from "../types/label.ts";
+import type {LabelBreakdown} from "../../types/label";
 
 type LabelBreakdownTableProps = {
     labelBreakDownList: LabelBreakdown[]
