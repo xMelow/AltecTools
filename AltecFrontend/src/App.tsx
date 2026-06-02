@@ -1,6 +1,6 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import HomeScreen from './pages/HomeScreen'
-import Navbar from './components/Navbar'
+import Navbar from './components/Navbar/Navbar'
 import TsplScreen from './pages/TsplPreviewScreen'
 import PrinterScreen from './pages/PrinterScreen'
 import AutomationsScreen from './pages/AutomationsScreen'
@@ -20,12 +20,12 @@ export default function App() {
               </header>
               <main className="max-w-10xl mx-auto px-6 py-8">
                   <Routes>
-                      <Route path="/" element={<HomeScreen />}/>
-                      <Route path='/tspl' element={<TsplScreen />} />
-                      <Route path='/printers' element={<PrinterScreen />} />
-                      <Route path='/automations' element={<AutomationsScreen />} />
-                      <Route path='/printers/:ipAddress' element={<PrinterDetailedScreen />} />
-                      <Route path='/tools/ink-calculator' element={<InktFolieCalculatorScreen />} />
+                        <Route path="/" element={<HomeScreen />}/>
+                        <Route path='/printers' element={<PrinterScreen />} />
+                        <Route path='/automations' element={<AutomationsScreen />} />
+                        <Route path='/printers/:ipAddress' element={<PrinterDetailedScreen />} />
+                        <Route path='/tools/tspl-preview' element={<TsplScreen />} />
+                        <Route path='/tools/ink-calculator' element={<InktFolieCalculatorScreen />} />
                   </Routes>
               </main>
             </div>
