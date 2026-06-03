@@ -40,13 +40,13 @@ export default function Navbar() {
                     : <li
                         key={link.name}
                         className=""
-                    >
-                        <NavLink
-                            className={({ isActive }) => isActive ? 'nav-link-active' : 'nav-link'}
-                            to={link.path}
                         >
-                            {link.name}
-                        </NavLink>
+                            <NavLink
+                                className={({ isActive }) => isActive ? 'nav-link-active' : 'nav-link'}
+                                to={link.path}
+                            >
+                                {link.name}
+                            </NavLink>
                     </li>
                 ))}
             </ul>

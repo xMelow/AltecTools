@@ -15,22 +15,25 @@ type NavLinkDropdownProps = {
 export default function NavLinkDropdown({ link }: NavLinkDropdownProps) {    
 
     return (
-        <div className="group">
+        <div className="group relative bg-altec-gray">
             <NavLink 
+                className="nav-link"
                 key={link.name}
                 to={link.path}
             >
                 {link.name}
             </NavLink>
-            {link.children.map(el => (
-                <NavLink 
-                    className="hidden group-hover:block"
-                    key={el.name} 
-                    to={el.path}
-                >
-                    {el.name}
-                </NavLink>
-            ))}
+            <div className="hidden group-hover:block absolute top-full pb-2 pl-2 bg-altec-gray min-w-3xs flex flex-col">
+                {link.children.map(el => (
+                        <NavLink 
+                            className="nav-link block pt-2"
+                            key={el.name} 
+                            to={el.path}
+                        >
+                            {el.name}
+                        </NavLink>
+                ))}
+             </div>
         </div>
     )
 }
