@@ -6,7 +6,7 @@ import { SerialNumberRequest } from "../../types/automation";
 export default function PrintSerialNumbers() {
     const [excelFile, setExcelFile] = useState<File | null>(null)
     const [printerType, setPrinterType] = useState<string>("ATP-300NL")
-    const { loading, error, result, execute } = useFetch<SerialNumberRequest>()
+    const { loading, error, result, execute } = useFetch<string>()
     const { loading: previewLoading, error: previewError, result: labelPreviews, execute: executePreview } = useFetch<string[]>() 
  
     async function sendRequest() {
@@ -26,12 +26,12 @@ export default function PrintSerialNumbers() {
     }
     
     return (
-        <div className="shadow-md rounded-2xl p-3 bg-white w-1/4">
+        <div className="shadow-md rounded-2xl p-3 bg-white w-1/4 border border-altec-teal">
             <h2 className="text-xl font-semibold pt-1 mb-2 text-center">Serie nummers nieuwe printers</h2>
 
             <hr className="border-b border-altec-teal mb-4" />
 
-            {error && <p className="text-red-500">{error}</p>}
+            
 
             <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide mb-1">File</p>
             <div className="flex flex-col gap-2 mb-4">
@@ -82,6 +82,9 @@ export default function PrintSerialNumbers() {
                     !previewLoading && <p className="text-xs text-gray-400">Preview will appear here...</p>
                 )}
             </div>
+
+            {error && <p className="text-red-500">{error}</p>}
+            {result && <p className="text-green-500">{result}</p>}
 
             <button
                 className="w-full border bg-altec-teal text-altec-white p-1.5 rounded-xl mt-2"

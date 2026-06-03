@@ -1,6 +1,6 @@
 import { SdCardRequest, SerialNumberRequest } from "../types/automation";
 
-export async function printSerialNumbers(body: SerialNumberRequest) {
+export async function printSerialNumbers(body: SerialNumberRequest): Promise<string> {
     const formData = new FormData()
     formData.append('excelFile', body.excelFile)
     formData.append('printerType', body.type)
@@ -12,7 +12,7 @@ export async function printSerialNumbers(body: SerialNumberRequest) {
 
     if (!res.ok) throw new Error("Failed to print serial numbers labels")
 
-    return await res.json()
+    return await res.text()
 }
 
 export async function previewSerialNumbers(body: SerialNumberRequest): Promise<string[]> {
