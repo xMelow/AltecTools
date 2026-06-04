@@ -1,8 +1,9 @@
 using System.Text;
+using Altec.Api.Services.Printers;
 
 namespace Altec.Api.Domain.Printers;
 
-public class UsbConnector
+public class UsbConnector : IDisposable, IPrinterConnection
 {
     private FileStream _stream;
 
@@ -46,5 +47,10 @@ public class UsbConnector
         {
             throw new IOException("Unable to read data from the printer", ex);
         }
+    }
+
+    public void Dispose()
+    {
+        _stream?.Dispose();
     }
 }
