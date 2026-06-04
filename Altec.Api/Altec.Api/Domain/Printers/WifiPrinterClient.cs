@@ -20,7 +20,17 @@ public class WifiPrinterClient : IPrinterConnection, IDisposable
 
     public string Read()
     {
-        throw new NotImplementedException();
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+        var buffer = new byte[4096];
+        var readTask = _stream.ReadAsync(buffer, cts.Token).AsTask();
+        var timeoutTask = Task.Delay(TimeSpan.FromSeconds(1), cts.Token);
+        
+        var completed = Task.WhenAny(readTask, timeoutTask).GetAwaiter().GetResult();
+        if (completed != readTask)
+            return "Printer didn't respond in time.";
+            
+        var bytesRead = readTask.GetAwaiter().GetResult();
+        return Encoding.ASCII.GetString(buffer, 0, bytesRead);
     }
 
     public void Send(string command)
