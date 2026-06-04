@@ -1,5 +1,4 @@
 using System.Text;
-using Altec.Api.Services.Printers;
 
 namespace Altec.Api.Domain.Printers;
 
@@ -29,7 +28,7 @@ public class UsbConnector : IDisposable, IPrinterConnection
         }
         catch (IOException ex)
         {
-            throw new IOException("Unable to send command to printer.", ex);
+            throw new IOException("Unable to send command to printer via usb", ex);
         }
     }
 

@@ -1,4 +1,4 @@
-namespace Altec.Api.Services.Printers;
+namespace Altec.Api.Domain.Printers;
 
 public interface IPrinterConnection
 {

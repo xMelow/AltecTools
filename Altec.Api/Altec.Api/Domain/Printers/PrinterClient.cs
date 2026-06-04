@@ -1,16 +1,17 @@
+namespace Altec.Api.Domain.Printers;
 
-
-using Altec.Api.Services.Printers;
-
-public class PrinterClient : IPrinterConnection
+public class PrinterClient
 {
-    public string Read()
+    private readonly IPrinterConnection _printerConnection;
+
+    public PrinterClient(IPrinterConnection printerConnection)
     {
-        throw new NotImplementedException();
+        _printerConnection = printerConnection;
     }
 
-    public void Send(string command)
+    public string SendCommand(string command)
     {
-        throw new NotImplementedException();
+        _printerConnection.Send(command);
+        return _printerConnection.Read();
     }
 }
