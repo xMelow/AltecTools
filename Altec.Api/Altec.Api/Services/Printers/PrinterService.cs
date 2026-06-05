@@ -6,10 +6,13 @@ namespace Altec.Api.Services.Printers;
 
 public class PrinterService : IPrinterService
 {
-    private readonly PrinterDiscovery _printerDiscovery;    
-    public PrinterService(PrinterDiscovery printerDiscovery)
+    private readonly PrinterDiscovery _printerDiscovery;
+    private readonly PrinterResponseParser _parser;
+
+    public PrinterService(PrinterDiscovery printerDiscovery, PrinterResponseParser parser)
     {
         _printerDiscovery = printerDiscovery;
+        _parser = parser;
     }
     
     public async Task<IReadOnlyList<Printer>> GetPrinters(List<string> subnets)
@@ -18,16 +21,19 @@ public class PrinterService : IPrinterService
         return result;
     }
 
-    public async Task<PrinterInfo> GetPrinterInfo(string ipAddress)
+    public PrinterInfo GetPrinterInfo(PrinterConnectionType connectionType, string address)
     {
-        var ip = IPAddress.Parse(ipAddress);
-        return await _printerDiscovery.GetPrinterSettings(ip);
+
+        var connection = CreateConnection(connectionType, address);
+        using var client = new PrinterClient(connection);
+        var result = client.SendCommand(PrinterCommands.GetBasicInfo());
+        return _parser.ParseSettings(result);
     }
 
-    public async Task<string> SendCommand(string ipAddress, string command)
+    public string SendCommand(PrinterConnectionType connectionType, string address, string command)
     {
-        var ip = IPAddress.Parse(ipAddress);
-        using var client = new PrinterClient(new WifiPrinterClient(ip));
+        var connection = CreateConnection(connectionType, address);
+        using var client = new PrinterClient(connection);
         return client.SendCommand(command);
     }
 
@@ -35,5 +41,17 @@ public class PrinterService : IPrinterService
     {
         var ip = IPAddress.Parse(ipAddress);
         return await _printerDiscovery.SendPrinterFiles(ip, files);
+    }
+
+    private IPrinterConnection CreateConnection(PrinterConnectionType connectionType, string address)
+    {
+        IPrinterConnection connection = connectionType switch
+        {
+            PrinterConnectionType.Wifi => new WifiPrinterClient(IPAddress.Parse(address)),
+            PrinterConnectionType.Usb => new UsbConnector(address),
+            _ => throw new ArgumentException("Unknown connection type")
+        };
+
+        return connection;
     }
 }
