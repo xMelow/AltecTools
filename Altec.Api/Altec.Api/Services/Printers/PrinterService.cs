@@ -1,5 +1,8 @@
 ﻿using System.Net;
-using Altec.Api.Domain.Printers;
+using Altec.Api.Domain.Printers.Communication;
+using Altec.Api.Domain.Printers.Connections;
+using Altec.Api.Domain.Printers.Discovery;
+using Altec.Api.Domain.Printers.Parsing;
 using Altec.Api.Record.Printers;
 
 namespace Altec.Api.Services.Printers;

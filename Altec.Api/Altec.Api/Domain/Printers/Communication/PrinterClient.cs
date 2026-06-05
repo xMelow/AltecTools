@@ -1,3 +1,5 @@
+using Altec.Api.Domain.Printers.Connections;
+
 namespace Altec.Api.Domain.Printers.Communication;
 
 public class PrinterClient : IDisposable

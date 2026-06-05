@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using Altec.Api.Domain.Printers.Communication;
 
 namespace Altec.Api.Domain.Printers.Connections;
 
@@ -45,6 +46,11 @@ public class WifiPrinterClient : IPrinterConnection, IDisposable
         {
             throw new IOException("Unable to send command using Wifi", ex);
         }
+    }
+
+    public void SendFiles(IEnumerable<PrinterFile> files)
+    {
+        throw new NotImplementedException();
     }
 
     public void Dispose()
