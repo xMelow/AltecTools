@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace Altec.Api.Domain.Printers;
+namespace Altec.Api.Domain.Printers.Connections;
 
 public class UsbConnector : IDisposable, IPrinterConnection
 {

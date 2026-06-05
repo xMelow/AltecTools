@@ -2,7 +2,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
-namespace Altec.Api.Domain.Printers;
+namespace Altec.Api.Domain.Printers.Connections;
 
 public class WifiPrinterClient : IPrinterConnection, IDisposable
 {

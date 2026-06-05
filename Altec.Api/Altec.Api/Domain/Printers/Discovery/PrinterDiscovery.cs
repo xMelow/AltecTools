@@ -1,9 +1,12 @@
 ﻿using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using Altec.Api.Domain.Printers.Communication;
+using Altec.Api.Domain.Printers.Parsing;
+using Altec.Api.Domain.Printers.Connections;
 using Altec.Api.Record.Printers;
 
-namespace Altec.Api.Domain.Printers;
+namespace Altec.Api.Domain.Printers.Discovery;
 
 public class PrinterDiscovery
 {

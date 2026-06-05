@@ -1,4 +1,4 @@
-namespace Altec.Api.Domain.Printers;
+namespace Altec.Api.Domain.Printers.Communication;
 
 public class PrinterClient : IDisposable
 {

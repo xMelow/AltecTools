@@ -1,7 +1,7 @@
 using System.Globalization;
 using Altec.Api.Record.Printers;
 
-namespace Altec.Api.Domain.Printers; 
+namespace Altec.Api.Domain.Printers.Parsing; 
 
 public class PrinterResponseParser
 {
