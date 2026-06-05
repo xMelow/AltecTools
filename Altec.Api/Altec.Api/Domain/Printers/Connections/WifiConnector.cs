@@ -5,13 +5,13 @@ using Altec.Api.Domain.Printers.Communication;
 
 namespace Altec.Api.Domain.Printers.Connections;
 
-public class WifiPrinterClient : IPrinterConnection, IDisposable
+public class WifiConnector : IPrinterConnection, IDisposable
 {
     private readonly TcpClient _client;
     private readonly NetworkStream _stream;
     private const int PrinterPort = 9100;
     
-    public WifiPrinterClient(IPAddress ipAddress)
+    public WifiConnector(IPAddress ipAddress)
     {
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
         _client = new TcpClient();
@@ -52,6 +52,41 @@ public class WifiPrinterClient : IPrinterConnection, IDisposable
     {
         throw new NotImplementedException();
     }
+
+    // public async Task<string> SendPrinterFiles(IPAddress ip, IEnumerable<(Stream stream, string fileName, string memory)> files)
+    // {
+    //     using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+    //     using var client = new TcpClient();
+    //     await client.ConnectAsync(ip, PrinterPort, cts.Token);
+    //     using var tcpStream = client.GetStream();
+
+    //     foreach (var (stream, fileName, memory) in files)
+    //     {
+    //         var memPrefix = memory switch { "F" => "F,", "E" => "E,", _ => "" };
+    //         var ext = Path.GetExtension(fileName).ToUpperInvariant();
+
+    //         if (ext == ".BAS")
+    //         {
+    //             var header = Encoding.ASCII.GetBytes($"DOWNLOAD {memPrefix}\"{fileName}\"\r\n");
+    //             await tcpStream.WriteAsync(header, cts.Token);
+    //             await stream.CopyToAsync(tcpStream, cts.Token);
+    //             await tcpStream.WriteAsync(Encoding.ASCII.GetBytes("\r\nEOP\r\n"), cts.Token);
+    //         }
+    //         else
+    //         {
+    //             using var ms = new MemoryStream();
+    //             await stream.CopyToAsync(ms, cts.Token);
+    //             var fileBytes = ms.ToArray();
+    //             var header = Encoding.ASCII.GetBytes($"DOWNLOAD {memPrefix}\"{fileName}\",{fileBytes.Length},");
+    //             await tcpStream.WriteAsync(header, cts.Token);
+    //             await tcpStream.WriteAsync(fileBytes, cts.Token);
+    //             await tcpStream.WriteAsync(Encoding.ASCII.GetBytes("\r\n"), cts.Token);
+    //         }
+    //     }
+
+    //     await tcpStream.FlushAsync(cts.Token);
+    //     return "File sent successfully";
+    // }
 
     public void Dispose()
     {

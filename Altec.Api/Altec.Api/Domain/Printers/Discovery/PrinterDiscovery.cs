@@ -11,9 +11,6 @@ namespace Altec.Api.Domain.Printers.Discovery;
 public class PrinterDiscovery
 {
     private const int PrinterPort = 9100;
-
-    private readonly PrinterResponseParser _parser = new PrinterResponseParser();
-
     public async Task<IReadOnlyList<Printer>> Discover(List<string> subnets)
     {
         List<Printer> printers = new List<Printer>();
@@ -147,61 +144,5 @@ public class PrinterDiscovery
         {
             return false;
         }
-    }
-
-    private async Task<(string printerDnsName, string printerModelName)> GetPrinterInfo(IPAddress ip)
-    {
-        using var client = new PrinterClient(new WifiPrinterClient(ip));
-        var response = client.SendCommand(PrinterCommands.GetBasicInfo());
-        var settings = response
-            .Split('\n', StringSplitOptions.RemoveEmptyEntries)
-            .Select(l => l.Trim())
-            .Where(l => l.Contains('='))
-            .Select(l => l.Split('=', 2))
-            .ToDictionary(parts => parts[0], parts => parts[1].Trim(), StringComparer.OrdinalIgnoreCase);
-
-        return (settings.GetValueOrDefault("NAME", "Not found"), settings.GetValueOrDefault("MODEL", "Unknown"));
-    }
-
-    public async Task<PrinterInfo> GetPrinterSettings(IPAddress ip)
-    {
-        using var client = new PrinterClient(new WifiPrinterClient(ip));
-        var response = client.SendCommand(PrinterCommands.GetAllSettings());
-        return _parser.ParseSettings(response);
-    }
-
-    public async Task<string> SendPrinterFiles(IPAddress ip, IEnumerable<(Stream stream, string fileName, string memory)> files)
-    {
-        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
-        using var client = new TcpClient();
-        await client.ConnectAsync(ip, PrinterPort, cts.Token);
-        using var tcpStream = client.GetStream();
-
-        foreach (var (stream, fileName, memory) in files)
-        {
-            var memPrefix = memory switch { "F" => "F,", "E" => "E,", _ => "" };
-            var ext = Path.GetExtension(fileName).ToUpperInvariant();
-
-            if (ext == ".BAS")
-            {
-                var header = Encoding.ASCII.GetBytes($"DOWNLOAD {memPrefix}\"{fileName}\"\r\n");
-                await tcpStream.WriteAsync(header, cts.Token);
-                await stream.CopyToAsync(tcpStream, cts.Token);
-                await tcpStream.WriteAsync(Encoding.ASCII.GetBytes("\r\nEOP\r\n"), cts.Token);
-            }
-            else
-            {
-                using var ms = new MemoryStream();
-                await stream.CopyToAsync(ms, cts.Token);
-                var fileBytes = ms.ToArray();
-                var header = Encoding.ASCII.GetBytes($"DOWNLOAD {memPrefix}\"{fileName}\",{fileBytes.Length},");
-                await tcpStream.WriteAsync(header, cts.Token);
-                await tcpStream.WriteAsync(fileBytes, cts.Token);
-                await tcpStream.WriteAsync(Encoding.ASCII.GetBytes("\r\n"), cts.Token);
-            }
-        }
-
-        await tcpStream.FlushAsync(cts.Token);
-        return "File sent successfully";
     }
 }

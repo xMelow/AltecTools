@@ -4,6 +4,7 @@ using Altec.Api.Domain.Printers.Connections;
 using Altec.Api.Domain.Printers.Discovery;
 using Altec.Api.Domain.Printers.Parsing;
 using Altec.Api.Record.Printers;
+using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 
 namespace Altec.Api.Services.Printers;
 
@@ -33,24 +34,25 @@ public class PrinterService : IPrinterService
         return _parser.ParseSettings(result);
     }
 
-    public string SendCommand(PrinterConnectionType connectionType, string address, string command)
+    public void SendCommand(PrinterConnectionType connectionType, string address, string command)
     {
         var connection = CreateConnection(connectionType, address);
         using var client = new PrinterClient(connection);
-        return client.SendCommand(command);
+        client.SendCommand(command);
     }
 
-    public async Task<string> SendFiles(string ipAddress, IEnumerable<(Stream stream, string fileName, string memory)> files)
+    public void SendFiles(PrinterConnectionType connectionType, string address, IEnumerable<PrinterFile> files)
     {
-        var ip = IPAddress.Parse(ipAddress);
-        return await _printerDiscovery.SendPrinterFiles(ip, files);
+        var connection = CreateConnection(connectionType, address);
+        using var client = new PrinterClient(connection);
+        client.SendFile(files);
     }
 
     private IPrinterConnection CreateConnection(PrinterConnectionType connectionType, string address)
     {
         IPrinterConnection connection = connectionType switch
         {
-            PrinterConnectionType.Wifi => new WifiPrinterClient(IPAddress.Parse(address)),
+            PrinterConnectionType.Wifi => new WifiConnector(IPAddress.Parse(address)),
             PrinterConnectionType.Usb => new UsbConnector(address),
             _ => throw new ArgumentException("Unknown connection type")
         };

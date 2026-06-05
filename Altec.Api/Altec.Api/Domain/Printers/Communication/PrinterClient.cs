@@ -17,6 +17,11 @@ public class PrinterClient : IDisposable
         return _printerConnection.Read();
     }
 
+    public void SendFile(IEnumerable<PrinterFile> files)
+    {
+        _printerConnection.SendFiles(files);
+    }
+
     public void Dispose()
     {
         if (_printerConnection is IDisposable disposable)
