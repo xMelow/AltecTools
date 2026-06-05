@@ -8,8 +8,9 @@ namespace Altec.Api.Domain.Printers;
 public class PrinterDiscovery
 {
     private const int PrinterPort = 9100;
+
     private readonly PrinterResponseParser _parser = new PrinterResponseParser();
-    
+
     public async Task<IReadOnlyList<Printer>> Discover(List<string> subnets)
     {
         List<Printer> printers = new List<Printer>();
@@ -147,13 +148,8 @@ public class PrinterDiscovery
 
     private async Task<(string printerDnsName, string printerModelName)> GetPrinterInfo(IPAddress ip)
     {
-        var commandTask = SendPrinterCommand(ip, PrinterCommands.GetBasicInfo());
-        var timeoutTask = Task.Delay(1500);
-        var completed = await Task.WhenAny(commandTask, timeoutTask);
-        if (completed != commandTask)
-            return ("Not found", "Unknown");
-
-        var response = await commandTask;
+        using var client = new PrinterClient(new WifiPrinterClient(ip));
+        var response = client.SendCommand(PrinterCommands.GetBasicInfo());
         var settings = response
             .Split('\n', StringSplitOptions.RemoveEmptyEntries)
             .Select(l => l.Trim())
@@ -166,31 +162,9 @@ public class PrinterDiscovery
 
     public async Task<PrinterInfo> GetPrinterSettings(IPAddress ip)
     {
-        var program = PrinterCommands.GetAllSettings();        
-        var response = await SendPrinterCommand(ip, program);  
+        using var client = new PrinterClient(new WifiPrinterClient(ip));
+        var response = client.SendCommand(PrinterCommands.GetAllSettings());
         return _parser.ParseSettings(response);
-    }
-
-    public async Task<string> SendPrinterCommand(IPAddress ip, string command)
-    {
-        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-        using var client = new TcpClient();
-        await client.ConnectAsync(ip, 9100, cts.Token);
-
-        using var stream = client.GetStream();
-
-        var data = Encoding.ASCII.GetBytes(command + "\r\n");
-        await stream.WriteAsync(data, cts.Token);
-
-        var buffer = new byte[4096];
-        var readTask = stream.ReadAsync(buffer, cts.Token).AsTask();
-        var timeoutTask = Task.Delay(TimeSpan.FromSeconds(1), cts.Token);
-
-        if (await Task.WhenAny(readTask, timeoutTask) != readTask)
-            return "Command sent successfully";
-
-        var bytesRead = await readTask;
-        return Encoding.ASCII.GetString(buffer, 0, bytesRead);
     }
 
     public async Task<string> SendPrinterFiles(IPAddress ip, IEnumerable<(Stream stream, string fileName, string memory)> files)

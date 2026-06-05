@@ -6,8 +6,7 @@ namespace Altec.Api.Services.Printers;
 
 public class PrinterService : IPrinterService
 {
-    private readonly PrinterDiscovery _printerDiscovery;
-    
+    private readonly PrinterDiscovery _printerDiscovery;    
     public PrinterService(PrinterDiscovery printerDiscovery)
     {
         _printerDiscovery = printerDiscovery;
@@ -28,7 +27,8 @@ public class PrinterService : IPrinterService
     public async Task<string> SendCommand(string ipAddress, string command)
     {
         var ip = IPAddress.Parse(ipAddress);
-        return await _printerDiscovery.SendPrinterCommand(ip, command);
+        using var client = new PrinterClient(new WifiPrinterClient(ip));
+        return client.SendCommand(command);
     }
 
     public async Task<string> SendFiles(string ipAddress, IEnumerable<(Stream stream, string fileName, string memory)> files)
