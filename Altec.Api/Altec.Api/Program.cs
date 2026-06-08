@@ -1,5 +1,6 @@
 using System.Text.Json;
-using Altec.Api.Domain.Printers;
+using Altec.Api.Domain.Printers.Discovery;
+using Altec.Api.Domain.Printers.Parsing;
 using Altec.Api.Domain.Tspl;
 using Altec.Api.Interface;
 using Altec.Api.Services;
@@ -23,6 +24,7 @@ builder.Services.AddScoped<TsplValidator>();
 builder.Services.AddScoped<ITsplService, TsplService>();
 builder.Services.AddScoped<PrinterDiscovery>();
 builder.Services.AddScoped<IPrinterService, PrinterService>();
+builder.Services.AddScoped<PrinterResponseParser>();
 
 builder.Services.AddHttpClient<INiceLabelClient, NiceLabelClient>(client =>
 {

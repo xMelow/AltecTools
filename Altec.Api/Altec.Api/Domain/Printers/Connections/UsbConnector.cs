@@ -49,9 +49,44 @@ public class UsbConnector : IDisposable, IPrinterConnection
         }
     }
     
-    public Task SendFiles(IEnumerable<PrinterFile> files)
+    public async Task SendFiles(IEnumerable<PrinterFile> files)
     {
-        throw new NotImplementedException();
+        try
+        {
+            foreach (var file in files)
+            {
+                var memPrefix = file.Memory switch
+                {
+                    PrinterMemory.Flash => "F,", 
+                    PrinterMemory.Dram => "D,", 
+                    PrinterMemory.Card => "C,", 
+                    _ => ""
+                };
+                var extension = Path.GetExtension(file.FileName).ToUpperInvariant();
+
+                if (extension == ".BAS")
+                {
+                    var header = Encoding.ASCII.GetBytes($"DOWNLOAD {memPrefix}\"{file.FileName}\"\r\n");
+                    await _stream.WriteAsync(header);
+                    await file.Stream.CopyToAsync(_stream);
+                    await _stream.WriteAsync(Encoding.ASCII.GetBytes("\r\nEOP\r\n"));
+                }
+                else
+                {
+                    using var ms = new MemoryStream();
+                    await file.Stream.CopyToAsync(ms);
+                    var fileBytes = ms.ToArray();
+                    var header = Encoding.ASCII.GetBytes($"DOWNLOAD {memPrefix}\"{file.FileName}\",{fileBytes.Length},");
+                    await _stream.WriteAsync(header);
+                    await _stream.WriteAsync(fileBytes);
+                    await _stream.WriteAsync(Encoding.ASCII.GetBytes("\r\n"));
+                }
+            }
+        }
+        catch (IOException ex)
+        {
+            throw new IOException("Unable to send file to printer via USB", ex);
+        }
     }
 
     public void Dispose()

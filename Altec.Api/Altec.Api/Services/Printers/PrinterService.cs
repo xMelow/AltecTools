@@ -4,7 +4,6 @@ using Altec.Api.Domain.Printers.Connections;
 using Altec.Api.Domain.Printers.Discovery;
 using Altec.Api.Domain.Printers.Parsing;
 using Altec.Api.Record.Printers;
-using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 
 namespace Altec.Api.Services.Printers;
 
@@ -25,27 +24,27 @@ public class PrinterService : IPrinterService
         return result;
     }
 
-    public PrinterInfo GetPrinterInfo(PrinterConnectionType connectionType, string address)
+    public async Task<PrinterInfo> GetPrinterInfo(PrinterConnectionType connectionType, string address)
     {
 
         var connection = CreateConnection(connectionType, address);
         using var client = new PrinterClient(connection);
-        var result = client.SendCommand(PrinterCommands.GetBasicInfo());
+        var result = await client.SendCommand(PrinterCommands.GetAllSettings());
         return _parser.ParseSettings(result);
     }
 
-    public void SendCommand(PrinterConnectionType connectionType, string address, string command)
+    public async Task<string> SendCommand(PrinterConnectionType connectionType, string address, string command)
     {
         var connection = CreateConnection(connectionType, address);
         using var client = new PrinterClient(connection);
-        client.SendCommand(command);
+        return await client.SendCommand(command);
     }
 
-    public void SendFiles(PrinterConnectionType connectionType, string address, IEnumerable<PrinterFile> files)
+    public async Task SendFiles(PrinterConnectionType connectionType, string address, IEnumerable<PrinterFile> files)
     {
         var connection = CreateConnection(connectionType, address);
         using var client = new PrinterClient(connection);
-        client.SendFile(files);
+        await client.SendFile(files);
     }
 
     private IPrinterConnection CreateConnection(PrinterConnectionType connectionType, string address)

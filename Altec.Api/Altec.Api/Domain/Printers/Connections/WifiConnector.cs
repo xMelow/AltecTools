@@ -62,9 +62,9 @@ public class WifiConnector : IPrinterConnection, IDisposable
                         PrinterMemory.Card => "C,", 
                         _ => "" 
                     };
-                var ext = Path.GetExtension(file.FileName).ToUpperInvariant();
+                var extension = Path.GetExtension(file.FileName).ToUpperInvariant();
 
-                if (ext == ".BAS")
+                if (extension == ".BAS")
                 {
                     var header = Encoding.ASCII.GetBytes($"DOWNLOAD {memPrefix}\"{file.FileName}\"\r\n");
                     await _stream.WriteAsync(header, cts.Token);

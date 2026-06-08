@@ -2,8 +2,8 @@
 using System.Net.Sockets;
 using System.Text;
 using Altec.Api.Domain.Printers.Communication;
-using Altec.Api.Domain.Printers.Parsing;
 using Altec.Api.Domain.Printers.Connections;
+using Altec.Api.Domain.Printers.Parsing;
 using Altec.Api.Record.Printers;
 
 namespace Altec.Api.Domain.Printers.Discovery;
@@ -60,14 +60,18 @@ public class PrinterDiscovery
 
     private async Task<List<Printer?>> GetPrinterDetails(IEnumerable<IPAddress> foundIps)
     {
+        var parser = new PrinterResponseParser();
+
         var printerTask = foundIps.Select(async ip =>
             {
                 try
                 {
                     if (!await IsTscPrinter(ip))
                         return null;
-                    var printerInfo = await GetPrinterInfo(ip);
-                    return new Printer(printerInfo.printerDnsName, ip.ToString(), printerInfo.printerModelName, PrinterPort);
+                    using var printerClient = new PrinterClient(new WifiConnector(ip));
+                    var printerInfo = await printerClient.SendCommand(PrinterCommands.GetBasicInfo());
+                    var result = parser.ParseSettings(printerInfo);
+                    return new Printer(result.DnsName, ip.ToString(), result.Model, PrinterPort);
                 }
                 catch
                 {
