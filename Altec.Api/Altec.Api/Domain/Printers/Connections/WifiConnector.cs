@@ -19,28 +19,28 @@ public class WifiConnector : IPrinterConnection, IDisposable
         _stream = _client.GetStream();
     }
 
-    public string Read()
+    public async Task<string> Read()
     {
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
         var buffer = new byte[4096];
         var readTask = _stream.ReadAsync(buffer, cts.Token).AsTask();
         var timeoutTask = Task.Delay(TimeSpan.FromSeconds(1), cts.Token);
         
-        var completed = Task.WhenAny(readTask, timeoutTask).GetAwaiter().GetResult();
+        var completed = await Task.WhenAny(readTask, timeoutTask);
         if (completed != readTask)
             return "Printer didn't respond in time.";
             
-        var bytesRead = readTask.GetAwaiter().GetResult();
+        var bytesRead = await readTask;
         return Encoding.ASCII.GetString(buffer, 0, bytesRead);
     }
 
-    public void Send(string command)
+    public async Task Send(string command)
     {
        try
         {
             using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
             var data = Encoding.ASCII.GetBytes(command + "\r\n");
-            _stream.WriteAsync(data, cts.Token).GetAwaiter().GetResult();
+            await _stream.WriteAsync(data, cts.Token);
         }
         catch (IOException ex)
         {
@@ -48,45 +48,48 @@ public class WifiConnector : IPrinterConnection, IDisposable
         }
     }
 
-    public void SendFiles(IEnumerable<PrinterFile> files)
+    public async Task SendFiles(IEnumerable<PrinterFile> files)
     {
-        throw new NotImplementedException();
+        try
+        {
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+            foreach (var file in files)
+            {
+                var memPrefix = file.Memory switch 
+                    { 
+                        PrinterMemory.Flash => "F,", 
+                        PrinterMemory.Dram => "D,", 
+                        PrinterMemory.Card => "C,", 
+                        _ => "" 
+                    };
+                var ext = Path.GetExtension(file.FileName).ToUpperInvariant();
+
+                if (ext == ".BAS")
+                {
+                    var header = Encoding.ASCII.GetBytes($"DOWNLOAD {memPrefix}\"{file.FileName}\"\r\n");
+                    await _stream.WriteAsync(header, cts.Token);
+                    await file.Stream.CopyToAsync(_stream, cts.Token);
+                    await _stream.WriteAsync(Encoding.ASCII.GetBytes("\r\nEOP\r\n"), cts.Token);
+                }
+                else
+                {
+                    using var ms = new MemoryStream();
+                    await file.Stream.CopyToAsync(ms, cts.Token);
+                    var fileBytes = ms.ToArray();
+                    var header = Encoding.ASCII.GetBytes($"DOWNLOAD {memPrefix}\"{file.FileName}\",{fileBytes.Length},");
+                    await _stream.WriteAsync(header, cts.Token);
+                    await _stream.WriteAsync(fileBytes, cts.Token);
+                    await _stream.WriteAsync(Encoding.ASCII.GetBytes("\r\n"), cts.Token);
+                }
+            }
+
+            await _stream.FlushAsync(cts.Token);
+        }
+        catch (IOException ex)
+        {
+            throw new IOException("Unable to send files to printer via Wifi.", ex);
+        }
     }
-
-    // public async Task<string> SendPrinterFiles(IPAddress ip, IEnumerable<(Stream stream, string fileName, string memory)> files)
-    // {
-    //     using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(30));
-    //     using var client = new TcpClient();
-    //     await client.ConnectAsync(ip, PrinterPort, cts.Token);
-    //     using var tcpStream = client.GetStream();
-
-    //     foreach (var (stream, fileName, memory) in files)
-    //     {
-    //         var memPrefix = memory switch { "F" => "F,", "E" => "E,", _ => "" };
-    //         var ext = Path.GetExtension(fileName).ToUpperInvariant();
-
-    //         if (ext == ".BAS")
-    //         {
-    //             var header = Encoding.ASCII.GetBytes($"DOWNLOAD {memPrefix}\"{fileName}\"\r\n");
-    //             await tcpStream.WriteAsync(header, cts.Token);
-    //             await stream.CopyToAsync(tcpStream, cts.Token);
-    //             await tcpStream.WriteAsync(Encoding.ASCII.GetBytes("\r\nEOP\r\n"), cts.Token);
-    //         }
-    //         else
-    //         {
-    //             using var ms = new MemoryStream();
-    //             await stream.CopyToAsync(ms, cts.Token);
-    //             var fileBytes = ms.ToArray();
-    //             var header = Encoding.ASCII.GetBytes($"DOWNLOAD {memPrefix}\"{fileName}\",{fileBytes.Length},");
-    //             await tcpStream.WriteAsync(header, cts.Token);
-    //             await tcpStream.WriteAsync(fileBytes, cts.Token);
-    //             await tcpStream.WriteAsync(Encoding.ASCII.GetBytes("\r\n"), cts.Token);
-    //         }
-    //     }
-
-    //     await tcpStream.FlushAsync(cts.Token);
-    //     return "File sent successfully";
-    // }
 
     public void Dispose()
     {

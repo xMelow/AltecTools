@@ -19,13 +19,13 @@ public class UsbConnector : IDisposable, IPrinterConnection
         }
     }
 
-    public void Send(string command)
+    public async Task Send(string command)
     {
         var bytes = Encoding.ASCII.GetBytes(command);
         
         try
         {
-            _stream.Write(bytes, 0, bytes.Length);
+            await _stream.WriteAsync(bytes, 0, bytes.Length);
         }
         catch (IOException ex)
         {
@@ -33,13 +33,13 @@ public class UsbConnector : IDisposable, IPrinterConnection
         }
     }
 
-    public string Read()
+    public async Task<string> Read()
     {
         var buffer = new byte[1024];
 
         try
         {
-            var bytesRead = _stream.Read(buffer, 0, buffer.Length);
+            var bytesRead = await _stream.ReadAsync(buffer, 0, buffer.Length);
             var result = Encoding.ASCII.GetString(buffer, 0, bytesRead);
             return result;
         }
@@ -49,7 +49,7 @@ public class UsbConnector : IDisposable, IPrinterConnection
         }
     }
     
-    public void SendFiles(IEnumerable<PrinterFile> files)
+    public Task SendFiles(IEnumerable<PrinterFile> files)
     {
         throw new NotImplementedException();
     }

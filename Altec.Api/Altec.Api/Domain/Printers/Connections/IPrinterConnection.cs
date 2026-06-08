@@ -4,7 +4,7 @@ namespace Altec.Api.Domain.Printers.Connections;
 
 public interface IPrinterConnection
 {
-    void Send(string command);
-    string Read();
-    void SendFiles(IEnumerable<PrinterFile> files);
+    Task Send(string command);
+    Task<string> Read();
+    Task SendFiles(IEnumerable<PrinterFile> files);
 }
