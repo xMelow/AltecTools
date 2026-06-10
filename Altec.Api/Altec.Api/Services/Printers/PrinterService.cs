@@ -9,18 +9,18 @@ namespace Altec.Api.Services.Printers;
 
 public class PrinterService : IPrinterService
 {
-    private readonly PrinterDiscovery _printerDiscovery;
+    private readonly WifiDiscovery _wifiDiscovery;
     private readonly PrinterResponseParser _parser;
 
-    public PrinterService(PrinterDiscovery printerDiscovery, PrinterResponseParser parser)
+    public PrinterService(WifiDiscovery wifiDiscovery, PrinterResponseParser parser)
     {
-        _printerDiscovery = printerDiscovery;
+        _wifiDiscovery = wifiDiscovery;
         _parser = parser;
     }
     
     public async Task<IReadOnlyList<Printer>> GetPrinters(List<string> subnets)
     {
-        var result = await _printerDiscovery.Discover(subnets);
+        var result = await _wifiDiscovery.Discover(subnets);
         return result;
     }
 

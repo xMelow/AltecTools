@@ -8,7 +8,7 @@ using Altec.Api.Record.Printers;
 
 namespace Altec.Api.Domain.Printers.Discovery;
 
-public class PrinterDiscovery
+public class WifiDiscovery
 {
     private const int PrinterPort = 9100;
     public async Task<IReadOnlyList<Printer>> Discover(List<string> subnets)
@@ -71,7 +71,7 @@ public class PrinterDiscovery
                     using var printerClient = new PrinterClient(new WifiConnector(ip));
                     var printerInfo = await printerClient.SendCommand(PrinterCommands.GetBasicInfo());
                     var result = parser.ParseSettings(printerInfo);
-                    return new Printer(result.DnsName, ip.ToString(), result.Model, PrinterPort);
+                    return new Printer(result.DnsName, ip.ToString(), result.Model, PrinterConnectionType.Wifi);
                 }
                 catch
                 {
@@ -79,7 +79,7 @@ public class PrinterDiscovery
                 }
             });
         var foundPrinters = await Task.WhenAll(printerTask);
-        return foundPrinters.Where(p => p != null && p.PrinterModel != "Unknown").ToList();
+        return foundPrinters.Where(p => p != null && p.Model != "Unknown").ToList();
     }
 
     private async Task<bool> IsTscPrinter(IPAddress ip)
