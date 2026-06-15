@@ -21,9 +21,9 @@ public class PrinterController : ControllerBase
     }
 
     [HttpGet("discover")]
-    public async Task<IActionResult> Discover([FromQuery] List<string> subnets)
+    public async Task<IActionResult> Discover([FromQuery] PrinterConnectionType connectionType, [FromQuery] List<string>? subnets)
     {
-        var printers = await _printerService.GetPrinters(subnets);
+        var printers = await _printerService.GetPrinters(connectionType, subnets);
         return Ok(new PrinterResponse(printers));
     }
     
