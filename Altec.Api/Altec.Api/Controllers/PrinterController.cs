@@ -30,7 +30,6 @@ public class PrinterController : ControllerBase
     [HttpGet("getPrinterInfo/{address}")]
     public async Task<IActionResult> GetPrinterInfo(string address, [FromQuery] PrinterConnectionType connectionType)
     {
-        // check if connectiontype is empty --> bad request
         try
         {
             var info = await _printerService.GetPrinterInfo(connectionType, address);
@@ -43,12 +42,11 @@ public class PrinterController : ControllerBase
     }
 
     [HttpPost("command/{address}")]
-    public async Task<IActionResult> SendCommand(string address, [FromBody] PrinterCommandRequest request)
+    public async Task<IActionResult> SendCommand(string address, [FromBody] PrinterCommandRequest request, [FromQuery] PrinterConnectionType connectionType)
     {
-        // check if connectiontype is empty --> bad request
         try
         {
-            var response = await _printerService.SendCommand(request.connectionType, address, request.Command);
+            var response = await _printerService.SendCommand(connectionType, address, request.Command);
             return Ok(new PrinterCommandResponse(response));
         } 
         catch (Exception ex)

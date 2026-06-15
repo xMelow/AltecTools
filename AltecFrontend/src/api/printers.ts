@@ -1,8 +1,11 @@
-import { PrinterRequest, PrinterResponse, PrinterSettings, CommandResponse } from "../types/printer"
+import { PrinterRequest, PrinterResponse, PrinterSettings, CommandResponse, PrinterConnectionType, PrinterFile } from "../types/printer"
 
 export async function getPrinters(data: PrinterRequest): Promise<PrinterResponse> {
     const params = new URLSearchParams()
-    data.subnets.forEach(subnet => params.append('subnets', subnet))
+    params.append("connectionType", data.printerConnectionType)
+
+    if (data.subnets != null) 
+        data.subnets.forEach(subnet => params.append('subnets', subnet))
 
     const res = await fetch(`/api/printer/discover?${params}`, {
         method: "GET",
@@ -13,33 +16,22 @@ export async function getPrinters(data: PrinterRequest): Promise<PrinterResponse
     return await res.json()
 }
 
-export async function getPrinterSettings(ipAddress: string): Promise<PrinterSettings> {
-    const res = await fetch(`/api/printer/${encodeURIComponent(ipAddress)}/settings`)
+export async function getPrinterSettings(address: string, printerConnectionType: PrinterConnectionType): Promise<PrinterSettings> {
+    const params = new URLSearchParams()
+    params.append("connectionType", printerConnectionType)
+
+    const res = await fetch(`/api/printer/getPrinterInfo/${encodeURIComponent(address)}?${params}`)
 
     if (!res.ok) throw new Error("Failed to fetch printer settings")
 
     return await res.json()
 }
 
-export async function sendPrinterFile(ipAddress: string, entries: { file: File; fileName: string; memory: string }[]): Promise<CommandResponse> {
-    const formData = new FormData()
-    entries.forEach(({ file, fileName, memory }) => {
-        formData.append("files", file)
-        formData.append("fileNames", fileName)
-        formData.append("memories", memory)
-    })
+export async function sendPrinterCommand(address: string, command: string, printerConnectionType: PrinterConnectionType): Promise<CommandResponse> {
+    const params = new URLSearchParams()
+    params.append("connectionType", printerConnectionType)
 
-    const res = await fetch(`/api/printer/${encodeURIComponent(ipAddress)}/file`, {
-        method: "POST",
-        body: formData,
-    })
-
-    if (!res.ok) throw new Error("Failed to send file")
-    return await res.json()
-}
-
-export async function sendPrinterCommand(ipAddress: string, command: string): Promise<CommandResponse> {
-    const res = await fetch(`/api/printer/${encodeURIComponent(ipAddress)}/command`, {
+    const res = await fetch(`/api/printer/command/${encodeURIComponent(address)}?${params}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ command }),
@@ -47,5 +39,25 @@ export async function sendPrinterCommand(ipAddress: string, command: string): Pr
 
     if (!res.ok) throw new Error("Failed to send command")
         
+    return await res.json()
+}
+
+export async function sendPrinterFile(address: string, entries: PrinterFile[], printerConnectionType: PrinterConnectionType): Promise<CommandResponse> {
+    const params = new URLSearchParams()
+    params.append("connectionType", printerConnectionType)
+
+    const formData = new FormData()
+    entries.forEach((file) => {
+        formData.append("files", file.file)
+        formData.append("fileNames", file.fileName)
+        formData.append("memories", file.memory)
+    })
+
+    const res = await fetch(`/api/printer/file/${encodeURIComponent(address)}?${params}`, {
+        method: "POST",
+        body: formData,
+    })
+
+    if (!res.ok) throw new Error("Failed to send file")
     return await res.json()
 }

@@ -1,6 +1,9 @@
 export type PrinterRequest = {
-    subnets: string[]
+    printerConnectionType: PrinterConnectionType
+    subnets?: string[]
 }
+
+export type PrinterConnectionType = "Wifi" | "Usb"
 
 export type PrinterResponse = {
     printers: Printer[]
@@ -8,9 +11,15 @@ export type PrinterResponse = {
 
 export type Printer = {
     networkName: string,
-    ipAddress: string,
+    address: string,
     printerModel: string,
     port: number,
+}
+
+export type PrinterFile = {
+    file: File
+    fileName: string
+    memory: string
 }
 
 export type PrinterSettings = {

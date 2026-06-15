@@ -9,10 +9,10 @@ export default function PrinterCard({printer}: PrinterCardProps) {
     return (
         <div
             className="w-1/5 h-1/4 pl-5 pb-5 pr-5 flex flex-col border rounded-2xl border-altec-teal bg-altec-white justify-center">
-            <Link to={`/printers/${printer.ipAddress}`} state={{ dnsName: printer.dnsName }}>
+            <Link to={`/printers/${printer.address}`} state={{ dnsName: printer.networkName }}>
 
                 <div className="flex justify-between items-center pt-2 pb-2">
-                    <p className="font-semibold">{printer.dnsName || printer.ipAddress}</p>
+                    <p className="font-semibold">{printer.networkName || printer.address}</p>
                     <p className="border border-altec-teal bg-altec-light rounded-xl p-1 w-8">🖨️</p>
                 </div>
 
@@ -20,7 +20,7 @@ export default function PrinterCard({printer}: PrinterCardProps) {
 
                 <div className="flex justify-between mt-1">
                     <span className="">IP Address</span>
-                    <span className="">{printer.ipAddress}</span>
+                    <span className="">{printer.address}</span>
                 </div>
 
                 <div className="flex justify-between">
