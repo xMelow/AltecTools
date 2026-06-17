@@ -5,6 +5,7 @@ import { CommandTab, LogEntry } from "../types/printerTerminal"
 import { TSPL_COMMAND_GROUPS, PRINTER_COMMAND_GROUPS } from "../constants/printerCommands"
 import PrinterSettingsPanel from "../components/PrinterSettings"
 import PrinterFilesTab from "../components/PrinterFilesTab"
+import { PrinterConnectionType } from "../types/printer"
 
 export default function PrinterDetailedScreen() {
     const { ipAddress } = useParams<{ ipAddress: string }>()
@@ -13,6 +14,7 @@ export default function PrinterDetailedScreen() {
     const [log, setLog] = useState<LogEntry[]>([])
     const [sending, setSending] = useState(false)
     const [commandTab, setCommandTab] = useState<CommandTab>("printer")
+    const [connectionType, setConnectionType] = useState<PrinterConnectionType>("Usb")
     const logEndRef = useRef<HTMLDivElement>(null)
     const activeGroups = commandTab === "tspl" ? TSPL_COMMAND_GROUPS : PRINTER_COMMAND_GROUPS
 
@@ -28,9 +30,10 @@ export default function PrinterDetailedScreen() {
     async function sendCommand(command: string) {
         if (!ipAddress) return
         addLog("sent", command)
+
         setSending(true)
         try {
-            const res = await sendPrinterCommand(ipAddress, command)
+            const res = await sendPrinterCommand(ipAddress, command, connectionType)
             if (res.result) addLog("received", res.result)
         } catch (err) {
             addLog("error", err instanceof Error ? err.message : "Failed to send command")
@@ -185,7 +188,7 @@ export default function PrinterDetailedScreen() {
                     </div>
                 </div>
 
-                <PrinterSettingsPanel ipAddress={ipAddress} onNetworkName={setDnsName} />
+                <PrinterSettingsPanel address={ipAddress} onNetworkName={setDnsName} connectionType={connectionType}/>
 
             </div>
         </div>

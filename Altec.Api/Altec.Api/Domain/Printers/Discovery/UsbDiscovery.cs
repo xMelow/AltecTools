@@ -20,8 +20,14 @@ public class UsbDiscovery
         var printers = query.Get()
                     .Cast<ManagementObject>()
                     .Where(p => p["PortName"]?.ToString().Contains("USB") == true)
-                    .Select(p => new Printer(p["Name"]?.ToString() ?? "Unknown", p["PortName"]?.ToString() ?? "Unknown", p["DriverName"]?.ToString() ?? "Unknown", Communication.PrinterConnectionType.Usb))
+                    .Where(p => p["WorkOffline"]?.ToString() == "False")
+                    .Select(p => new Printer(p["Name"]?.ToString() ?? "Unknown", p["Name"]?.ToString() ?? "Unknown", p["DriverName"]?.ToString() ?? "Unknown", Communication.PrinterConnectionType.Usb))
                     .ToList();
+
+        foreach (var printer in printers)
+        {
+            Console.WriteLine(printer);
+        }
 
         return printers;
     }

@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { getPrinters, getPrinterSettings } from "../api/printers"
 import {PrinterConnectionType, PrinterResponse} from "../types/printer"
@@ -14,10 +14,10 @@ export default function PrinterScreen() {
     const navigate = useNavigate()
 
     async function discoverPrinters() {
-        const subnets = ["192.168.0.0/24", "192.168.1.0/24"]
+        // const subnets = ["192.168.0.0/24", "192.168.1.0/24"]
 
         await execute(() => getPrinters({
-            subnets: subnets,
+            // subnets: subnets,
             printerConnectionType: connectionType
         }))
     }
@@ -41,15 +41,14 @@ export default function PrinterScreen() {
         if (e.key === "Enter") connectToIp()
     }
 
+    useEffect(() => {
+        if (connectionType == "Usb")
+            discoverPrinters()
+    }, [connectionType])
+
     return (
         <div className="flex flex-col gap-6">
             <h2 className="text-center text-3xl font-bold text-altec-teal">Printers</h2>
-
-            <div className="flex flex-row justify-center flex-wrap gap-4">
-                {result?.printers?.map(el => (
-                    <PrinterCard printer={el} key={el.address} />
-                ))}
-            </div>
 
             <div className="flex flex-col items-center gap-3">
                 <div className="flex rounded-xl border border-altec-teal overflow-hidden">
@@ -98,6 +97,12 @@ export default function PrinterScreen() {
 
                 {connectError && <p className="text-red-500 text-sm">{connectError}</p>}
                 {error && <p className="text-red-500 text-sm">{error}</p>}
+            </div>
+
+            <div className="flex flex-row justify-center flex-wrap gap-4">
+                    {result?.printers?.map(el => (
+                        <PrinterCard printer={el} key={el.address} />
+                    ))}
             </div>
         </div>
     )

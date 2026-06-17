@@ -10,10 +10,10 @@ export type PrinterResponse = {
 }
 
 export type Printer = {
-    networkName: string,
+    name: string,
     address: string,
-    printerModel: string,
-    port: number,
+    model: string,
+    connectionType: PrinterConnectionType,
 }
 
 export type PrinterFile = {
@@ -59,11 +59,6 @@ export type PrinterSettings = {
 
 export type CommandResponse = {
     result: string
-}
-
-export type PrinterSettingsPanelProps = {
-    ipAddress: string | undefined
-    onNetworkName?: (name: string) => void
 }
 
 export type EditableSettings = {
