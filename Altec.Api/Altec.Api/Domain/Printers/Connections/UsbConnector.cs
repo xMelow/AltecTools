@@ -48,19 +48,24 @@ public class UsbConnector : IDisposable, IPrinterConnection
     {
         var docInfo = new DOCINFO { pDocName = "RawPrint", pOutputFile = null, pDataType = "RAW" };
 
-        if (!StartDocPrinter(_hPrinter, 1, ref docInfo))
-             throw new IOException($"Could not start doc printer");
+        try
+        {
+            if (!StartDocPrinter(_hPrinter, 1, ref docInfo))
+                throw new IOException($"Could not start doc printer");
 
-        if (!StartPagePrinter(_hPrinter))
-            throw new IOException($"Could not start page printer");
+            if (!StartPagePrinter(_hPrinter))
+                throw new IOException($"Could not start page printer");
 
-        var commandBytes = Encoding.ASCII.GetBytes(command);
+            var commandBytes = Encoding.ASCII.GetBytes(command);
 
-        if (!WritePrinter(_hPrinter, commandBytes, commandBytes.Length, out _))
-            throw new IOException("Unable to send command to the printer");
-        
-        EndPagePrinter(_hPrinter);
-        EndDocPrinter(_hPrinter);
+            if (!WritePrinter(_hPrinter, commandBytes, commandBytes.Length, out _))
+                throw new IOException("Unable to send command to the printer");
+        }
+        finally
+        {
+            EndPagePrinter(_hPrinter);
+            EndDocPrinter(_hPrinter);
+        }
 
         return Task.CompletedTask;
     }
@@ -83,17 +88,16 @@ public class UsbConnector : IDisposable, IPrinterConnection
     
     public async Task SendFiles(IEnumerable<PrinterFile> files)
     {
-
-        var docInfo = new DOCINFO { pDocName = "RawPrint", pOutputFile = null, pDataType = "RAW" };
-
-        if (!StartDocPrinter(_hPrinter, 1, ref docInfo))
-             throw new IOException($"Could not start doc printer");
-
-        if (!StartPagePrinter(_hPrinter))
-            throw new IOException($"Could not start page printer");
-
         try
         {
+            var docInfo = new DOCINFO { pDocName = "RawPrint", pOutputFile = null, pDataType = "RAW" };
+
+            if (!StartDocPrinter(_hPrinter, 1, ref docInfo))
+                throw new IOException($"Could not start doc printer");
+
+            if (!StartPagePrinter(_hPrinter))
+                throw new IOException($"Could not start page printer");
+
             foreach (var file in files)
             {
                 var memPrefix = file.Memory switch
@@ -104,41 +108,43 @@ public class UsbConnector : IDisposable, IPrinterConnection
                     _ => ""
                 };
                 var extension = Path.GetExtension(file.FileName).ToUpperInvariant();
+                using var ms = new MemoryStream();
+                await file.Stream.CopyToAsync(ms);
+                var fileBytes = ms.ToArray();
+                byte[] endOfProgramBytes;
+                byte[] header;
 
-                if (extension == ".BAS")
+                if (extension == ".BAS") 
                 {
-                    var header = Encoding.ASCII.GetBytes($"DOWNLOAD {memPrefix}\"{file.FileName}\"\r\n");
+                    endOfProgramBytes = Encoding.ASCII.GetBytes("\r\nEOP\r\n");
+                    header = Encoding.ASCII.GetBytes($"DOWNLOAD {memPrefix}\"{file.FileName}\"\r\n");
+                }
+                else 
+                {
+                    endOfProgramBytes = Encoding.ASCII.GetBytes("\r\n");
+                    header = Encoding.ASCII.GetBytes($"DOWNLOAD {memPrefix}\"{file.FileName}\",{fileBytes.Length},");
+                }
 
-                    // await _stream.WriteAsync(header);
-
-                    // what does this exactly do??????
-                    await file.Stream.CopyToAsync(_stream);
-                    await _stream.WriteAsync(Encoding.ASCII.GetBytes("\r\nEOP\r\n"));
-
-                    if (!WritePrinter(_hPrinter, header, header.Length, out _))
+                if (!WritePrinter(_hPrinter, header, header.Length, out _))
                         throw new IOException("Unable to send command to the printer");
 
+                if (!WritePrinter(_hPrinter, fileBytes, fileBytes.Length, out _))
+                        throw new IOException("Unable to send command to the printer");
 
-                }
-                else
-                {
-                    using var ms = new MemoryStream();
-                    await file.Stream.CopyToAsync(ms);
-                    var fileBytes = ms.ToArray();
-                    var header = Encoding.ASCII.GetBytes($"DOWNLOAD {memPrefix}\"{file.FileName}\",{fileBytes.Length},");
-                    await _stream.WriteAsync(header);
-                    await _stream.WriteAsync(fileBytes);
-                    await _stream.WriteAsync(Encoding.ASCII.GetBytes("\r\n"));
-                }
+                if (!WritePrinter(_hPrinter, endOfProgramBytes, endOfProgramBytes.Length, out _))
+                        throw new IOException("Unable to send end of program command to printer");
+                
             }
         }
         catch (IOException ex)
         {
             throw new IOException("Unable to send file to printer via USB", ex);
         }
-
-        EndPagePrinter(_hPrinter);
-        EndDocPrinter(_hPrinter);
+        finally
+        {
+            EndPagePrinter(_hPrinter);
+            EndDocPrinter(_hPrinter);
+        }
     }
 
     public void Dispose()
