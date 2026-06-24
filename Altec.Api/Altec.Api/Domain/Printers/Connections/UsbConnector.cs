@@ -1,154 +1,24 @@
 using System.Text;
-using Altec.Api.Domain.Printers.Communication;
 using System.Runtime.InteropServices;
+using Microsoft.Win32.SafeHandles;
+using Altec.Api.Domain.Printers.Communication;
 
 namespace Altec.Api.Domain.Printers.Connections;
 
 public class UsbConnector : IDisposable, IPrinterConnection
 {
-    [DllImport("winspool.drv", CharSet = CharSet.Unicode, SetLastError = true)]
-    private static extern bool OpenPrinter(string printerName, out IntPtr hPrinter, IntPtr pd);
-
-    [DllImport("winspool.drv", SetLastError = true)]
-    private static extern bool ClosePrinter(IntPtr hPrinter);
-
-    [DllImport("winspool.drv", CharSet = CharSet.Unicode, SetLastError = true)]
-    private static extern bool StartDocPrinter(IntPtr hPrinter, int level, ref DOCINFO docInfo);
-
-    [DllImport("winspool.drv", SetLastError = true)]
-    private static extern bool EndDocPrinter(IntPtr hPrinter);
-
-    [DllImport("winspool.drv", SetLastError = true)]
-    private static extern bool StartPagePrinter(IntPtr hPrinter);
-
-    [DllImport("winspool.drv", SetLastError = true)]
-    private static extern bool EndPagePrinter(IntPtr hPrinter);
-
-    [DllImport("winspool.drv", SetLastError = true)]
-    private static extern bool WritePrinter(IntPtr hPrinter, byte[] data, int bufferSize, out int bytesWritten);
-
-    [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-    private struct DOCINFO
-    {
-        [MarshalAs(UnmanagedType.LPWStr)] public string pDocName;
-        [MarshalAs(UnmanagedType.LPWStr)] public string pOutputFile;
-        [MarshalAs(UnmanagedType.LPWStr)] public string pDataType;
-    }
-
-    private IntPtr _hPrinter;
-
-    public UsbConnector(string printerName)
-    {
-        if (!OpenPrinter(printerName, out _hPrinter, IntPtr.Zero)) 
-            throw new IOException($"Could not open printer: {printerName}");
-        
-    }
-
-    public Task Send(string command)
-    {
-        var docInfo = new DOCINFO { pDocName = "RawPrint", pOutputFile = null, pDataType = "RAW" };
-
-        try
-        {
-            if (!StartDocPrinter(_hPrinter, 1, ref docInfo))
-                throw new IOException($"Could not start doc printer");
-
-            if (!StartPagePrinter(_hPrinter))
-                throw new IOException($"Could not start page printer");
-
-            var commandBytes = Encoding.ASCII.GetBytes(command);
-
-            if (!WritePrinter(_hPrinter, commandBytes, commandBytes.Length, out _))
-                throw new IOException("Unable to send command to the printer");
-        }
-        finally
-        {
-            EndPagePrinter(_hPrinter);
-            EndDocPrinter(_hPrinter);
-        }
-
-        return Task.CompletedTask;
-    }
-
-    public async Task<string> Read()
-    {
-        var buffer = new byte[1024];
-
-        try
-        {
-            var bytesRead = await _stream.ReadAsync(buffer, 0, buffer.Length);
-            var result = Encoding.ASCII.GetString(buffer, 0, bytesRead);
-            return result;
-        }
-        catch (IOException ex)
-        {
-            throw new IOException("Unable to read data from the printer", ex);
-        }
-    }
+    private const string AltecVendorId = "vid_1203";
     
-    public async Task SendFiles(IEnumerable<PrinterFile> files)
+    private readonly SafeFileHandle _handle;
+    private readonly FileStream _stream;
+
+    public UsbConnector()
     {
-        try
-        {
-            var docInfo = new DOCINFO { pDocName = "RawPrint", pOutputFile = null, pDataType = "RAW" };
-
-            if (!StartDocPrinter(_hPrinter, 1, ref docInfo))
-                throw new IOException($"Could not start doc printer");
-
-            if (!StartPagePrinter(_hPrinter))
-                throw new IOException($"Could not start page printer");
-
-            foreach (var file in files)
-            {
-                var memPrefix = file.Memory switch
-                {
-                    PrinterMemory.Flash => "F,", 
-                    PrinterMemory.Dram => "D,", 
-                    PrinterMemory.Card => "C,", 
-                    _ => ""
-                };
-                var extension = Path.GetExtension(file.FileName).ToUpperInvariant();
-                using var ms = new MemoryStream();
-                await file.Stream.CopyToAsync(ms);
-                var fileBytes = ms.ToArray();
-                byte[] endOfProgramBytes;
-                byte[] header;
-
-                if (extension == ".BAS") 
-                {
-                    endOfProgramBytes = Encoding.ASCII.GetBytes("\r\nEOP\r\n");
-                    header = Encoding.ASCII.GetBytes($"DOWNLOAD {memPrefix}\"{file.FileName}\"\r\n");
-                }
-                else 
-                {
-                    endOfProgramBytes = Encoding.ASCII.GetBytes("\r\n");
-                    header = Encoding.ASCII.GetBytes($"DOWNLOAD {memPrefix}\"{file.FileName}\",{fileBytes.Length},");
-                }
-
-                if (!WritePrinter(_hPrinter, header, header.Length, out _))
-                        throw new IOException("Unable to send command to the printer");
-
-                if (!WritePrinter(_hPrinter, fileBytes, fileBytes.Length, out _))
-                        throw new IOException("Unable to send command to the printer");
-
-                if (!WritePrinter(_hPrinter, endOfProgramBytes, endOfProgramBytes.Length, out _))
-                        throw new IOException("Unable to send end of program command to printer");
-                
-            }
-        }
-        catch (IOException ex)
-        {
-            throw new IOException("Unable to send file to printer via USB", ex);
-        }
-        finally
-        {
-            EndPagePrinter(_hPrinter);
-            EndDocPrinter(_hPrinter);
-        }
+        // TODO
     }
 
-    public void Dispose()
-    {
-        ClosePrinter(_hPrinter);
-    }
+    public async Task<string> Read() { /* TODO */ }
+    public async Task Send(string command) { /* TODO */ }
+    public async Task SendFiles(IEnumerable<PrinterFile> files) { /* TODO */ }
+    public void Dispose() { /* TODO */ }
 }
