@@ -2,41 +2,11 @@ using System.Text;
 using System.Runtime.InteropServices;
 using Microsoft.Win32.SafeHandles;
 using Altec.Api.Domain.Printers.Communication;
-using Altec.Api.Record.Printers;
 
 namespace Altec.Api.Domain.Printers.Connections;
 
 public class UsbConnector : IDisposable, IPrinterConnection
 {
-    [DllImport("setupapi.dll", SetLastError = true)]
-    private static extern IntPtr SetupDiGetClassDevs(
-        ref Guid classGuid,
-        IntPtr enumerator,
-        IntPtr hwndParent,
-        uint flags
-    );
-
-    [DllImport("setupapi.dll", SetLastError = true)]
-    private static extern bool SetupDiEnumDeviceInterfaces(
-        IntPtr hDevInfo,
-        IntPtr devInfo,
-        ref Guid interfaceClassGuid,
-        uint memberIndex,
-        ref SP_DEVICE_INTERFACE_DATA deviceInterfaceData
-    );
-
-    [DllImport("setupapi.dll", CharSet = CharSet.Auto, SetLastError = true)]
-    private static extern bool SetupDiGetDeviceInterfaceDetail(
-        IntPtr hDevInfo,
-        ref SP_DEVICE_INTERFACE_DATA deviceInterfaceData,
-        IntPtr deviceInterfaceDetailData,
-        uint deviceInterfaceDetailDataSize,
-        out uint requiredSize,
-        IntPtr deviceInfoData
-    );
-
-    [DllImport("setupapi.dll", SetLastError = true)]
-    private static extern bool SetupDiDestroyDeviceInfoList(IntPtr hDevInfo);
 
     [DllImport("kernel32.dll", CharSet = CharSet.Auto, SetLastError = true)]
     private static extern SafeFileHandle CreateFile(
@@ -49,34 +19,17 @@ public class UsbConnector : IDisposable, IPrinterConnection
         IntPtr hTemplateFile
     );
 
-    [StructLayout(LayoutKind.Sequential)]
-    private struct SP_DEVICE_INTERFACE_DATA
-    {
-        public uint cbSize;
-        public Guid InterfaceClassGuid;
-        public uint Flags;
-        public IntPtr Reserved;
-    }
-
     private const uint GENERIC_READ = 0x80000000;
     private const uint GENERIC_WRITE = 0x40000000;
     private const uint FILE_SHARE_READ = 0x01;
     private const uint FILE_SHARE_WRITE = 0x02;
     private const uint OPEN_EXISTING = 3;
-    private const uint DIGCF_PRESENT = 0x02;
-    private const uint DIGCF_DEVICEINTERFACE = 0x10;
     private const uint FILE_FLAG_OVERLAPPED = 0x40000000;
-    private static readonly Guid UsbPrintGuid = new Guid("{28D78FAD-5A12-11D1-AE5B-0000F803A8C2}");
-
-    private const string AltecVendorId = "vid_1203";
     private readonly SafeFileHandle _handle;
     private readonly FileStream _stream;
 
-    public UsbConnector()
+    public UsbConnector(string devicePath)
     {
-        var devicePath = FindAltecDevicePath()
-            ?? throw new IOException($"No Altec USB printer found (expected {AltecVendorId})");
-
         _handle = CreateFile(
             devicePath,
             GENERIC_READ | GENERIC_WRITE,
@@ -90,47 +43,6 @@ public class UsbConnector : IDisposable, IPrinterConnection
             throw new IOException($"Could not open USB device at {devicePath} (error {Marshal.GetLastWin32Error()})");
 
         _stream = new FileStream(_handle, FileAccess.ReadWrite, bufferSize: 4096, isAsync: true);
-    }
-
-    private static string? FindAltecDevicePath()
-    {
-        var usbPrinterFilter = UsbPrintGuid;
-        var usbPrinterList = SetupDiGetClassDevs(ref usbPrinterFilter, IntPtr.Zero, IntPtr.Zero, DIGCF_PRESENT | DIGCF_DEVICEINTERFACE);
-
-        if (usbPrinterList == new IntPtr(-1))
-            return null;
-
-        try
-        {
-            var interfaceData = new SP_DEVICE_INTERFACE_DATA { cbSize = (uint)Marshal.SizeOf<SP_DEVICE_INTERFACE_DATA>() };
-            uint index = 0;
-
-            while (SetupDiEnumDeviceInterfaces(usbPrinterList, IntPtr.Zero, ref usbPrinterFilter, index++, ref interfaceData))
-            {
-                SetupDiGetDeviceInterfaceDetail(usbPrinterList, ref interfaceData, IntPtr.Zero, 0, out uint requiredSize, IntPtr.Zero);
-
-                var detailBuffer = Marshal.AllocHGlobal((int)requiredSize);
-                try
-                {
-                    Marshal.WriteInt32(detailBuffer, IntPtr.Size == 8 ? 8 : 6);
-                    SetupDiGetDeviceInterfaceDetail(usbPrinterList, ref interfaceData, detailBuffer, requiredSize, out _, IntPtr.Zero);
-                    var devicePath = Marshal.PtrToStringAuto(detailBuffer + 4);
-
-                    if (devicePath != null && devicePath.Contains(AltecVendorId, StringComparison.OrdinalIgnoreCase))
-                        return devicePath;
-                }
-                finally
-                {
-                    Marshal.FreeHGlobal(detailBuffer);
-                }
-            }
-        }
-        finally
-        {
-            SetupDiDestroyDeviceInfoList(usbPrinterList);
-        }
-
-        return null;
     }
 
     public async Task<string> Read()

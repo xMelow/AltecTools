@@ -60,7 +60,7 @@ public class PrinterService : IPrinterService
         IPrinterConnection connection = connectionType switch
         {
             PrinterConnectionType.Wifi => new WifiConnector(IPAddress.Parse(address)),
-            PrinterConnectionType.Usb => new UsbConnector(),
+            PrinterConnectionType.Usb => new UsbConnector(address),
             _ => throw new ArgumentException("Unknown connection type")
         };
 

@@ -9,6 +9,7 @@ import { PrinterConnectionType } from "../types/printer"
 
 export default function PrinterDetailedScreen() {
     const { ipAddress } = useParams<{ ipAddress: string }>()
+    const address = decodeURIComponent(ipAddress ?? "")
     const [dnsName, setDnsName] = useState<string>()
     const [commandInput, setCommandInput] = useState("")
     const [log, setLog] = useState<LogEntry[]>([])
@@ -28,12 +29,12 @@ export default function PrinterDetailedScreen() {
     }
 
     async function sendCommand(command: string) {
-        if (!ipAddress) return
+        if (!address) return
         addLog("sent", command)
 
         setSending(true)
         try {
-            const res = await sendPrinterCommand(ipAddress, command, connectionType)
+            const res = await sendPrinterCommand(address, command, connectionType)
             if (res.result) addLog("received", res.result)
         } catch (err) {
             addLog("error", err instanceof Error ? err.message : "Failed to send command")
@@ -44,7 +45,7 @@ export default function PrinterDetailedScreen() {
 
     async function handleSend() {
         const command = commandInput.trim()
-        if (!ipAddress || !command) return
+        if (!address || !command) return
         setCommandInput("")
         await sendCommand(command)
     }
@@ -59,7 +60,7 @@ export default function PrinterDetailedScreen() {
     return (
         <div>
             <h2 className="text-center text-3xl font-bold text-altec-teal mb-4">
-                {dnsName ? `${dnsName} - ${ipAddress}` : ipAddress}
+                {dnsName ? `${dnsName} - ${address}` : address}
             </h2>
 
             <div className="flex gap-4 items-start">
@@ -105,7 +106,7 @@ export default function PrinterDetailedScreen() {
                     <div className="overflow-y-auto px-4 pb-4 grow">
                         {commandTab === "files" ? (
                             <PrinterFilesTab
-                                ipAddress={ipAddress!}
+                                address={address!}
                                 sending={sending}
                                 setSending={setSending}
                                 addLog={addLog}
@@ -181,14 +182,14 @@ export default function PrinterDetailedScreen() {
                         <button
                             className="border bg-altec-teal text-altec-white px-4 rounded-xl self-stretch disabled:opacity-50"
                             onClick={handleSend}
-                            disabled={sending || !ipAddress}
+                            disabled={sending || !address}
                         >
                             {sending ? "..." : "Send"}
                         </button>
                     </div>
                 </div>
 
-                <PrinterSettingsPanel address={ipAddress} onNetworkName={setDnsName} connectionType={connectionType}/>
+                <PrinterSettingsPanel address={address} onNetworkName={setDnsName} connectionType={connectionType}/>
 
             </div>
         </div>

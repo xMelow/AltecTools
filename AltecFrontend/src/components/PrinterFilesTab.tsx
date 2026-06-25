@@ -6,7 +6,7 @@ function newEntry(): FileEntry {
     return { id: String(Date.now() + Math.random()), file: null, fileName: "", memory: "" }
 }
 
-export default function PrinterFilesTab({ ipAddress, sending, setSending, addLog }: PrinterFilesTabProps) {
+export default function PrinterFilesTab({address, sending, setSending, addLog }: PrinterFilesTabProps) {
     const [fileEntries, setFileEntries] = useState<FileEntry[]>([newEntry()])
 
     function addEntry() {
@@ -36,7 +36,8 @@ export default function PrinterFilesTab({ ipAddress, sending, setSending, addLog
         addLog("sent", `Files: ${toSend.map(e => e.fileName).join(", ")}`)
         setSending(true)
         try {
-            const res = await sendPrinterFile(ipAddress, toSend.map(e => ({ file: e.file!, fileName: e.fileName, memory: e.memory })))
+            // TODO: FIX SEND PRINTER FILES BY ADDING PRINTER CONNECTION TYPE
+            const res = await sendPrinterFile(address, toSend.map(e => ({ file: e.file!, fileName: e.fileName, memory: e.memory })), )
             if (res.result) addLog("received", res.result)
         } catch (err) {
             addLog("error", err instanceof Error ? err.message : "Failed to send files")
