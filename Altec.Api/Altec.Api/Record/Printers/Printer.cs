@@ -1,5 +1,5 @@
-﻿using System.Net;
+﻿using Altec.Api.Domain.Printers.Communication;
 
 namespace Altec.Api.Record.Printers;
 
-public record Printer(string DnsName, string IpAddress, string PrinterModel, int Port);
+public record Printer(string Name, string Address, string Model, PrinterConnectionType ConnectionType);

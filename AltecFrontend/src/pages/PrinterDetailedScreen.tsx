@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react"
-import { useParams } from "react-router-dom"
+import { useLocation, useParams } from "react-router-dom"
 import { sendPrinterCommand } from "../api/printers"
 import { CommandTab, LogEntry } from "../types/printerTerminal"
 import { TSPL_COMMAND_GROUPS, PRINTER_COMMAND_GROUPS } from "../constants/printerCommands"
@@ -15,6 +15,12 @@ export default function PrinterDetailedScreen() {
     const [commandTab, setCommandTab] = useState<CommandTab>("printer")
     const logEndRef = useRef<HTMLDivElement>(null)
     const activeGroups = commandTab === "tspl" ? TSPL_COMMAND_GROUPS : PRINTER_COMMAND_GROUPS
+    const address = decodeURIComponent(ipAddress ?? "")
+    const location = useLocation()
+    const connectionType = location.state?.connectionType ?? "Wifi"
+    const printerName = location.state?.name
+
+    console.log(location.state)
 
     useEffect(() => {
         logEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -26,11 +32,12 @@ export default function PrinterDetailedScreen() {
     }
 
     async function sendCommand(command: string) {
-        if (!ipAddress) return
+        if (!address) return
         addLog("sent", command)
+
         setSending(true)
         try {
-            const res = await sendPrinterCommand(ipAddress, command)
+            const res = await sendPrinterCommand(address, command, connectionType)
             if (res.result) addLog("received", res.result)
         } catch (err) {
             addLog("error", err instanceof Error ? err.message : "Failed to send command")
@@ -41,7 +48,7 @@ export default function PrinterDetailedScreen() {
 
     async function handleSend() {
         const command = commandInput.trim()
-        if (!ipAddress || !command) return
+        if (!address || !command) return
         setCommandInput("")
         await sendCommand(command)
     }
@@ -56,7 +63,7 @@ export default function PrinterDetailedScreen() {
     return (
         <div>
             <h2 className="text-center text-3xl font-bold text-altec-teal mb-4">
-                {dnsName ? `${dnsName} - ${ipAddress}` : ipAddress}
+                {printerName || dnsName || "Not found"}
             </h2>
 
             <div className="flex gap-4 items-start">
@@ -102,7 +109,7 @@ export default function PrinterDetailedScreen() {
                     <div className="overflow-y-auto px-4 pb-4 grow">
                         {commandTab === "files" ? (
                             <PrinterFilesTab
-                                ipAddress={ipAddress!}
+                                address={address!}
                                 sending={sending}
                                 setSending={setSending}
                                 addLog={addLog}
@@ -178,14 +185,14 @@ export default function PrinterDetailedScreen() {
                         <button
                             className="border bg-altec-teal text-altec-white px-4 rounded-xl self-stretch disabled:opacity-50"
                             onClick={handleSend}
-                            disabled={sending || !ipAddress}
+                            disabled={sending || !address}
                         >
                             {sending ? "..." : "Send"}
                         </button>
                     </div>
                 </div>
 
-                <PrinterSettingsPanel ipAddress={ipAddress} onNetworkName={setDnsName} />
+                <PrinterSettingsPanel address={address} onNetworkName={setDnsName} connectionType={connectionType}/>
 
             </div>
         </div>

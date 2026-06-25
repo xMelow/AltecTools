@@ -8,7 +8,7 @@ export interface FileEntry {
 }
 
 export type PrinterFilesTabProps = {
-    ipAddress: string
+    address: string
     sending: boolean
     setSending: (v: boolean) => void
     addLog: (type: LogEntry["type"], text: string) => void

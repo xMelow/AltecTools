@@ -1,11 +1,12 @@
-﻿using Altec.Api.Record.Printers;
+﻿using Altec.Api.Domain.Printers.Communication;
+using Altec.Api.Record.Printers;
 
 namespace Altec.Api.Services.Printers;
 
 public interface IPrinterService
 {
-    Task<IReadOnlyList<Printer>> GetPrinters(List<string> subnets);
-    Task<PrinterInfo> GetPrinterInfo(string ipAddress);
-    Task<string> SendCommand(string ipAddress, string command);
-    Task<string> SendFiles(string ipAddress, IEnumerable<(Stream stream, string fileName, string memory)> files);
+    Task<IReadOnlyList<Printer>> GetPrinters(PrinterConnectionType connectionType, List<string>? subnets);
+    Task<PrinterInfo> GetPrinterInfo(PrinterConnectionType connectionType, string address);
+    Task<string> SendCommand(PrinterConnectionType connectionType, string address, string command);
+    Task SendFiles(PrinterConnectionType connectionType, string address, IEnumerable<PrinterFile> files);
 }

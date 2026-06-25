@@ -1,11 +1,17 @@
 import {useEffect, useState} from "react";
 import {useFetch} from "../../hooks/useFetch";
-import {CommandResponse, EditableSettings, PrinterSettings, PrinterSettingsPanelProps} from "../../types/printer";
+import {CommandResponse, EditableSettings, PrinterConnectionType, PrinterSettings} from "../../types/printer";
 import {getPrinterSettings, sendPrinterCommand} from "../../api/printers";
 import { EditableRow, SelectRow, SettingRow, SettingsSection} from "./parts";
 import ExportPrinterSettings from "../ExportPrinterSetttings";
 
-export default function PrinterSettingsPanel({ ipAddress, onNetworkName }: PrinterSettingsPanelProps) {
+export type PrinterSettingsPanelProps = {
+    address: string | undefined
+    connectionType: PrinterConnectionType
+    onNetworkName?: (name: string) => void
+}
+
+export default function PrinterSettingsPanel({ address, connectionType, onNetworkName }: PrinterSettingsPanelProps) {
     const settingsFetch = useFetch<PrinterSettings>()
     const updateFetch = useFetch<CommandResponse>()
     const s = settingsFetch.result
@@ -15,10 +21,10 @@ export default function PrinterSettingsPanel({ ipAddress, onNetworkName }: Print
     const [showExport, setShowExport] = useState(false)
 
     useEffect(() => {
-        if (ipAddress) {
-            settingsFetch.execute(() => getPrinterSettings(ipAddress))
+        if (address) {
+            settingsFetch.execute(() => getPrinterSettings(address, connectionType))
         }
-    }, [ipAddress])
+    }, [address])
 
     useEffect(() => {
         if (s) {
@@ -62,11 +68,11 @@ export default function PrinterSettingsPanel({ ipAddress, onNetworkName }: Print
         setEditable(prev => prev ? { ...prev, [key]: value } : prev)
 
     const handleRefresh = () => {
-        if (ipAddress) settingsFetch.execute(() => getPrinterSettings(ipAddress))
+        if (address) settingsFetch.execute(() => getPrinterSettings(address, connectionType))
     }
 
     const handleUpdate = () => {
-        if (!ipAddress || !editableSettings) return
+        if (!address || !editableSettings) return
 
         let updateSensorType = setSensorType(editableSettings.sensorType, editableSettings.gapSize, editableSettings.gapOffset)
         let postPrint = setPostPrint(editableSettings.postPrint)
@@ -86,7 +92,7 @@ export default function PrinterSettingsPanel({ ipAddress, onNetworkName }: Print
             ...postPrint
         ].join('\r\n')
 
-        updateFetch.execute(() => sendPrinterCommand(ipAddress, commands))
+        updateFetch.execute(() => sendPrinterCommand(address, commands, connectionType))
     }
 
     const setSensorType = (sensorType: string, gapSize: number, gapOffset: number) => {

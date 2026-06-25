@@ -1,5 +1,8 @@
 ﻿using System.IO;
+using System.Net;
 using System.Net.Sockets;
+using Altec.Api.Domain.Printers.Communication;
+using Altec.Api.Domain.Printers.Connections;
 using Altec.Api.Record.Printers;
 using Altec.Api.Services.Printers;
 using Microsoft.AspNetCore.Mvc;
@@ -18,32 +21,32 @@ public class PrinterController : ControllerBase
     }
 
     [HttpGet("discover")]
-    public async Task<IActionResult> Discover([FromQuery] List<string> subnets)
+    public async Task<IActionResult> Discover([FromQuery] PrinterConnectionType connectionType, [FromQuery] List<string>? subnets)
     {
-        var printers = await _printerService.GetPrinters(subnets);
+        var printers = await _printerService.GetPrinters(connectionType, subnets);
         return Ok(new PrinterResponse(printers));
     }
     
-    [HttpGet("{ipAddress}/settings")]
-    public async Task<IActionResult> GetPrinterSettings(string ipAddress)
+    [HttpGet("getPrinterInfo/{address}")]
+    public async Task<IActionResult> GetPrinterInfo(string address, [FromQuery] PrinterConnectionType connectionType)
     {
         try
         {
-            var info = await _printerService.GetPrinterInfo(ipAddress);
+            var info = await _printerService.GetPrinterInfo(connectionType, address);
             return Ok(info);
         }
          catch (Exception ex)
         {
-            return BadRequest($"Error sending command to printer : {ex.Message}" );
+            return BadRequest($"Error sending command to printer : {ex.Message}");
         }
     }
 
-    [HttpPost("{ipAddress}/command")]
-    public async Task<IActionResult> SendCommand(string ipAddress, [FromBody] PrinterCommandRequest request)
+    [HttpPost("command/{address}")]
+    public async Task<IActionResult> SendCommand(string address, [FromBody] PrinterCommandRequest request, [FromQuery] PrinterConnectionType connectionType)
     {
         try
         {
-            var response = await _printerService.SendCommand(ipAddress, request.Command);
+            var response = await _printerService.SendCommand(connectionType, address, request.Command);
             return Ok(new PrinterCommandResponse(response));
         } 
         catch (Exception ex)
@@ -52,29 +55,26 @@ public class PrinterController : ControllerBase
         }
     }
 
-    [HttpPost("{ipAddress}/file")]
-    public async Task<IActionResult> SendFile(string ipAddress)
-    {
-        var fileNames = Request.Form["fileNames"].ToArray();
-        var memories = Request.Form["memories"].ToArray();
-
-        var entries = Request.Form.Files
-            .Select((file, i) => (
-                Stream: file.OpenReadStream(),
-                FileName: i < fileNames.Length ? fileNames[i] : file.FileName,
-                Memory: i < memories.Length ? memories[i] : string.Empty
-            ))
-            .ToList();
-
+    [HttpPost("file/{address}")]
+    public async Task<IActionResult> SendFile(string address, [FromForm] List<IFormFile> files, [FromForm] List<string> fileNames, [FromForm] List<string> memories, [FromQuery] PrinterConnectionType connectionType)
+    {   
+        if (address == null) return BadRequest("Address must be present");
+        
         try
         {
-            var response = await _printerService.SendFiles(ipAddress, entries.Select(e => (e.Stream, e.FileName, e.Memory)));
-            return Ok(new PrinterCommandResponse(response));
+            var fileBundle = new List<PrinterFile>();
+
+            for (int i = 0; i < files.Count; i++)
+            {
+                fileBundle.Add(new PrinterFile{ FileName = fileNames[i], Memory = Enum.Parse<PrinterMemory>(memories[i]), Stream = files[i].OpenReadStream()});
+            }
+
+            await _printerService.SendFiles(connectionType, address, fileBundle);
+            return Ok("Files send to printer");
         }
-        finally
+        catch (Exception ex)
         {
-            foreach (var entry in entries)
-                await entry.Stream.DisposeAsync();
+            return BadRequest($"Error sending files to the printer: {ex.Message}");
         }
     }
 }

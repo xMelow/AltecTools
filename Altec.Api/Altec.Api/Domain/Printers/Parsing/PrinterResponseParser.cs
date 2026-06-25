@@ -1,12 +1,14 @@
 using System.Globalization;
 using Altec.Api.Record.Printers;
 
-namespace Altec.Api.Domain.Printers; 
+namespace Altec.Api.Domain.Printers.Parsing; 
 
 public class PrinterResponseParser
 {
     public PrinterInfo ParseSettings(string response)
     {
+        Console.WriteLine(response);
+
         var settings = response
             .Split('\n', StringSplitOptions.RemoveEmptyEntries)
             .Select(l => l.Trim())
@@ -17,7 +19,6 @@ public class PrinterResponseParser
         string Get(string key) => settings.GetValueOrDefault(key, "");
         
         var dpi = ParseInt(Get("DPI"));
-
         var labelWidth = ParseDimensionDots(Get("PAPER WIDTH"), dpi);
         var labelHeight = ParseDimensionDots(Get("PAPER SIZE"), dpi);
 

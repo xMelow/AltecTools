@@ -1,5 +1,6 @@
 using System.Text.Json;
-using Altec.Api.Domain.Printers;
+using Altec.Api.Domain.Printers.Discovery;
+using Altec.Api.Domain.Printers.Parsing;
 using Altec.Api.Domain.Tspl;
 using Altec.Api.Interface;
 using Altec.Api.Services;
@@ -14,6 +15,7 @@ builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+        options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
     });
 builder.Services.AddOpenApi();
 
@@ -21,8 +23,10 @@ builder.Services.AddScoped<TsplParser>();
 builder.Services.AddScoped<TsplRender>();
 builder.Services.AddScoped<TsplValidator>();
 builder.Services.AddScoped<ITsplService, TsplService>();
-builder.Services.AddScoped<PrinterDiscovery>();
+builder.Services.AddScoped<WifiDiscovery>();
+builder.Services.AddScoped<UsbDiscovery>();
 builder.Services.AddScoped<IPrinterService, PrinterService>();
+builder.Services.AddScoped<PrinterResponseParser>();
 
 builder.Services.AddHttpClient<INiceLabelClient, NiceLabelClient>(client =>
 {

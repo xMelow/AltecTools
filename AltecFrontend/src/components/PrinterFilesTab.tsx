@@ -1,13 +1,16 @@
 import { useState } from "react"
 import { sendPrinterFile } from "../api/printers"
 import { FileEntry, PrinterFilesTabProps } from "../types/printerFiles"
+import { useLocation } from "react-router-dom"
 
 function newEntry(): FileEntry {
-    return { id: String(Date.now() + Math.random()), file: null, fileName: "", memory: "" }
+    return { id: String(Date.now() + Math.random()), file: null, fileName: "", memory: "Flash" }
 }
 
-export default function PrinterFilesTab({ ipAddress, sending, setSending, addLog }: PrinterFilesTabProps) {
+export default function PrinterFilesTab({address, sending, setSending, addLog }: PrinterFilesTabProps) {
     const [fileEntries, setFileEntries] = useState<FileEntry[]>([newEntry()])
+    const location = useLocation()
+    const connectionType = location.state?.connectionType ?? "Wifi"
 
     function addEntry() {
         setFileEntries(prev => [...prev, newEntry()])
@@ -36,8 +39,8 @@ export default function PrinterFilesTab({ ipAddress, sending, setSending, addLog
         addLog("sent", `Files: ${toSend.map(e => e.fileName).join(", ")}`)
         setSending(true)
         try {
-            const res = await sendPrinterFile(ipAddress, toSend.map(e => ({ file: e.file!, fileName: e.fileName, memory: e.memory })))
-            if (res.result) addLog("received", res.result)
+            const res = await sendPrinterFile(address, toSend.map(e => ({ file: e.file!, fileName: e.fileName, memory: e.memory })), connectionType)
+            if (res) addLog("received", res)
         } catch (err) {
             addLog("error", err instanceof Error ? err.message : "Failed to send files")
         } finally {
@@ -84,9 +87,9 @@ export default function PrinterFilesTab({ ipAddress, sending, setSending, addLog
                                 value={entry.memory}
                                 onChange={e => updateEntry(i, "memory", e.target.value)}
                             >
-                                <option value="">DRAM</option>
-                                <option value="F">FLASH</option>
-                                <option value="E">CARD</option>
+                                <option value="Flash">FLASH</option>
+                                <option value="Dram">DRAM</option>
+                                <option value="Card">CARD</option>
                             </select>
                         </>
                     )}

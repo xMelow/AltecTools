@@ -1,16 +1,25 @@
 export type PrinterRequest = {
-    subnets: string[]
+    printerConnectionType: PrinterConnectionType
+    subnets?: string[]
 }
+
+export type PrinterConnectionType = "Wifi" | "Usb"
 
 export type PrinterResponse = {
     printers: Printer[]
 }
 
 export type Printer = {
-    networkName: string,
-    ipAddress: string,
-    printerModel: string,
-    port: number,
+    name: string,
+    address: string,
+    model: string,
+    connectionType: PrinterConnectionType,
+}
+
+export type PrinterFile = {
+    file: File
+    fileName: string
+    memory: string
 }
 
 export type PrinterSettings = {
@@ -50,11 +59,6 @@ export type PrinterSettings = {
 
 export type CommandResponse = {
     result: string
-}
-
-export type PrinterSettingsPanelProps = {
-    ipAddress: string | undefined
-    onNetworkName?: (name: string) => void
 }
 
 export type EditableSettings = {
