@@ -4,7 +4,7 @@ import { FileEntry, PrinterFilesTabProps } from "../types/printerFiles"
 import { useLocation } from "react-router-dom"
 
 function newEntry(): FileEntry {
-    return { id: String(Date.now() + Math.random()), file: null, fileName: "", memory: "" }
+    return { id: String(Date.now() + Math.random()), file: null, fileName: "", memory: "Flash" }
 }
 
 export default function PrinterFilesTab({address, sending, setSending, addLog }: PrinterFilesTabProps) {
@@ -40,7 +40,7 @@ export default function PrinterFilesTab({address, sending, setSending, addLog }:
         setSending(true)
         try {
             const res = await sendPrinterFile(address, toSend.map(e => ({ file: e.file!, fileName: e.fileName, memory: e.memory })), connectionType)
-            if (res.result) addLog("received", res.result)
+            if (res) addLog("received", res)
         } catch (err) {
             addLog("error", err instanceof Error ? err.message : "Failed to send files")
         } finally {
@@ -87,9 +87,9 @@ export default function PrinterFilesTab({address, sending, setSending, addLog }:
                                 value={entry.memory}
                                 onChange={e => updateEntry(i, "memory", e.target.value)}
                             >
-                                <option value="FLASH">FLASH</option>
-                                <option value="DRAM">DRAM</option>
-                                <option value="CARD">CARD</option>
+                                <option value="Flash">FLASH</option>
+                                <option value="Dram">DRAM</option>
+                                <option value="Card">CARD</option>
                             </select>
                         </>
                     )}

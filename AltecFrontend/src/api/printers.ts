@@ -42,7 +42,7 @@ export async function sendPrinterCommand(address: string, command: string, print
     return await res.json()
 }
 
-export async function sendPrinterFile(address: string, entries: PrinterFile[], printerConnectionType: PrinterConnectionType): Promise<CommandResponse> {
+export async function sendPrinterFile(address: string, entries: PrinterFile[], printerConnectionType: PrinterConnectionType): Promise<string> {
     const params = new URLSearchParams()
     params.append("connectionType", printerConnectionType)
 
@@ -59,5 +59,5 @@ export async function sendPrinterFile(address: string, entries: PrinterFile[], p
     })
 
     if (!res.ok) throw new Error("Failed to send file")
-    return await res.json()
+    return await res.text()
 }
