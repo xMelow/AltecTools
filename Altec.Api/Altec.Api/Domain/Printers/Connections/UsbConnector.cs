@@ -64,6 +64,7 @@ public class UsbConnector : IDisposable, IPrinterConnection
     private const uint OPEN_EXISTING = 3;
     private const uint DIGCF_PRESENT = 0x02;
     private const uint DIGCF_DEVICEINTERFACE = 0x10;
+    private const uint FILE_FLAG_OVERLAPPED = 0x40000000;
     private static readonly Guid UsbPrintGuid = new Guid("{28D78FAD-5A12-11D1-AE5B-0000F803A8C2}");
 
     private const string AltecVendorId = "vid_1203";
@@ -81,7 +82,7 @@ public class UsbConnector : IDisposable, IPrinterConnection
             FILE_SHARE_READ | FILE_SHARE_WRITE,
             IntPtr.Zero,
             OPEN_EXISTING,
-            0,
+            FILE_FLAG_OVERLAPPED,
             IntPtr.Zero);
 
         if (_handle.IsInvalid)
