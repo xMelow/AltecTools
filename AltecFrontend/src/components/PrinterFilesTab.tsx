@@ -87,9 +87,9 @@ export default function PrinterFilesTab({address, sending, setSending, addLog }:
                                 value={entry.memory}
                                 onChange={e => updateEntry(i, "memory", e.target.value)}
                             >
-                                <option value="">DRAM</option>
-                                <option value="F">FLASH</option>
-                                <option value="E">CARD</option>
+                                <option value="FLASH">FLASH</option>
+                                <option value="DRAM">DRAM</option>
+                                <option value="CARD">CARD</option>
                             </select>
                         </>
                     )}

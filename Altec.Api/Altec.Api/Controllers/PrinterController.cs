@@ -56,23 +56,25 @@ public class PrinterController : ControllerBase
     }
 
     [HttpPost("file/{address}")]
-    public async Task<IActionResult> SendFile(string address, [FromBody] List<PrinterFile> files, [FromQuery] PrinterConnectionType connectionType)
+    public async Task<IActionResult> SendFile(string address, [FromForm] List<IFormFile> files, [FromForm] List<string> fileNames, [FromForm] List<string> memories, [FromQuery] PrinterConnectionType connectionType)
     {   
         if (address == null) return BadRequest("Address must be present");
         
         try
         {
-            await _printerService.SendFiles(connectionType, address, files);
+            var fileBundle = new List<PrinterFile>();
+
+            for (int i = 0; i < files.Count; i++)
+            {
+                fileBundle.Add(new PrinterFile{ FileName = fileNames[i], Memory = Enum.Parse<PrinterMemory>(memories[i]), Stream = files[i].OpenReadStream()});
+            }
+
+            await _printerService.SendFiles(connectionType, address, fileBundle);
             return Ok("Files send to printer");
         }
         catch (Exception ex)
         {
             return BadRequest($"Error sending files to the printer: {ex.Message}");
-        }
-        finally
-        {
-            foreach (var file in files)
-                await file.Stream.DisposeAsync();
         }
     }
 }
