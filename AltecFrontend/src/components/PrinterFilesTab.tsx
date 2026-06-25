@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { sendPrinterFile } from "../api/printers"
 import { FileEntry, PrinterFilesTabProps } from "../types/printerFiles"
+import { useLocation } from "react-router-dom"
 
 function newEntry(): FileEntry {
     return { id: String(Date.now() + Math.random()), file: null, fileName: "", memory: "" }
@@ -8,6 +9,8 @@ function newEntry(): FileEntry {
 
 export default function PrinterFilesTab({address, sending, setSending, addLog }: PrinterFilesTabProps) {
     const [fileEntries, setFileEntries] = useState<FileEntry[]>([newEntry()])
+    const location = useLocation()
+    const connectionType = location.state?.connectionType ?? "Wifi"
 
     function addEntry() {
         setFileEntries(prev => [...prev, newEntry()])
@@ -36,8 +39,7 @@ export default function PrinterFilesTab({address, sending, setSending, addLog }:
         addLog("sent", `Files: ${toSend.map(e => e.fileName).join(", ")}`)
         setSending(true)
         try {
-            // TODO: FIX SEND PRINTER FILES BY ADDING PRINTER CONNECTION TYPE
-            const res = await sendPrinterFile(address, toSend.map(e => ({ file: e.file!, fileName: e.fileName, memory: e.memory })), )
+            const res = await sendPrinterFile(address, toSend.map(e => ({ file: e.file!, fileName: e.fileName, memory: e.memory })), connectionType)
             if (res.result) addLog("received", res.result)
         } catch (err) {
             addLog("error", err instanceof Error ? err.message : "Failed to send files")

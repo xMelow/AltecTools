@@ -9,7 +9,7 @@ export default function PrinterCard({printer}: PrinterCardProps) {
     return (
         <div
             className="w-1/5 h-1/4 pl-5 pb-5 pr-5 flex flex-col border rounded-2xl border-altec-teal bg-altec-white justify-center">
-            <Link to={`/printers/${encodeURIComponent(printer.address)}`} state={{ dnsName: printer.name, connectionType: printer.connectionType }}>
+            <Link to={`/printers/${encodeURIComponent(printer.address)}`} state={{ name: printer.name, connectionType: printer.connectionType, model: printer.model }}>
 
                 <div className="flex justify-between items-center pt-2 pb-2">
                     <p className="font-semibold">{printer.name || printer.address}</p>

@@ -1,23 +1,26 @@
 import { useState, useRef, useEffect } from "react"
-import { useParams } from "react-router-dom"
+import { useLocation, useParams } from "react-router-dom"
 import { sendPrinterCommand } from "../api/printers"
 import { CommandTab, LogEntry } from "../types/printerTerminal"
 import { TSPL_COMMAND_GROUPS, PRINTER_COMMAND_GROUPS } from "../constants/printerCommands"
 import PrinterSettingsPanel from "../components/PrinterSettings"
 import PrinterFilesTab from "../components/PrinterFilesTab"
-import { PrinterConnectionType } from "../types/printer"
 
 export default function PrinterDetailedScreen() {
     const { ipAddress } = useParams<{ ipAddress: string }>()
-    const address = decodeURIComponent(ipAddress ?? "")
     const [dnsName, setDnsName] = useState<string>()
     const [commandInput, setCommandInput] = useState("")
     const [log, setLog] = useState<LogEntry[]>([])
     const [sending, setSending] = useState(false)
     const [commandTab, setCommandTab] = useState<CommandTab>("printer")
-    const [connectionType, setConnectionType] = useState<PrinterConnectionType>("Usb")
     const logEndRef = useRef<HTMLDivElement>(null)
     const activeGroups = commandTab === "tspl" ? TSPL_COMMAND_GROUPS : PRINTER_COMMAND_GROUPS
+    const address = decodeURIComponent(ipAddress ?? "")
+    const location = useLocation()
+    const connectionType = location.state?.connectionType ?? "Wifi"
+    const printerName = location.state?.name
+
+    console.log(location.state)
 
     useEffect(() => {
         logEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -60,7 +63,7 @@ export default function PrinterDetailedScreen() {
     return (
         <div>
             <h2 className="text-center text-3xl font-bold text-altec-teal mb-4">
-                {dnsName ? `${dnsName} - ${address}` : address}
+                {printerName ? dnsName : "Not found"}
             </h2>
 
             <div className="flex gap-4 items-start">
