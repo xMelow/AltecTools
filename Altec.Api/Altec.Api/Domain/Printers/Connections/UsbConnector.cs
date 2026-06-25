@@ -2,6 +2,7 @@ using System.Text;
 using System.Runtime.InteropServices;
 using Microsoft.Win32.SafeHandles;
 using Altec.Api.Domain.Printers.Communication;
+using Altec.Api.Record.Printers;
 
 namespace Altec.Api.Domain.Printers.Connections;
 
@@ -135,19 +136,30 @@ public class UsbConnector : IDisposable, IPrinterConnection
     public async Task<string> Read()
     {
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-        var buffer = new byte[4096];
-        var readTask = _stream.ReadAsync(buffer, cts.Token).AsTask();
-        var timeoutTask = Task.Delay(TimeSpan.FromSeconds(1), cts.Token);
-        
-        var completed = await Task.WhenAny(readTask, timeoutTask);
-        if (completed != readTask)
-            return "Printer didn't respond in time.";
-            
-        var bytesRead = await readTask;
-        return Encoding.ASCII.GetString(buffer, 0, bytesRead);
+        var sb = new StringBuilder();
+
+        while (true)
+        {
+            var buffer = new byte[4096];
+            var readTask = _stream.ReadAsync(buffer, cts.Token).AsTask();
+            var timeoutTask = Task.Delay(TimeSpan.FromSeconds(1), cts.Token);
+            var completed = await Task.WhenAny(readTask, timeoutTask);
+
+            if (completed == readTask)
+            {
+                var bytesRead = await readTask;
+                var result = Encoding.ASCII.GetString(buffer, 0, bytesRead);
+                sb.Append(result);
+            }
+            else
+            {
+               return sb.ToString();
+            }
+        }
     }
+
     public async Task Send(string command) 
-    { 
+    {
         try
         {
             using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));

@@ -17,7 +17,6 @@ public class PrinterResponseParser
         string Get(string key) => settings.GetValueOrDefault(key, "");
         
         var dpi = ParseInt(Get("DPI"));
-
         var labelWidth = ParseDimensionDots(Get("PAPER WIDTH"), dpi);
         var labelHeight = ParseDimensionDots(Get("PAPER SIZE"), dpi);
 
