@@ -63,7 +63,7 @@ export default function PrinterDetailedScreen() {
     return (
         <div>
             <h2 className="text-center text-3xl font-bold text-altec-teal mb-4">
-                {printerName ? dnsName : "Not found"}
+                {printerName || dnsName || "Not found"}
             </h2>
 
             <div className="flex gap-4 items-start">
