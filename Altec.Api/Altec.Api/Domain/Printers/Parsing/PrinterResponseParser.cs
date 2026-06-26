@@ -7,8 +7,6 @@ public class PrinterResponseParser
 {
     public PrinterInfo ParseSettings(string response)
     {
-        Console.WriteLine(response);
-
         var settings = response
             .Split('\n', StringSplitOptions.RemoveEmptyEntries)
             .Select(l => l.Trim())

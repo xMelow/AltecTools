@@ -8,27 +8,9 @@ export const TSPL_COMMAND_GROUPS: CommandGroup[] = [
         ],
     },
     {
-        label: "Paper Control",
-        commands: [
-            { label: "Feed", command: "FEED" },
-            { label: "Form Feed", command: "FORMFEED" },
-            { label: "Home", command: "HOME" },
-            { label: "End of Page", command: "EOP" },
-        ],
-    },
-    {
         label: "Print Buffer",
         commands: [
             { label: "Clear Buffer", command: "CLS" },
-            { label: "Print 1 Copy", command: "PRINT 1" },
-        ],
-    },
-    {
-        label: "Calibration",
-        commands: [
-            { label: "Auto Detect", command: "AUTODETECT" },
-            { label: "Gap Detect", command: "GAPDETECT" },
-            { label: "Black Mark Detect", command: "BLINEDETECT" },
         ],
     },
     {
@@ -45,18 +27,18 @@ export const TSPL_COMMAND_GROUPS: CommandGroup[] = [
     {
         label: "Keys",
         commands: [
+            { label: "Key1 On", command: "SET KEY1 ON" },
+            { label: "Key1 Off", command: "SET KEY1 OFF" },
+            { label: "Key2 On", command: "SET KEY2 ON" },
+            { label: "Key2 Off", command: "SET KEY2 OFF" },
+            { label: "Key3 On", command: "SET KEY3 ON" },
+            { label: "Key3 Off", command: "SET KEY3 OFF" },
             { label: "Key4 On", command: "SET KEY4 ON" },
             { label: "Key4 Off", command: "SET KEY4 OFF" },
             { label: "Key5 On", command: "SET KEY5 ON" },
             { label: "Key5 Off", command: "SET KEY5 OFF" },
-        ],
-    },
-    {
-        label: "System",
-        commands: [
-            { label: "Reprint On", command: "SET REPRINT ON" },
-            { label: "Reprint Off", command: "SET REPRINT OFF" },
-            { label: "Reset", command: "RESET" },
+            { label: "Key6 On", command: "SET KEY6 ON" },
+            { label: "Key6 Off", command: "SET KEY6 OFF" },
         ],
     },
 ]
@@ -68,7 +50,6 @@ export const PRINTER_COMMAND_GROUPS: CommandGroup[] = [
             { label: "Auto Detect", command: "AUTODETECT" },
             { label: "Gap Sensor Detect", command: "GAPDETECT" },
             { label: "Black Mark Detect", command: "BLINEDETECT" },
-            { label: "Gap Sensor Auto", command: "SET GAP AUTO" },
         ],
     },
     {
@@ -86,7 +67,6 @@ export const PRINTER_COMMAND_GROUPS: CommandGroup[] = [
     {
         label: "Paper Control",
         commands: [
-            { label: "Feed Label", command: "FEED 25" },
             { label: "Form Feed", command: "FORMFEED" },
             { label: "Home", command: "HOME" },
             { label: "Cut", command: "CUT" },
@@ -95,7 +75,7 @@ export const PRINTER_COMMAND_GROUPS: CommandGroup[] = [
     {
         label: "Status",
         commands: [
-            { label: "Quick Status", command: "\x1B!?" },
+            { label: "Quick Status", command: "\x1B!?" }, // does not work
             { label: "Full Status", command: "\x1B!S" },
             { label: "Free Memory", command: "~!A" },
             { label: "Mileage", command: "~!@" },
@@ -107,7 +87,7 @@ export const PRINTER_COMMAND_GROUPS: CommandGroup[] = [
     {
         label: "Network",
         commands: [
-            { label: "Ethernet DHCP", command: "NET DHCP" },
+            { label: "Ethernet DHCP", command: "NET DHCP" }, // does these work
             { label: "WiFi DHCP", command: "WLAN DHCP" },
             { label: "Print Ethernet Config", command: "SELFTEST ETHERNET" },
             { label: "Print WiFi Config", command: "SELFTEST WLAN" },
@@ -136,18 +116,9 @@ export const PRINTER_COMMAND_GROUPS: CommandGroup[] = [
             { label: "Clear Buffer", command: "CLS" },
             { label: "Pause", command: "\x1B!P" },
             { label: "Resume", command: "\x1B!O" },
-        ],
-    },
-    {
-        label: "Clock",
-        commands: [
-            { label: "Get Date/Time", command: 'OUT NOW$()' },
-            { label: "Set Year", command: 'YEAR=25' },
-            { label: "Set Month", command: 'MONTH=01' },
-            { label: "Set Date", command: 'DATE=01' },
-            { label: "Set Hour", command: 'HOUR=00' },
-            { label: "Set Minute", command: 'MINUTE=00' },
-            { label: "Set Second", command: 'SECOND=00' },
+            { label: "Reprint On", command: "SET REPRINT ON" },
+            { label: "Reprint Off", command: "SET REPRINT OFF" },
+            { label: "Reset", command: "RESET" },
         ],
     },
 ]
