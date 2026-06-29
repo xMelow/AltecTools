@@ -46,7 +46,7 @@ export const PRINTER_COMMAND_GROUPS: CommandGroup[] = [
         label: "Status",
         commands: [
             { label: "Quick Status", command: "\x1B!?" },
-            { label: "Full Status", command: "\x1B!S" }, // parse the response to human readable
+            { label: "Full Status", command: "\x1B!S" },
             { label: "Free Memory", command: "~!A" },
             { label: "Mileage", command: "~!@" },
             { label: "Files List", command: "~!F" },

@@ -3,9 +3,8 @@
 export function parsePrinterReponse(command: string, response: string): string {
     let result = response;
 
-    if (command === "\x1B!?") {
-        result = parseQuickStatus(response);
-    }
+    if (command === "\x1B!?") result = parseQuickStatus(response);
+    else if (command == "\x1B!S") result = parseFullStatus(response)
 
     return result
 }
@@ -21,6 +20,49 @@ function parseQuickStatus(response: string): string {
     if (byte & 0x10) messages.push("Pause")
     if (byte & 0x20) messages.push("Printing")
     if (byte & 0x80) messages.push("Other error")
+
+    return messages.length > 0 ? messages.join(", ") : "Normal"
+}
+
+function parseFullStatus(response: string): string {
+    const statusByte = response.charCodeAt(0)
+    const warningByte = response.charCodeAt(1)
+    const errorByte = response.charCodeAt(2)
+    const errorByte2 = response.charCodeAt(3)
+    const status = statusByte & ~0x40
+    const warning = warningByte & ~0x40
+    const internalError = errorByte & ~0x40
+    const externalError = errorByte2 & ~0x40
+    const messages: string[] = []
+
+    switch(status) {
+        case 0x00: messages.push("Normal") 
+        case 0x20: messages.push("Pause")
+        case 0x02: messages.push("Backing label")
+        case 0x00: messages.push("Cutting") 
+        case 0x20: messages.push("Printer error")
+        case 0x02: messages.push("Form feed")
+        case 0x00: messages.push("Waiting to press print key") 
+        case 0x20: messages.push("Printing batch")
+        case 0x02: messages.push("Imaging")
+    }
+
+    switch(warning) {
+        case 0x00: messages.push("Normal")
+        case 0x20: messages.push("Paper low")
+        case 0x02: messages.push("Ribbon low")
+    }
+    switch(internalError) {
+        case 0x00: messages.push("Normal") 
+        case 0x20: messages.push("Print head overheat")
+        case 0x02: messages.push("Stepping motor overheat")
+    }
+
+    switch(externalError) {
+        case 0x00: messages.push("Normal")
+        case 0x20: messages.push("Paper empty")
+        case 0x02: messages.push("Paper jam")
+    }
 
     return messages.length > 0 ? messages.join(", ") : "Normal"
 }
