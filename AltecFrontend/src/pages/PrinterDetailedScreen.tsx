@@ -2,9 +2,10 @@ import { useState, useRef, useEffect } from "react"
 import { useLocation, useParams } from "react-router-dom"
 import { sendPrinterCommand } from "../api/printers"
 import { CommandTab, LogEntry } from "../types/printerTerminal"
-import { TSPL_COMMAND_GROUPS, PRINTER_COMMAND_GROUPS } from "../constants/printerCommands"
+import { PRINTER_COMMAND_GROUPS } from "../constants/printerCommands"
 import PrinterSettingsPanel from "../components/PrinterSettings"
 import PrinterFilesTab from "../components/PrinterFilesTab"
+import { parsePrinterReponse } from "../utils/parsePrinterResponse"
 
 export default function PrinterDetailedScreen() {
     const { ipAddress } = useParams<{ ipAddress: string }>()
@@ -14,13 +15,11 @@ export default function PrinterDetailedScreen() {
     const [sending, setSending] = useState(false)
     const [commandTab, setCommandTab] = useState<CommandTab>("printer")
     const logEndRef = useRef<HTMLDivElement>(null)
-    const activeGroups = commandTab === "tspl" ? TSPL_COMMAND_GROUPS : PRINTER_COMMAND_GROUPS
+    const activeGroups = PRINTER_COMMAND_GROUPS
     const address = decodeURIComponent(ipAddress ?? "")
     const location = useLocation()
     const connectionType = location.state?.connectionType ?? "Wifi"
     const printerName = location.state?.name
-
-    console.log(location.state)
 
     useEffect(() => {
         logEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -38,7 +37,8 @@ export default function PrinterDetailedScreen() {
         setSending(true)
         try {
             const res = await sendPrinterCommand(address, command, connectionType)
-            if (res.result) addLog("received", res.result)
+            const result = parsePrinterReponse(command, res.result)
+            if (res.result) addLog("received", result)
         } catch (err) {
             addLog("error", err instanceof Error ? err.message : "Failed to send command")
         } finally {
@@ -70,7 +70,7 @@ export default function PrinterDetailedScreen() {
 
                 <div className="w-1/5 flex flex-col border rounded-2xl border-altec-teal bg-altec-white max-h-[75vh]">
                     <div className="px-4 pt-4 shrink-0">
-                        <h3 className="text-lg font-semibold mb-2">Commands</h3>
+                        <h3 className="text-lg font-semibold mb-2">Printer Commands</h3>
                         <hr className="border-b border-altec-teal mb-3" />
                         <div className="flex gap-2 mb-3">
                             <button
@@ -81,17 +81,7 @@ export default function PrinterDetailedScreen() {
                                 }`}
                                 onClick={() => setCommandTab("printer")}
                             >
-                                Printer
-                            </button>
-                            <button
-                                className={`text-sm px-3 py-1 rounded-xl border border-altec-teal transition-colors ${
-                                    commandTab === "tspl"
-                                        ? "bg-altec-teal text-altec-white"
-                                        : "bg-altec-white text-altec-teal hover:bg-altec-light"
-                                }`}
-                                onClick={() => setCommandTab("tspl")}
-                            >
-                                TSPL
+                                Commands
                             </button>
                             <button
                                 className={`text-sm px-3 py-1 rounded-xl border border-altec-teal transition-colors ${
