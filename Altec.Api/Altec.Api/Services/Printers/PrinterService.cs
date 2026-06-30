@@ -25,7 +25,7 @@ public class PrinterService : IPrinterService
         IReadOnlyList<Printer> result = connectionType switch
         {
             PrinterConnectionType.Wifi => await _wifiDiscovery.Discover(subnets),
-            PrinterConnectionType.Usb => _usbDiscovery.Discover(),
+            PrinterConnectionType.Usb => await _usbDiscovery.Discover(),
             _ => throw new ArgumentException("Unknown connection type")
         };
 
