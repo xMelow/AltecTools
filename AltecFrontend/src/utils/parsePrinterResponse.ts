@@ -4,7 +4,7 @@ export function parsePrinterReponse(command: string, response: string): string {
     let result = response;
 
     if (command === "\x1B!?") result = parseQuickStatus(response);
-    else if (command == "\x1B!S") result = parseFullStatus(response)
+    else if (command === "\x1B!S") result = parseFullStatus(response)
 
     return result
 }
@@ -36,33 +36,50 @@ function parseFullStatus(response: string): string {
     const messages: string[] = []
 
     switch(status) {
-        case 0x00: messages.push("Normal") 
-        case 0x20: messages.push("Pause")
-        case 0x02: messages.push("Backing label")
-        case 0x00: messages.push("Cutting") 
-        case 0x20: messages.push("Printer error")
-        case 0x02: messages.push("Form feed")
-        case 0x00: messages.push("Waiting to press print key") 
-        case 0x20: messages.push("Printing batch")
-        case 0x02: messages.push("Imaging")
+        case 0x20: 
+            messages.push("Pause")
+            break
+        case 0x02: 
+            messages.push("Backing label")
+            break
+        case 0x03: 
+            messages.push("Cutting")
+            break
+        case 0x05: 
+            messages.push("Printer error")
+            break
+        case 0x06: 
+            messages.push("Form feed")
+            break
+        case 0x0B: 
+            messages.push("Waiting to press print key") 
+            break
+        case 0x10: 
+            messages.push("Printing batch")
+            break
+        case 0x17: 
+            messages.push("Imaging")
+            break
+        default:
+            messages.push("Normal") 
+            break 
     }
 
-    switch(warning) {
-        case 0x00: messages.push("Normal")
-        case 0x20: messages.push("Paper low")
-        case 0x02: messages.push("Ribbon low")
-    }
-    switch(internalError) {
-        case 0x00: messages.push("Normal") 
-        case 0x20: messages.push("Print head overheat")
-        case 0x02: messages.push("Stepping motor overheat")
-    }
+    if (warning & 0x01) messages.push("Paper low")
+    if (warning & 0x02) messages.push("Ribbon low")
+    if (warning & 0x08) messages.push("Receive buffer full")
 
-    switch(externalError) {
-        case 0x00: messages.push("Normal")
-        case 0x20: messages.push("Paper empty")
-        case 0x02: messages.push("Paper jam")
-    }
+    if (internalError & 0x01) messages.push("Print head overheat")
+    if (internalError & 0x02) messages.push("Stepping motor overheat")
+    if (internalError & 0x04) messages.push("Print head error")
+    if (internalError & 0x08) messages.push("Cutter jam")
+    if (internalError & 0x10) messages.push("Insufficient memory")
 
-    return messages.length > 0 ? messages.join(", ") : "Normal"
+    if (externalError & 0x01) messages.push("Paper empty")
+    if (externalError & 0x02) messages.push("Paper jam")
+    if (externalError & 0x04) messages.push("Ribbon empty")
+    if (externalError & 0x08) messages.push("Ribbon jam")
+    if (externalError & 0x20) messages.push("Print head open")
+
+    return messages.join(", ")
 }
