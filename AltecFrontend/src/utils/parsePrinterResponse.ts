@@ -25,10 +25,10 @@ function parseQuickStatus(response: string): string {
 }
 
 function parseFullStatus(response: string): string {
-    const statusByte = response.charCodeAt(0)
-    const warningByte = response.charCodeAt(1)
-    const errorByte = response.charCodeAt(2)
-    const errorByte2 = response.charCodeAt(3)
+    const statusByte = response.charCodeAt(1)
+    const warningByte = response.charCodeAt(2)
+    const errorByte = response.charCodeAt(3)
+    const errorByte2 = response.charCodeAt(4)
     const status = statusByte & ~0x40
     const warning = warningByte & ~0x40
     const internalError = errorByte & ~0x40

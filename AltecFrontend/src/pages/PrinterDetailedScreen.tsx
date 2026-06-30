@@ -38,7 +38,6 @@ export default function PrinterDetailedScreen() {
         try {
             const res = await sendPrinterCommand(address, command, connectionType)
             const result = parsePrinterReponse(command, res.result)
-            console.log("RES RESULT: " + res.result)
             if (res.result) addLog("received", result)
         } catch (err) {
             addLog("error", err instanceof Error ? err.message : "Failed to send command")
