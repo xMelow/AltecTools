@@ -1,6 +1,8 @@
 using Altec.Api.Record.Printers;
 using System.Runtime.InteropServices;
 using Altec.Api.Domain.Printers.Communication;
+using Altec.Api.Domain.Printers.Connections;
+using Altec.Api.Domain.Printers.Parsing;
 
 namespace Altec.Api.Domain.Printers.Discovery;
 
@@ -50,7 +52,7 @@ public class UsbDiscovery
     private static readonly Guid UsbPrintGuid = new Guid("{28D78FAD-5A12-11D1-AE5B-0000F803A8C2}");
     private const string AltecVendorId = "vid_1203";
 
-    public IReadOnlyList<Printer> Discover()
+    public async Task<IReadOnlyList<Printer>> Discover()
     {
         if (!System.OperatingSystem.IsWindows())
         {
@@ -81,7 +83,15 @@ public class UsbDiscovery
                     var devicePath = Marshal.PtrToStringAuto(detailBuffer + 4);
 
                     if (devicePath != null && devicePath.Contains(AltecVendorId, StringComparison.OrdinalIgnoreCase))
-                        printers.Add(new Printer("Altec USB Printer", devicePath, "", PrinterConnectionType.Usb));
+                    {
+                        var printerInfo = await GetPrinterDetails(devicePath);
+                        if (printerInfo != null)
+                        {
+                            var name = string.IsNullOrEmpty(printerInfo.DnsName) ? printerInfo.Model : printerInfo.DnsName;
+                            printers.Add(new Printer(name, devicePath, printerInfo.Model, PrinterConnectionType.Usb));
+                        }
+                    }
+
                 }
                 finally
                 {
@@ -95,5 +105,22 @@ public class UsbDiscovery
         }
 
         return printers;
+    }
+
+    private async Task<PrinterInfo?> GetPrinterDetails(string address)
+    {
+        var parser = new PrinterResponseParser();
+
+        try
+        {
+            using var printerClient = new PrinterClient(new UsbConnector(address));
+            var printerInfo = await printerClient.SendCommand(PrinterCommands.GetBasicInfo());
+            return parser.ParseSettings(printerInfo);
+        }
+        catch
+        {
+            return null;
+        }
+        
     }
 }

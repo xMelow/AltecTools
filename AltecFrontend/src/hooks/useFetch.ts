@@ -3,11 +3,12 @@ import { useState } from "react"
 export function useFetch<T>() {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
-    const [result, setResult] = useState<T>()
+    const [result, setResult] = useState<T | undefined>(undefined)
 
     async function execute(fn: () => Promise<T>) {
         setError(null)
         setLoading(true)
+        setResult(undefined)
         try {
             setResult(await fn())
         } catch (err) {
@@ -17,5 +18,11 @@ export function useFetch<T>() {
         }
     }
 
-    return { loading, error, result, execute }
+    function reset() {
+        setResult(undefined)
+        setError(null)
+        setLoading(false)
+    }
+
+    return { loading, error, result, execute, reset }
 }
