@@ -1,74 +1,25 @@
 import { CommandGroup } from "../types/printerTerminal"
 
-export const TSPL_COMMAND_GROUPS: CommandGroup[] = [
-    {
-        label: "Status & Diagnostics",
-        commands: [
-            { label: "Self Test", command: "SELFTEST" },
-        ],
-    },
-    {
-        label: "Paper Control",
-        commands: [
-            { label: "Feed", command: "FEED" },
-            { label: "Form Feed", command: "FORMFEED" },
-            { label: "Home", command: "HOME" },
-            { label: "End of Page", command: "EOP" },
-        ],
-    },
-    {
-        label: "Print Buffer",
-        commands: [
-            { label: "Clear Buffer", command: "CLS" },
-            { label: "Print 1 Copy", command: "PRINT 1" },
-        ],
-    },
-    {
-        label: "Calibration",
-        commands: [
-            { label: "Auto Detect", command: "AUTODETECT" },
-            { label: "Gap Detect", command: "GAPDETECT" },
-            { label: "Black Mark Detect", command: "BLINEDETECT" },
-        ],
-    },
-    {
-        label: "Tear / Peel / Cutter",
-        commands: [
-            { label: "Tear On", command: "SET TEAR ON" },
-            { label: "Tear Off", command: "SET TEAR OFF" },
-            { label: "Peel On", command: "SET PEEL ON" },
-            { label: "Peel Off", command: "SET PEEL OFF" },
-            { label: "Cutter On", command: "SET CUTTER ON" },
-            { label: "Cutter Off", command: "SET CUTTER OFF" },
-        ],
-    },
-    {
-        label: "Keys",
-        commands: [
-            { label: "Key4 On", command: "SET KEY4 ON" },
-            { label: "Key4 Off", command: "SET KEY4 OFF" },
-            { label: "Key5 On", command: "SET KEY5 ON" },
-            { label: "Key5 Off", command: "SET KEY5 OFF" },
-        ],
-    },
+export const PRINTER_COMMAND_GROUPS: CommandGroup[] = [
     {
         label: "System",
         commands: [
-            { label: "Reprint On", command: "SET REPRINT ON" },
-            { label: "Reprint Off", command: "SET REPRINT OFF" },
+            { label: "Default Settings", command: "INITIALPRINTER" },
+            { label: "Restart Printer", command: "\x1B!C" },
+            { label: "Ignore AUTO.BAS", command: "\x1B!Q" },
+            { label: "Dump Mode", command: "~!D" },
+            { label: "Files on Printer", command: "FILES" },
+            { label: "Pause", command: "\x1B!P" },
+            { label: "Resume", command: "\x1B!O" },
             { label: "Reset", command: "RESET" },
         ],
     },
-]
-
-export const PRINTER_COMMAND_GROUPS: CommandGroup[] = [
     {
         label: "Calibration",
         commands: [
             { label: "Auto Detect", command: "AUTODETECT" },
             { label: "Gap Sensor Detect", command: "GAPDETECT" },
             { label: "Black Mark Detect", command: "BLINEDETECT" },
-            { label: "Gap Sensor Auto", command: "SET GAP AUTO" },
         ],
     },
     {
@@ -86,7 +37,6 @@ export const PRINTER_COMMAND_GROUPS: CommandGroup[] = [
     {
         label: "Paper Control",
         commands: [
-            { label: "Feed Label", command: "FEED 25" },
             { label: "Form Feed", command: "FORMFEED" },
             { label: "Home", command: "HOME" },
             { label: "Cut", command: "CUT" },
@@ -105,15 +55,6 @@ export const PRINTER_COMMAND_GROUPS: CommandGroup[] = [
         ],
     },
     {
-        label: "Network",
-        commands: [
-            { label: "Ethernet DHCP", command: "NET DHCP" },
-            { label: "WiFi DHCP", command: "WLAN DHCP" },
-            { label: "Print Ethernet Config", command: "SELFTEST ETHERNET" },
-            { label: "Print WiFi Config", command: "SELFTEST WLAN" },
-        ],
-    },
-    {
         label: "Sensor",
         commands: [
             { label: "Read Gap Sensor", command: 'OUT GETSENSOR("GAP")' },
@@ -125,29 +66,47 @@ export const PRINTER_COMMAND_GROUPS: CommandGroup[] = [
             { label: "Head Voltage", command: 'OUT GETSENSOR("HEAD VOLT")' },
         ],
     },
-     {
-        label: "System",
+    {
+        label: "Print Buffer",
         commands: [
-            { label: "Factory Reset", command: "INITIALPRINTER" },
-            { label: "Restart Printer", command: "\x1B!C" },
-            { label: "Restart (Ignore AUTO.BAS)", command: "\x1B!Q" },
-            { label: "Dump Mode", command: "~!D" },
-            { label: "Files on Printer", command: "FILES" },
             { label: "Clear Buffer", command: "CLS" },
-            { label: "Pause", command: "\x1B!P" },
-            { label: "Resume", command: "\x1B!O" },
         ],
     },
     {
-        label: "Clock",
+        label: "Printer Options",
         commands: [
-            { label: "Get Date/Time", command: 'OUT NOW$()' },
-            { label: "Set Year", command: 'YEAR=25' },
-            { label: "Set Month", command: 'MONTH=01' },
-            { label: "Set Date", command: 'DATE=01' },
-            { label: "Set Hour", command: 'HOUR=00' },
-            { label: "Set Minute", command: 'MINUTE=00' },
-            { label: "Set Second", command: 'SECOND=00' },
+            { label: "Tear On", command: "SET TEAR ON" },
+            { label: "Tear Off", command: "SET TEAR OFF" },
+            { label: "Peel On", command: "SET PEEL ON" },
+            { label: "Peel Off", command: "SET PEEL OFF" },
+            { label: "Cutter On", command: "SET CUTTER ON" },
+            { label: "Cutter Off", command: "SET CUTTER OFF" },
+            { label: "Reprint On", command: "SET REPRINT ON" },
+            { label: "Reprint Off", command: "SET REPRINT OFF" },
+        ],
+    },
+    {
+        label: "Keys",
+        commands: [
+            { label: "Key1 On", command: "SET KEY1 ON" },
+            { label: "Key1 Off", command: "SET KEY1 OFF" },
+            { label: "Key2 On", command: "SET KEY2 ON" },
+            { label: "Key2 Off", command: "SET KEY2 OFF" },
+            { label: "Key3 On", command: "SET KEY3 ON" },
+            { label: "Key3 Off", command: "SET KEY3 OFF" },
+            { label: "Key4 On", command: "SET KEY4 ON" },
+            { label: "Key4 Off", command: "SET KEY4 OFF" },
+            { label: "Key5 On", command: "SET KEY5 ON" },
+            { label: "Key5 Off", command: "SET KEY5 OFF" },
+            { label: "Key6 On", command: "SET KEY6 ON" },
+            { label: "Key6 Off", command: "SET KEY6 OFF" },
+        ],
+    },
+        {
+        label: "Program",
+        commands: [
+            { label: "Exit BAS", command: "END" },
+            { label: "Go to Menu", command: "GOTO START" },
         ],
     },
 ]
