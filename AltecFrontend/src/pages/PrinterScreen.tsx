@@ -6,7 +6,7 @@ import PrinterCard from "../components/PrinterCard"
 import {useFetch} from "../hooks/useFetch";
 
 export default function PrinterScreen() {
-    const {loading, error, result, execute} = useFetch<PrinterResponse>()
+    const {loading, error, result, execute, reset} = useFetch<PrinterResponse>()
     const [address, setAddress] = useState("")
     const [connecting, setConnecting] = useState(false)
     const [connectionType, setConnectionType] = useState<PrinterConnectionType>("Wifi")
@@ -60,7 +60,7 @@ export default function PrinterScreen() {
                                     ? "bg-altec-teal text-white"
                                     : "bg-white text-altec-teal hover:bg-altec-teal/10"
                             }`}
-                            onClick={() => { setConnectionType(type); setAddress("") }}
+                            onClick={() => { setConnectionType(type); setAddress(""); reset() }}
                         >
                             {type === "Wifi" ? "WiFi" : "USB"}
                         </button>
@@ -69,30 +69,26 @@ export default function PrinterScreen() {
 
                 <div className="flex gap-2">
                     {connectionType === "Wifi" && (
-                        <button
-                            className="border bg-altec-teal text-white px-3 py-1.5 rounded-xl text-sm disabled:opacity-50"
-                            disabled={true}
-                            onClick={discoverPrinters}
+                        <>
+                            <input
+                                type="text"
+                                className="border border-altec-teal rounded-xl px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-altec-teal w-64"
+                                placeholder={"Enter printer IP Address ..."}
+                                value={address}
+                                onChange={e => { setAddress(e.target.value); setConnectError(null) }}
+                                onKeyDown={handleIpKeyDown}
+                                disabled={connecting}
+                            />
+                            
+                            <button
+                            className="bg-altec-teal text-white px-3 py-1.5 rounded-xl text-sm disabled:opacity-50"
+                            onClick={connectToIp}
+                            disabled={!address.trim() || connecting}
                         >
-                            {loading ? "Searching..." : "Search"}
+                            {connecting ? "Connecting..." : "Connect"}
                         </button>
+                    </>
                     )}
-                    <input
-                        type="text"
-                        className="border border-altec-teal rounded-xl px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-altec-teal w-64"
-                        placeholder={connectionType === "Wifi" ? "Enter printer IP..." : "Enter USB port (e.g. USB001)..."}
-                        value={address}
-                        onChange={e => { setAddress(e.target.value); setConnectError(null) }}
-                        onKeyDown={handleIpKeyDown}
-                        disabled={connecting}
-                    />
-                    <button
-                        className="bg-altec-teal text-white px-3 py-1.5 rounded-xl text-sm disabled:opacity-50"
-                        onClick={connectToIp}
-                        disabled={!address.trim() || connecting}
-                    >
-                        {connecting ? "Connecting..." : "Connect"}
-                    </button>
                 </div>
 
                 {connectError && <p className="text-red-500 text-sm">{connectError}</p>}
