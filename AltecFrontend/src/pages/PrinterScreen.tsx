@@ -80,7 +80,7 @@ export default function PrinterScreen() {
                                 disabled={connecting}
                             />
                             
-                            <button
+                        <button
                             className="bg-altec-teal text-white px-3 py-1.5 rounded-xl text-sm disabled:opacity-50"
                             onClick={connectToIp}
                             disabled={!address.trim() || connecting}
@@ -89,14 +89,23 @@ export default function PrinterScreen() {
                         </button>
                     </>
                     )}
+
+                    {connectionType == "Usb" && (
+                        <>
+                            <button
+                            className="bg-altec-teal text-white px-3 py-1.5 rounded-xl text-sm disabled:opacity-50"
+                            onClick={discoverPrinters}
+                            disabled={loading}
+                            >
+                                {loading ? "Loading..." : "Refresh"}
+                            </button>
+                        </>
+                    )}
                 </div>
 
                 {connectError && <p className="text-red-500 text-sm">{connectError}</p>}
                 {error && <p className="text-red-500 text-sm">{error}</p>}
-                {loading && connectionType === "Usb" && <p className="text-sm">Loading...</p>}
             </div>
-
-            
 
             <div className="flex flex-row justify-center flex-wrap gap-4">
                     {result?.printers?.map(el => (
