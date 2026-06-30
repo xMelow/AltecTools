@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react"
-import { useLocation, useParams } from "react-router-dom"
+import { Link, useLocation, useParams } from "react-router-dom"
 import { sendPrinterCommand } from "../api/printers"
 import { CommandTab, LogEntry } from "../types/printerTerminal"
 import { PRINTER_COMMAND_GROUPS } from "../constants/printerCommands"
@@ -62,6 +62,10 @@ export default function PrinterDetailedScreen() {
 
     return (
         <div>
+            <Link to={"/printers"} className="text-sm px-3 py-1 rounded-xl border border-altec-teal bg-altec-teal text-altec-white">
+                {"< back"}
+            </Link>
+
             <h2 className="text-center text-3xl font-bold text-altec-teal mb-4">
                 {printerName || dnsName || "Not found"}
             </h2>
