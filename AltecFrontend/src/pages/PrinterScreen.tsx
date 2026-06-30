@@ -93,7 +93,10 @@ export default function PrinterScreen() {
 
                 {connectError && <p className="text-red-500 text-sm">{connectError}</p>}
                 {error && <p className="text-red-500 text-sm">{error}</p>}
+                {loading && connectionType === "Usb" && <p className="text-sm">Loading...</p>}
             </div>
+
+            
 
             <div className="flex flex-row justify-center flex-wrap gap-4">
                     {result?.printers?.map(el => (
