@@ -80,14 +80,14 @@ export default function PrinterScreen() {
                                 disabled={connecting}
                             />
                             
-                        <button
-                            className="bg-altec-teal text-white px-3 py-1.5 rounded-xl text-sm disabled:opacity-50"
-                            onClick={connectToIp}
-                            disabled={!address.trim() || connecting}
-                        >
-                            {connecting ? "Connecting..." : "Connect"}
-                        </button>
-                    </>
+                            <button
+                                className="bg-altec-teal text-white px-3 py-1.5 rounded-xl text-sm disabled:opacity-50"
+                                onClick={connectToIp}
+                                disabled={!address.trim() || connecting}
+                            >
+                                {connecting ? "Connecting..." : "Connect"}
+                            </button>
+                        </>
                     )}
 
                     {connectionType == "Usb" && (
