@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react"
 import { Link, useLocation, useParams } from "react-router-dom"
 import { sendPrinterCommand } from "../api/printers"
-import { CommandTab, LogEntry } from "../types/printerTerminal"
+import { LogEntry } from "../types/printerTerminal"
 import { PRINTER_COMMAND_GROUPS } from "../constants/printerCommands"
 import PrinterSettingsPanel from "../components/PrinterSettings"
 import PrinterFilesTab from "../components/PrinterFilesTab"
@@ -13,7 +13,8 @@ export default function PrinterDetailedScreen() {
     const [commandInput, setCommandInput] = useState("")
     const [log, setLog] = useState<LogEntry[]>([])
     const [sending, setSending] = useState(false)
-    const [commandTab, setCommandTab] = useState<CommandTab>("printer")
+    const [commandTab, setCommandTab] = useState<string>("printer")
+    const [terminalTab, setTerminalTab] = useState<string>("terminal")
     const logEndRef = useRef<HTMLDivElement>(null)
     const activeGroups = PRINTER_COMMAND_GROUPS
     const address = decodeURIComponent(ipAddress ?? "")
@@ -152,6 +153,29 @@ export default function PrinterDetailedScreen() {
                         </button>
                     </div>
                     <hr className="border-b border-altec-teal mb-3" />
+
+                    <div className="flex gap-2 mb-3">
+                        <button
+                            className={`text-sm px-3 py-1 rounded-xl border border-altec-teal transition-colors ${
+                                terminalTab === "terminal"
+                                    ? "bg-altec-teal text-altec-white"
+                                    : "bg-altec-white text-altec-teal hover:bg-altec-light"
+                            }`}
+                            onClick={() => setTerminalTab("terminal")}
+                        >
+                            Terminal
+                        </button>
+                        <button
+                            className={`text-sm px-3 py-1 rounded-xl border border-altec-teal transition-colors ${
+                                terminalTab === "editor"
+                                    ? "bg-altec-teal text-altec-white"
+                                    : "bg-altec-white text-altec-teal hover:bg-altec-light"
+                            }`}
+                            onClick={() => setTerminalTab("editor")}
+                        >
+                            Editor
+                        </button>
+                    </div>
 
                     <div className="flex-1 bg-altec-light rounded-xl p-3 font-mono text-sm overflow-y-auto mb-3 min-h-64">
                         {log.length === 0 && (
