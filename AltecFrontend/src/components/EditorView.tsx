@@ -1,8 +1,9 @@
 
 type EditorViewProps = {
-    onSend: (script: string) => Promise<void>
+    sending: boolean
+    onSend: (script: string) => Promise<string>
 }
 
-export default function EditorView({ onSend }: EditorViewProps) {
+export default function EditorView({ sending, onSend }: EditorViewProps) {
 
 }
