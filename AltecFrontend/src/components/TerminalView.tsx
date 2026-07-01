@@ -59,7 +59,7 @@ export default function TerminalView({ log, sending, onSend }: TerminalViewProps
                 />
                 <button
                     className="border bg-altec-teal text-altec-white px-4 rounded-xl self-stretch disabled:opacity-50"
-                    onClick={() => onSend}
+                    onClick={() => handleSend()}
                     disabled={sending}
                 >
                     {sending ? "..." : "Send"}

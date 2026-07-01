@@ -50,6 +50,20 @@ export default function PrinterDetailedScreen() {
         }
     }
 
+    async function sendScript(script: string): Promise<string> {
+        if (!address) throw new Error("No address")
+        setSending(true)
+
+        try {
+            const res = await sendPrinterCommand(address, script, connectionType)
+            return res.result
+        } catch (err) {
+            throw new Error(err instanceof Error ? err.message : "Failed to send script")
+        } finally {
+            setSending(false)
+        }
+    }
+
     return (
         <div>
             <div className="flex items-center mb-4">
@@ -166,9 +180,9 @@ export default function PrinterDetailedScreen() {
                     </div>
 
                     {terminalTab === "terminal" ? (
-                            <TerminalView log={} sending={} onSend={sendCommand(command)}/>
+                            <TerminalView log={log} sending={sending} onSend={(command) => sendCommand(command)}/>
                         ) : (
-                            <EditorView sending={} onSend={sendCommand(script)} />
+                            <EditorView sending={sending} onSend={(script) => sendScript(script)} />
                         )}
                 </div>
 

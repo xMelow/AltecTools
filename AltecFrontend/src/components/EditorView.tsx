@@ -5,5 +5,9 @@ type EditorViewProps = {
 }
 
 export default function EditorView({ sending, onSend }: EditorViewProps) {
-
+    return (
+        <div>
+            
+        </div>
+    )
 }
