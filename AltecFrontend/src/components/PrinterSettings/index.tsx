@@ -14,8 +14,7 @@ export type PrinterSettingsPanelProps = {
 export default function PrinterSettingsPanel({ address, connectionType, onNetworkName }: PrinterSettingsPanelProps) {
     const settingsFetch = useFetch<PrinterSettings>()
     const updateFetch = useFetch<CommandResponse>()
-    const s = settingsFetch.result
-
+    const settings = settingsFetch.result
     const [editableSettings, setEditable] = useState<EditableSettings | null>(null)
     const [showSuccess, setShowSuccess] = useState(false)
     const [showExport, setShowExport] = useState(false)
@@ -27,35 +26,35 @@ export default function PrinterSettingsPanel({ address, connectionType, onNetwor
     }, [address])
 
     useEffect(() => {
-        if (s) {
-            if (s.dnsName) onNetworkName?.(s.dnsName)
-            if (s.sensorType == "CONTINUOUS") {
-                s.gapSize = 0
-                s.gapOffset = 0
+        if (settings) {
+            if (settings.dnsName) onNetworkName?.(settings.dnsName)
+            if (settings.sensorType == "CONTINUOUS") {
+                settings.gapSize = 0
+                settings.gapOffset = 0
             }
             setEditable({
-                postPrint: s.postPrint,
-                speed: s.speed,
-                density: s.density,
-                labelWidth: s.labelWidth,
-                labelHeight: s.labelHeight,
-                blineSize: s.blineSize,
-                direction: s.direction,
-                mirror: s.mirror,
-                ribbon: s.ribbon,
-                sensorType: s.sensorType,
-                gapSize: s.gapSize,
-                gapOffset: s.gapOffset,
-                offset: s.offset,
-                shiftX: s.shiftX,
-                shiftY: s.shiftY,
-                referenceX: s.referenceX,
-                referenceY: s.referenceY,   
-                countryCode: s.countryCode,
-                codePage: s.codePage,
+                postPrint: settings.postPrint,
+                speed: settings.speed,
+                density: settings.density,
+                labelWidth: settings.labelWidth,
+                labelHeight: settings.labelHeight,
+                blineSize: settings.blineSize,
+                direction: settings.direction,
+                mirror: settings.mirror,
+                ribbon: settings.ribbon,
+                sensorType: settings.sensorType,
+                gapSize: settings.gapSize,
+                gapOffset: settings.gapOffset,
+                offset: settings.offset,
+                shiftX: settings.shiftX,
+                shiftY: settings.shiftY,
+                referenceX: settings.referenceX,
+                referenceY: settings.referenceY,   
+                countryCode: settings.countryCode,
+                codePage: settings.codePage,
             })
         }
-    }, [s])
+    }, [settings])
 
     useEffect(() => {
         if (!updateFetch.result) return
@@ -121,7 +120,7 @@ export default function PrinterSettingsPanel({ address, connectionType, onNetwor
                         >
                             Export
                         </button>
-                        {showExport && <ExportPrinterSettings printerSettings={s!} editableSettings={editableSettings!} closePopUp={() => setShowExport(false)} /> }
+                        {showExport && <ExportPrinterSettings printerSettings={settings!} editableSettings={editableSettings!} closePopUp={() => setShowExport(false)} /> }
                         <button
                             className="text-xs border border-altec-teal text-altec-teal px-2 py-0.5 rounded-lg hover:bg-altec-light transition-colors disabled:opacity-50"
                             onClick={handleRefresh}
@@ -137,27 +136,27 @@ export default function PrinterSettingsPanel({ address, connectionType, onNetwor
             <div className="overflow-y-auto px-4 grow">
                 {settingsFetch.loading && <p className="text-sm text-altec-teal">Loading...</p>}
 
-                {s && editableSettings ? (
+                {settings && editableSettings ? (
                     <>
                         <SettingsSection title="Device">
-                            <SettingRow label="Printer Status" value={s.printerStatus} />
-                            <SettingRow label="Model" value={s.model} />
-                            <SettingRow label="Serial Number" value={s.serial} />
-                            <SettingRow label="Version" value={s.version} />
-                            <SettingRow label="Check Sum" value={s.checkSum} />
-                            <SettingRow label="DPI" value={s.dpi} />
+                            <SettingRow label="Printer Status" value={settings.printerStatus} />
+                            <SettingRow label="Model" value={settings.model} />
+                            <SettingRow label="Serial Number" value={settings.serial} />
+                            <SettingRow label="Version" value={settings.version} />
+                            <SettingRow label="Check Sum" value={settings.checkSum} />
+                            <SettingRow label="DPI" value={settings.dpi} />
                         </SettingsSection>
 
                         <SettingsSection title="Network">
-                            <SettingRow label="IP Address" value={s.ipAddressNet} />
-                            <SettingRow label="MAC Address" value={s.macAddressNet} />
-                            <SettingRow label="DNS Name" value={s.dnsName} />
+                            <SettingRow label="IP Address" value={settings.ipAddressNet} />
+                            <SettingRow label="MAC Address" value={settings.macAddressNet} />
+                            <SettingRow label="DNS Name" value={settings.dnsName} />
                         </SettingsSection>
 
                         <SettingsSection title="Counters">
-                            <SettingRow label="Mileage" value={s.mileage} />
-                            <SettingRow label="Label Counter" value={s.labelCounter} />
-                            <SettingRow label="Cutter Counter" value={s.cutterCounter} />
+                            <SettingRow label="Mileage" value={settings.mileage} />
+                            <SettingRow label="Label Counter" value={settings.labelCounter} />
+                            <SettingRow label="Cutter Counter" value={settings.cutterCounter} />
                         </SettingsSection>
 
                         <SettingsSection title="Print">
@@ -192,7 +191,7 @@ export default function PrinterSettingsPanel({ address, connectionType, onNetwor
                 )}
             </div>
 
-            {s && editableSettings && (
+            {settings && editableSettings && (
                 <div className="px-4 pb-4 pt-2 shrink-0">
                     {updateFetch.error && (
                         <p className="text-sm text-red-500 mb-2">{updateFetch.error}</p>

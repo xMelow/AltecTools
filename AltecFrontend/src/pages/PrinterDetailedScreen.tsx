@@ -63,7 +63,6 @@ export default function PrinterDetailedScreen() {
 
     return (
         <div>
-
             <div className="flex items-center mb-4">
                 <Link 
                     to={"/printers"} 
