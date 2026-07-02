@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react"
+import { useState } from "react"
 import { Link, useLocation, useParams } from "react-router-dom"
 import { sendPrinterCommand } from "../api/printers"
 import { LogEntry } from "../types/printerTerminal"
@@ -11,7 +11,6 @@ import EditorView from "../components/EditorView"
 
 export default function PrinterDetailedScreen() {
     const { ipAddress } = useParams<{ ipAddress: string }>()
-    const logEndRef = useRef<HTMLDivElement>(null)
 
     const [dnsName, setDnsName] = useState<string>()
     const [log, setLog] = useState<LogEntry[]>([])
@@ -24,10 +23,6 @@ export default function PrinterDetailedScreen() {
     const location = useLocation()
     const connectionType = location.state?.connectionType ?? "Wifi"
     const printerName = location.state?.name
-
-    useEffect(() => {
-        logEndRef.current?.scrollIntoView({ behavior: "smooth" })
-    }, [log])
 
     function addLog(type: LogEntry["type"], text: string) {
         const timestamp = new Date().toLocaleTimeString()
@@ -147,6 +142,7 @@ export default function PrinterDetailedScreen() {
                 <div className="flex-1 flex flex-col border rounded-2xl border-altec-teal bg-altec-white p-4 max-h-[75vh]">
                     <div className="flex justify-between items-center mb-2">
                         <h3 className="text-lg font-semibold">Terminal</h3>
+                        {/* hidde when editor is selected or use it to clear the content in the text editor */}
                         <button
                             className="text-xs border border-altec-teal text-altec-teal px-2 py-0.5 rounded-lg hover:bg-altec-light transition-colors disabled:opacity-50"
                             onClick={() => setLog([])}

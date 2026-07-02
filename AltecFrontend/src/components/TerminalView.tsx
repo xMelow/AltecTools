@@ -1,4 +1,4 @@
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { LogEntry } from "../types/printerTerminal"
 
 type TerminalViewProps = {
@@ -10,6 +10,10 @@ type TerminalViewProps = {
 export default function TerminalView({ log, sending, onSend }: TerminalViewProps) {
     const [commandInput, setCommandInput] = useState("")
     const logEndRef = useRef<HTMLDivElement>(null)
+
+    useEffect(() => {
+        logEndRef.current?.scrollIntoView({ behavior: "smooth" })
+    }, [log])
 
     async function handleSend() {
         const command = commandInput.trim()
