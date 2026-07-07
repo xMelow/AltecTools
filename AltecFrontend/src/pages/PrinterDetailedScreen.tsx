@@ -142,13 +142,6 @@ export default function PrinterDetailedScreen() {
                 <div className="flex-1 flex flex-col border rounded-2xl border-altec-teal bg-altec-white p-4 max-h-[75vh]">
                     <div className="flex justify-between items-center mb-2">
                         <h3 className="text-lg font-semibold">Terminal</h3>
-                        {/* hidde when editor is selected or use it to clear the content in the text editor */}
-                        <button
-                            className="text-xs border border-altec-teal text-altec-teal px-2 py-0.5 rounded-lg hover:bg-altec-light transition-colors disabled:opacity-50"
-                            onClick={() => setLog([])}
-                        >
-                            Clear
-                        </button>
                     </div>
                     <hr className="border-b border-altec-teal mb-3" />
 
@@ -176,11 +169,11 @@ export default function PrinterDetailedScreen() {
                     </div>
 
                     <div className={terminalTab === "terminal" ? "" : "hidden"}> 
-                        <TerminalView log={log} sending={sending} onSend={(command) => sendCommand(command)}/>
+                        <TerminalView log={log} sending={sending} onSend={(command) => sendCommand(command)} onClear={() => setLog([])}/>
                     </div>
 
                     <div className={terminalTab === "editor" ? "" : "hidden"}> 
-                        <EditorView sending={sending} onSend={(script) => sendScript(script)} />
+                        <EditorView sending={sending} onSend={(script) => sendScript(script)}/>
                     </div>
                 </div>
 

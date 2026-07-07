@@ -35,6 +35,15 @@ export default function EditorView({ sending, onSend }: EditorViewProps) {
 
     return (
         <div>
+            <div className="flex justify-end">
+                <button
+                    className="mb-2 text-xs border border-altec-teal text-altec-teal px-2 py-0.5 rounded-lg hover:bg-altec-light transition-colors disabled:opacity-50"
+                    onClick={() => setScript("")}
+                >
+                    Clear
+                </button>
+            </div>
+
             {showSuccess && (
                 editorStatus?.type == "Success" ? (
                     <p className="text-altec-teal font-semibold">{editorStatus?.message}</p>
@@ -51,7 +60,7 @@ export default function EditorView({ sending, onSend }: EditorViewProps) {
                 className="bg-altec-light rounded-xl p-3 text-sm font-mono min-h-97 w-185"
             >
             </textarea>
-            <div>
+            <div className="flex justify-end mt-1">
                 <button
                     className="py-4 border bg-altec-teal text-altec-white px-4 rounded-xl self-stretch disabled:opacity-50"
                     onClick={() => handleSend()}
