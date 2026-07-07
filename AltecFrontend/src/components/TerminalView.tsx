@@ -32,16 +32,7 @@ export default function TerminalView({ log, sending, onSend, onClear }: Terminal
 
     return (
         <div>
-            <div className="flex justify-end">
-                <button
-                    className="mb-2 text-xs border border-altec-teal text-altec-teal px-2 py-0.5 rounded-lg hover:bg-altec-light transition-colors disabled:opacity-50"
-                    onClick={onClear}
-                >
-                    Clear
-                </button>
-            </div>
-
-            <div className="flex-1 bg-altec-light rounded-xl p-3 font-mono text-sm overflow-y-auto mb-3 min-h-64">
+            <div className="flex-1 bg-altec-light rounded-xl p-3 font-mono text-sm overflow-y-auto mb-1 min-h-64">
                 {log.length === 0 && (
                     <p className="text-gray-400 text-xs">Send a command to see output here...</p>
                 )}
@@ -59,6 +50,15 @@ export default function TerminalView({ log, sending, onSend, onClear }: Terminal
                     </div>
                 ))}
                 <div ref={logEndRef} />
+            </div>
+
+            <div>
+                <button
+                    className="mb-2 text-xs border border-altec-teal text-altec-teal px-2 py-0.5 rounded-lg hover:bg-altec-light transition-colors disabled:opacity-50"
+                    onClick={onClear}
+                >
+                    Clear
+                </button>
             </div>
 
             <div className="flex gap-2">
