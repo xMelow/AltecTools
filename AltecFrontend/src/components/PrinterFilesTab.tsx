@@ -19,13 +19,6 @@ export default function PrinterFilesTab({address, sending, setSending, addLog }:
         setFileEntries(prev => [...prev, entry])
     }
 
-   
-
-
-    // function addEntry() {
-    //     setFileEntries(prev => [...prev, newEntry()])
-    // }
-
     function removeEntry(index: number) {
         setFileEntries(prev => prev.filter((_, i) => i !== index))
     }
