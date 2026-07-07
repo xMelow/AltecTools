@@ -1,20 +1,30 @@
-import { useState } from "react"
+import { useRef, useState } from "react"
 import { sendPrinterFile } from "../api/printers"
 import { FileEntry, PrinterFilesTabProps } from "../types/printerFiles"
 import { useLocation } from "react-router-dom"
 
-function newEntry(): FileEntry {
-    return { id: String(Date.now() + Math.random()), file: null, fileName: "", memory: "Flash" }
+function newEntry(file: File): FileEntry {
+    return { id: String(Date.now() + Math.random()), file: file, fileName: file.name, memory: "Flash" }
 }
 
 export default function PrinterFilesTab({address, sending, setSending, addLog }: PrinterFilesTabProps) {
-    const [fileEntries, setFileEntries] = useState<FileEntry[]>([newEntry()])
+    const [fileEntries, setFileEntries] = useState<FileEntry[]>([])
     const location = useLocation()
     const connectionType = location.state?.connectionType ?? "Wifi"
+    const addInputRef = useRef<HTMLInputElement>(null)
 
-    function addEntry() {
-        setFileEntries(prev => [...prev, newEntry()])
+    function handleAddFileSelected(file: File | null) {
+        if (!file) return
+        const entry = newEntry(file)
+        setFileEntries(prev => [...prev, entry])
     }
+
+   
+
+
+    // function addEntry() {
+    //     setFileEntries(prev => [...prev, newEntry()])
+    // }
 
     function removeEntry(index: number) {
         setFileEntries(prev => prev.filter((_, i) => i !== index))
@@ -45,7 +55,6 @@ export default function PrinterFilesTab({address, sending, setSending, addLog }:
             addLog("error", err instanceof Error ? err.message : "Failed to send files")
         } finally {
             setSending(false)
-            setFileEntries([newEntry()])
         }
     }
 
@@ -65,14 +74,13 @@ export default function PrinterFilesTab({address, sending, setSending, addLog }:
                                 onChange={e => handleFileChange(i, e.target.files?.[0] ?? null)}
                             />
                         </label>
-                        {fileEntries.length > 1 && (
-                            <button
-                                className="text-xs text-gray-400 hover:text-red-400 transition-colors ml-2 shrink-0"
-                                onClick={() => removeEntry(i)}
-                            >
-                                ✕
-                            </button>
-                        )}
+                    
+                        <button
+                            className="text-xs text-gray-400 hover:text-red-400 transition-colors ml-2 shrink-0"
+                            onClick={() => removeEntry(i)}
+                        >
+                            ✕
+                        </button>
                     </div>
                     {entry.file && (
                         <>
@@ -95,10 +103,16 @@ export default function PrinterFilesTab({address, sending, setSending, addLog }:
                     )}
                 </div>
             ))}
+            
+            <input type="file" 
+                className="hidden" ref={addInputRef}                                 
+                accept=".bas,.bmp"
+                onChange={(e) => handleAddFileSelected(e.target.files?.[0] ?? null)}
+            />
 
             <button
                 className="text-sm text-altec-teal border border-dashed border-altec-teal rounded-xl p-2 hover:bg-altec-light transition-colors"
-                onClick={addEntry}
+                onClick={() => addInputRef.current?.click()}
             >
                 + Add File
             </button>
