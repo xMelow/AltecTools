@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 type EditorStatus = {
     type: "Success" | "Error"
@@ -13,21 +13,29 @@ type EditorViewProps = {
 export default function EditorView({ sending, onSend }: EditorViewProps) {
     const [scriptInput, setScript] = useState("")
     const [editorStatus, setEditorStatus] = useState<EditorStatus | undefined>()
+    const [showSuccess, setShowSuccess] = useState(false)
 
     async function handleSend() {
         try {
             const script = scriptInput.trim()
             if (!script) return
             const result = await onSend(script)
-            setEditorStatus({type: "Success", message: result})
+            setEditorStatus({type: "Success", message: result ? result : "Script sent"})
         } catch (err) {
             setEditorStatus({type: "Error", message: err instanceof Error ? err.message : "Failed to send script"})
         }
     }
 
+    useEffect(() => {
+        if (!editorStatus?.type) return
+        setShowSuccess(true)
+        const timer = setTimeout(() => setShowSuccess(false), 3000)
+        return () => clearTimeout(timer)
+    }, [editorStatus])
+
     return (
         <div>
-            {editorStatus !== undefined && (
+            {showSuccess && (
                 editorStatus?.type == "Success" ? (
                     <p className="text-altec-teal font-semibold">{editorStatus?.message}</p>
                 ) : (
@@ -40,18 +48,18 @@ export default function EditorView({ sending, onSend }: EditorViewProps) {
                 onChange={(e) => setScript(e.target.value)}
                 disabled={sending}
                 placeholder="Enter your script here..."
-                rows={20}
+                className="bg-altec-light rounded-xl p-3 text-sm font-mono min-h-97 w-185"
             >
-
             </textarea>
-
-            <button
-                className="border bg-altec-teal text-altec-white px-4 rounded-xl self-stretch disabled:opacity-50"
-                onClick={() => handleSend()}
-                disabled={sending}
-            >
-                {sending ? "..." : "Send"}
-            </button>
+            <div>
+                <button
+                    className="py-4 border bg-altec-teal text-altec-white px-4 rounded-xl self-stretch disabled:opacity-50"
+                    onClick={() => handleSend()}
+                    disabled={sending}
+                >
+                    {sending ? "..." : "Send"}
+                </button>
+            </div>
         </div>
     )
 }

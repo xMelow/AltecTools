@@ -175,11 +175,13 @@ export default function PrinterDetailedScreen() {
                         </button>
                     </div>
 
-                    {terminalTab === "terminal" ? (
-                            <TerminalView log={log} sending={sending} onSend={(command) => sendCommand(command)}/>
-                        ) : (
-                            <EditorView sending={sending} onSend={(script) => sendScript(script)} />
-                        )}
+                    <div className={terminalTab === "terminal" ? "" : "hidden"}> 
+                        <TerminalView log={log} sending={sending} onSend={(command) => sendCommand(command)}/>
+                    </div>
+
+                    <div className={terminalTab === "editor" ? "" : "hidden"}> 
+                        <EditorView sending={sending} onSend={(script) => sendScript(script)} />
+                    </div>
                 </div>
 
                 <PrinterSettingsPanel address={address} onNetworkName={setDnsName} connectionType={connectionType}/>
