@@ -36,13 +36,24 @@ export default function PrinterFilesTab({address, sending, setSending, addLog }:
     }
 
     async function handleSend() {
-        const toSend = fileEntries.filter(e => e.file !== null)
-        if (toSend.length === 0) return
+        const files = fileEntries.filter(e => e.file !== null)
+        if (files.length === 0) return
+        const normalized = files.map(e => ({ ...e, fileName: e.fileName.toUpperCase() }))
 
-        addLog("sent", `Files: ${toSend.map(e => e.fileName).join(", ")}`)
+        const seen = new Set()
+        for (const entry of normalized) {
+            const key = `${entry.fileName}|${entry.memory}`
+            if (seen.has(key)) {
+                addLog("error", `Failed to send double files: ${entry.fileName}`)
+                return
+            }
+            seen.add(key)
+        }
+
+        addLog("sent", `Files: ${normalized.map(e => e.fileName).join(", ")}`)
         setSending(true)
         try {
-            const res = await sendPrinterFile(address, toSend.map(e => ({ file: e.file!, fileName: e.fileName, memory: e.memory })), connectionType)
+            const res = await sendPrinterFile(address, normalized.map(e => ({ file: e.file!, fileName: e.fileName, memory: e.memory })), connectionType)
             if (res) addLog("received", res)
         } catch (err) {
             addLog("error", err instanceof Error ? err.message : "Failed to send files")
