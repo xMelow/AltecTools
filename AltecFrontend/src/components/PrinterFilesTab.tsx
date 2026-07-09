@@ -4,7 +4,7 @@ import { FileEntry, PrinterFilesTabProps } from "../types/printerFiles"
 import { useLocation } from "react-router-dom"
 
 function newEntry(file: File): FileEntry {
-    return { id: String(Date.now() + Math.random()), file: file, fileName: file.name, memory: "Flash" }
+    return { id: String(Date.now() + Math.random()), file: file, fileName: file.name.toUpperCase(), memory: "Flash" }
 }
 
 export default function PrinterFilesTab({address, sending, setSending, addLog }: PrinterFilesTabProps) {
@@ -25,18 +25,20 @@ export default function PrinterFilesTab({address, sending, setSending, addLog }:
 
     function handleFileChange(index: number, file: File | null) {
         setFileEntries(prev => prev.map((entry, i) =>
-            i === index ? { ...entry, file, fileName: file?.name ?? entry.fileName } : entry
+            i === index ? { ...entry, file, fileName: file?.name.toUpperCase() ?? entry.fileName.toUpperCase() } : entry
         ))
     }
 
     function updateEntry(index: number, field: "fileName" | "memory", value: string) {
+        const newValue = field === "fileName" ? value.toUpperCase() : value
+
         setFileEntries(prev => prev.map((entry, i) =>
-            i === index ? { ...entry, [field]: value } : entry
+            i === index ? { ...entry, [field]: newValue } : entry
         ))
     }
 
     async function handleSend() {
-        const files = buildFilesToSend()
+        const files = checkFilesToSend(fileEntries)
         if (!files) return
 
         addLog("sent", `Files: ${files.map(e => e.fileName).join(", ")}`)
@@ -51,13 +53,12 @@ export default function PrinterFilesTab({address, sending, setSending, addLog }:
         }
     }
 
-    function buildFilesToSend() {
-        const files = fileEntries.filter(e => e.file !== null)
+    function checkFilesToSend(entries: FileEntry[]) {
+        const files = entries.filter(e => e.file !== null)
         if (files.length === 0) return
-        const normalized = files.map(e => ({ ...e, fileName: e.fileName.toUpperCase() }))
 
         const seen = new Set()
-        for (const entry of normalized) {
+        for (const entry of files) {
             const key = `${entry.fileName}|${entry.memory}`
             if (seen.has(key)) {
                 addLog("error", `Failed to send: ${entry.fileName} already selected`)
@@ -65,7 +66,7 @@ export default function PrinterFilesTab({address, sending, setSending, addLog }:
             }
             seen.add(key)
         }
-        return normalized
+        return files
     }
 
     return (
@@ -75,7 +76,7 @@ export default function PrinterFilesTab({address, sending, setSending, addLog }:
                     <div className="flex items-center justify-between">
                         <label className="flex-1 cursor-pointer">
                             <span className="text-sm text-altec-teal hover:underline truncate block">
-                                {entry.file?.name ?? "Select file..."}
+                                {entry.file ? entry.fileName : "Select file..."}
                             </span>
                             <input
                                 type="file"
