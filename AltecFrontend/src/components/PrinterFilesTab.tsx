@@ -4,7 +4,7 @@ import { FileEntry, PrinterFilesTabProps } from "../types/printerFiles"
 import { useLocation } from "react-router-dom"
 
 function newEntry(file: File): FileEntry {
-    return { id: String(Date.now() + Math.random()), file: file, fileName: file.name, memory: "Flash" }
+    return { id: String(Date.now() + Math.random()), file: file, fileName: file.name.toUpperCase(), memory: "Flash" }
 }
 
 export default function PrinterFilesTab({address, sending, setSending, addLog }: PrinterFilesTabProps) {
@@ -25,30 +25,48 @@ export default function PrinterFilesTab({address, sending, setSending, addLog }:
 
     function handleFileChange(index: number, file: File | null) {
         setFileEntries(prev => prev.map((entry, i) =>
-            i === index ? { ...entry, file, fileName: file?.name ?? entry.fileName } : entry
+            i === index ? { ...entry, file, fileName: file?.name.toUpperCase() ?? entry.fileName.toUpperCase() } : entry
         ))
     }
 
     function updateEntry(index: number, field: "fileName" | "memory", value: string) {
+        const newValue = field === "fileName" ? value.toUpperCase() : value
+
         setFileEntries(prev => prev.map((entry, i) =>
-            i === index ? { ...entry, [field]: value } : entry
+            i === index ? { ...entry, [field]: newValue } : entry
         ))
     }
 
     async function handleSend() {
-        const toSend = fileEntries.filter(e => e.file !== null)
-        if (toSend.length === 0) return
+        const files = checkFilesToSend(fileEntries)
+        if (!files) return
 
-        addLog("sent", `Files: ${toSend.map(e => e.fileName).join(", ")}`)
+        addLog("sent", `Files: ${files.map(e => e.fileName).join(", ")}`)
         setSending(true)
         try {
-            const res = await sendPrinterFile(address, toSend.map(e => ({ file: e.file!, fileName: e.fileName, memory: e.memory })), connectionType)
+            const res = await sendPrinterFile(address, files.map(e => ({ file: e.file!, fileName: e.fileName, memory: e.memory })), connectionType)
             if (res) addLog("received", res)
         } catch (err) {
             addLog("error", err instanceof Error ? err.message : "Failed to send files")
         } finally {
             setSending(false)
         }
+    }
+
+    function checkFilesToSend(entries: FileEntry[]) {
+        const files = entries.filter(e => e.file !== null)
+        if (files.length === 0) return
+
+        const seen = new Set()
+        for (const entry of files) {
+            const key = `${entry.fileName}|${entry.memory}`
+            if (seen.has(key)) {
+                addLog("error", `Failed to send: ${entry.fileName} already selected`)
+                return
+            }
+            seen.add(key)
+        }
+        return files
     }
 
     return (
@@ -58,7 +76,7 @@ export default function PrinterFilesTab({address, sending, setSending, addLog }:
                     <div className="flex items-center justify-between">
                         <label className="flex-1 cursor-pointer">
                             <span className="text-sm text-altec-teal hover:underline truncate block">
-                                {entry.file?.name ?? "Select file..."}
+                                {entry.file ? entry.fileName : "Select file..."}
                             </span>
                             <input
                                 type="file"
