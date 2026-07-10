@@ -1,10 +1,7 @@
-﻿using System.Diagnostics;
-using System.Runtime.CompilerServices;
-using Altec.Api.Records;
+﻿using Altec.Api.Records;
 using SkiaSharp;
 using ZXing;
 using ZXing.Common;
-using ZXing.SkiaSharp;
 using ZXing.SkiaSharp.Rendering;
 
 namespace Altec.Api.Domain.Tspl;
@@ -22,7 +19,7 @@ public class TsplRender
         var width = Mm2Pixels(int.Parse(sizeCommand.Arguments[0]));
         var height = Mm2Pixels(int.Parse(sizeCommand.Arguments[1]));
 
-        return CreateBitMap(width, height, commands, showBlockOutline, images);
+        return CreateBitMap(width, height, commands, showBlockOutline, images);;
     }
 
     private int Mm2Pixels(int mm)
@@ -36,6 +33,9 @@ public class TsplRender
         SKBitmap bitmap = new SKBitmap(width, height);
         using var canvas = new SKCanvas(bitmap);
         canvas.Clear(SKColors.White);
+
+        var directionCommand = commands.FirstOrDefault(command => command.Name == "DIRECTION");
+        if (directionCommand != null) RotateBitMap(directionCommand, canvas, width, height);
 
         foreach (var command in commands)
         {
@@ -71,6 +71,20 @@ public class TsplRender
         using var data = image.Encode(SKEncodedImageFormat.Png, 100);
         
         return data.ToArray();
+    }
+
+    private SKCanvas RotateBitMap(TsplDrawCommand command, SKCanvas canvas, int width, int height)
+    {
+        var direction = int.Parse(command.Arguments[0]);
+        var mirror = int.Parse(command.Arguments[1]);
+        var xPivot = width / 2f;
+        var yPivot = height / 2f;
+
+        if (direction == 1 && mirror == 0) canvas.RotateDegrees(180, xPivot, yPivot);
+        // if (direction == 0 && mirror == 1) // mirror
+        if (direction == 1 && mirror == 1) canvas.RotateDegrees(180, xPivot, yPivot);
+
+        return canvas;
     }
 
     private float Dots2Pixels(int dots)

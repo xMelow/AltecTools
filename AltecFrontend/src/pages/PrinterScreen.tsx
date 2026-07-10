@@ -15,10 +15,7 @@ export default function PrinterScreen() {
     const navigate = useNavigate()
 
     async function discoverPrinters() {
-        // const subnets = ["192.168.0.0/24", "192.168.1.0/24"]
-
         await execute(() => getPrinters({
-            // subnets: subnets,
             printerConnectionType: connectionType
         }))
     }
@@ -91,17 +88,7 @@ export default function PrinterScreen() {
                         </>
                     )}
 
-                    {connectionType == "Usb" && (
-                        <>
-                            <button
-                            className="bg-altec-teal text-white px-3 py-1.5 rounded-xl text-sm disabled:opacity-50"
-                            onClick={discoverPrinters}
-                            disabled={loading}
-                            >
-                                {loading ? "Loading..." : "Refresh"}
-                            </button>
-                        </>
-                    )}
+                    
                 </div>
 
                 {connectError && <p className="text-red-500 text-sm">{connectError}</p>}
@@ -112,6 +99,19 @@ export default function PrinterScreen() {
                     {result?.printers?.map(el => (
                         <PrinterCard printer={el} key={el.address} />
                     ))}
+            </div>
+            <div className="flex justify-center">
+                {connectionType == "Usb" && (
+                        <>
+                            <button
+                            className="bg-altec-teal text-white px-3 py-1.5 rounded-xl text-sm disabled:opacity-50"
+                            onClick={discoverPrinters}
+                            disabled={loading}
+                            >
+                                {loading ? "Loading..." : "Refresh"}
+                            </button>
+                        </>
+                    )}
             </div>
         </div>
     )
