@@ -1,4 +1,5 @@
-﻿using Altec.Api.Interface;
+﻿using Altec.Api.Domain.Tspl;
+using Altec.Api.Interface;
 using Altec.Api.Records;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,8 +19,16 @@ public class TsplController : ControllerBase
     [HttpPost("preview")]
     public IActionResult Preview([FromBody] TsplPreviewRequest request)
     {
-        var imageBytes = _tsplService.RenderPreview(request.Tspl, request.ShowBlockOutlines, request.Images);
-        return File(imageBytes, "image/png");
+        try
+        {
+            var imageBytes = _tsplService.RenderPreview(request.Tspl, request.ShowBlockOutlines, request.Images);
+            return File(imageBytes, "image/png");
+        }
+        catch (TsplRenderException ex)
+        {
+            return BadRequest(new TsplPreviewResponse(ex.LineNumber, ex.Message));
+        }
+        
     }
 
     [HttpPost("parse")]

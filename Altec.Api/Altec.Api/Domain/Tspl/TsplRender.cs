@@ -45,8 +45,18 @@ public class TsplRender
         canvas.Clear(SKColors.White);
 
         var directionCommand = commands.FirstOrDefault(command => command.Name == "DIRECTION");
-        if (directionCommand != null) RotateBitMap(directionCommand, canvas, width, height);
-
+        if (directionCommand != null) 
+        {
+            try
+            {
+                RotateBitMap(directionCommand, canvas, width, height);
+            }
+            catch (Exception ex)
+            {
+                throw new TsplRenderException(directionCommand.LineNumber, ex);
+            }
+        }
+        
         foreach (var command in commands)
         {
             try
