@@ -19,7 +19,7 @@ public class TsplRender
         var width = Mm2Pixels(int.Parse(sizeCommand.Arguments[0]));
         var height = Mm2Pixels(int.Parse(sizeCommand.Arguments[1]));
 
-        return CreateBitMap(width, height, commands, showBlockOutline, images);;
+        return CreateBitMap(width, height, commands, showBlockOutline, images);
     }
 
     private int Mm2Pixels(int mm)
