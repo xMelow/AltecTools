@@ -14,10 +14,20 @@ public class TsplRender
     public byte[] Render(IReadOnlyList<TsplDrawCommand> commands, bool showBlockOutline, Dictionary<string, string> images)
     {
         var sizeCommand = commands.FirstOrDefault(command => command.Name == "SIZE")
-            ?? throw new InvalidOperationException("SIZE command is required");
+            ?? throw new TsplRenderException(0, "SIZE command must be present");
+
+        int width;
+        int height;
         
-        var width = Mm2Pixels(int.Parse(sizeCommand.Arguments[0]));
-        var height = Mm2Pixels(int.Parse(sizeCommand.Arguments[1]));
+        try
+        {
+            width = Mm2Pixels(int.Parse(sizeCommand.Arguments[0]));
+            height = Mm2Pixels(int.Parse(sizeCommand.Arguments[1]));
+        }
+        catch (Exception ex) when (ex is System.FormatException || ex is IndexOutOfRangeException)
+        {
+            throw new TsplRenderException(sizeCommand.LineNumber, ex);
+        }
 
         return CreateBitMap(width, height, commands, showBlockOutline, images);
     }
@@ -39,32 +49,39 @@ public class TsplRender
 
         foreach (var command in commands)
         {
-            switch (command.Name)
+            try
             {
-                case "TEXT":
-                    DrawTextCommand(command, canvas);
-                    break;
-                case "BAR":
-                    DrawBarCommand(command, canvas);
-                    break;
-                case "BOX":
-                    DrawBoxCommand(command, canvas);
-                    break;
-                case "CIRCLE":
-                    DrawCircleCommand(command, canvas);
-                    break;
-                case "BARCODE":
-                    DrawBarcodeCommand(command, canvas);
-                    break;
-                case "QRCODE":
-                    DrawQrcodeCommand(command, canvas);
-                    break;
-                case "PUTBMP":
-                    DrawBmpCommand(command, canvas, images);
-                    break;
-                case "BLOCK":
-                    DrawBlockCommand(command, canvas, showBlockOutline);
-                    break;
+                switch (command.Name)
+                {
+                    case "TEXT":
+                        DrawTextCommand(command, canvas);
+                        break;
+                    case "BAR":
+                        DrawBarCommand(command, canvas);
+                        break;
+                    case "BOX":
+                        DrawBoxCommand(command, canvas);
+                        break;
+                    case "CIRCLE":
+                        DrawCircleCommand(command, canvas);
+                        break;
+                    case "BARCODE":
+                        DrawBarcodeCommand(command, canvas);
+                        break;
+                    case "QRCODE":
+                        DrawQrcodeCommand(command, canvas);
+                        break;
+                    case "PUTBMP":
+                        DrawBmpCommand(command, canvas, images);
+                        break;
+                    case "BLOCK":
+                        DrawBlockCommand(command, canvas, showBlockOutline);
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new TsplRenderException(command.LineNumber, ex);
             }
         }
         using var image = SKImage.FromBitmap(bitmap);
