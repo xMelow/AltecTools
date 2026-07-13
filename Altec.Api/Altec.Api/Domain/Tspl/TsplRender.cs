@@ -73,18 +73,19 @@ public class TsplRender
         return data.ToArray();
     }
 
-    private SKCanvas RotateBitMap(TsplDrawCommand command, SKCanvas canvas, int width, int height)
+    private void RotateBitMap(TsplDrawCommand command, SKCanvas canvas, int width, int height)
     {
         var direction = int.Parse(command.Arguments[0]);
         var mirror = int.Parse(command.Arguments[1]);
         var xPivot = width / 2f;
         var yPivot = height / 2f;
 
-        if (direction == 1 && mirror == 0) canvas.RotateDegrees(180, xPivot, yPivot);
-        // if (direction == 0 && mirror == 1) // mirror
-        if (direction == 1 && mirror == 1) canvas.RotateDegrees(180, xPivot, yPivot);
-
-        return canvas;
+        if (direction == 1) canvas.RotateDegrees(180, xPivot, yPivot);
+        if (mirror == 1)
+        {
+            canvas.Translate(width, 0);
+            canvas.Scale(-1, 1);
+        }
     }
 
     private float Dots2Pixels(int dots)
