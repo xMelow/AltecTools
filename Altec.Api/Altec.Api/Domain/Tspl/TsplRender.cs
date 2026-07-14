@@ -234,7 +234,7 @@ public class TsplRender
 
     private (float x, float y, float width, float height, float rotation, float fontSize, int algin, string text) ParseBlockArguments(TsplDrawCommand command)
     {
-        RequireArguments(command, 7);
+        RequireArguments(command, 8);
         const double baseDotHeight = 3.6;
         var x = Dots2Pixels(int.Parse(command.Arguments[0]));
         var y = Dots2Pixels(int.Parse(command.Arguments[1]));
@@ -294,7 +294,7 @@ public class TsplRender
     
     private void DrawQrcodeCommand(TsplDrawCommand command, SKCanvas canvas)
     {
-        RequireArguments(command, 5);
+        RequireArguments(command, 6);
         const int qrGridCells = 25;
         var x = Dots2Pixels(int.Parse(command.Arguments[0]));
         var y = Dots2Pixels(int.Parse(command.Arguments[1]));
@@ -326,7 +326,7 @@ public class TsplRender
     
     private void DrawBarcodeCommand(TsplDrawCommand command, SKCanvas canvas)
     {
-        RequireArguments(command, 6);
+        RequireArguments(command, 7);
         var x = Dots2Pixels(int.Parse(command.Arguments[0]));
         var y = Dots2Pixels(int.Parse(command.Arguments[1]));
         var height = Dots2Pixels(int.Parse(command.Arguments[3]));
