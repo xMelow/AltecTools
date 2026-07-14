@@ -1,4 +1,4 @@
-import { LabelPreviewRequest, LabelPreviewResponse } from "../types/label";
+import { LabelPreviewRequest } from "../types/label";
 
 export async function getLabelPreview(data: LabelPreviewRequest): Promise<string> {
     const res = await fetch('/api/tspl/preview', {
@@ -7,7 +7,10 @@ export async function getLabelPreview(data: LabelPreviewRequest): Promise<string
         body: JSON.stringify(data)
     })
 
-    if (!res.ok) throw new Error("Failed to fetch label preview")
+    if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.message)
+    }
 
     const blob = await res.blob()
     return URL.createObjectURL(blob)

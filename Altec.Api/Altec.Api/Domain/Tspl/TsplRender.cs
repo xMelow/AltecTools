@@ -102,6 +102,7 @@ public class TsplRender
 
     private void RotateBitMap(TsplDrawCommand command, SKCanvas canvas, int width, int height)
     {
+        RequireArguments(command, 1);
         var direction = int.Parse(command.Arguments[0]);
         var mirror = int.Parse(command.Arguments[1]);
         var xPivot = width / 2f;
@@ -112,7 +113,7 @@ public class TsplRender
         {
             canvas.Translate(width, 0);
             canvas.Scale(-1, 1);
-        }
+        }   
     }
 
     private float Dots2Pixels(int dots)
@@ -121,7 +122,8 @@ public class TsplRender
     }
     
     private void DrawTextCommand(TsplDrawCommand command, SKCanvas canvas)
-    {        
+    {  
+        RequireArguments(command, 6);      
         const double baseDotHeight = 3.6;
         var x = Dots2Pixels(int.Parse(command.Arguments[0]));
         var y = Dots2Pixels(int.Parse(command.Arguments[1]));
@@ -155,6 +157,7 @@ public class TsplRender
     
     private void DrawBarCommand(TsplDrawCommand command, SKCanvas canvas)
     {
+        RequireArguments(command, 3);
         var x = Dots2Pixels(int.Parse(command.Arguments[0]));
         var y = Dots2Pixels(int.Parse(command.Arguments[1]));
         var width = Dots2Pixels(int.Parse(command.Arguments[2]));
@@ -171,6 +174,7 @@ public class TsplRender
     
     private void DrawBoxCommand(TsplDrawCommand command, SKCanvas canvas)
     {
+        RequireArguments(command, 4);
         var x = Dots2Pixels(int.Parse(command.Arguments[0]));
         var y = Dots2Pixels(int.Parse(command.Arguments[1]));
         var xEnd = Dots2Pixels(int.Parse(command.Arguments[2]));
@@ -190,6 +194,7 @@ public class TsplRender
     
     private void DrawCircleCommand(TsplDrawCommand command, SKCanvas canvas)
     {
+        RequireArguments(command, 3);
         var x = Dots2Pixels(int.Parse(command.Arguments[0]));
         var y = Dots2Pixels(int.Parse(command.Arguments[1]));
         var diameter = Dots2Pixels(int.Parse(command.Arguments[2]));
@@ -229,6 +234,7 @@ public class TsplRender
 
     private (float x, float y, float width, float height, float rotation, float fontSize, int algin, string text) ParseBlockArguments(TsplDrawCommand command)
     {
+        RequireArguments(command, 7);
         const double baseDotHeight = 3.6;
         var x = Dots2Pixels(int.Parse(command.Arguments[0]));
         var y = Dots2Pixels(int.Parse(command.Arguments[1]));
@@ -288,6 +294,7 @@ public class TsplRender
     
     private void DrawQrcodeCommand(TsplDrawCommand command, SKCanvas canvas)
     {
+        RequireArguments(command, 5);
         const int qrGridCells = 25;
         var x = Dots2Pixels(int.Parse(command.Arguments[0]));
         var y = Dots2Pixels(int.Parse(command.Arguments[1]));
@@ -319,6 +326,7 @@ public class TsplRender
     
     private void DrawBarcodeCommand(TsplDrawCommand command, SKCanvas canvas)
     {
+        RequireArguments(command, 6);
         var x = Dots2Pixels(int.Parse(command.Arguments[0]));
         var y = Dots2Pixels(int.Parse(command.Arguments[1]));
         var height = Dots2Pixels(int.Parse(command.Arguments[3]));
@@ -359,6 +367,7 @@ public class TsplRender
     
     private void DrawBmpCommand(TsplDrawCommand command, SKCanvas canvas, Dictionary<string, string> images)
     {
+        RequireArguments(command, 2);
         var filename = command.Arguments[2];
         
         if (!images.ContainsKey(filename)) return;
@@ -375,5 +384,12 @@ public class TsplRender
         var scaledBitmap = bitmap.Resize(new SKImageInfo(scaledWidth, scaledHeight), SKFilterQuality.High);
     
         canvas.DrawBitmap(scaledBitmap, x, y);
+    }
+
+    private void RequireArguments(TsplDrawCommand command, int highestIndex)
+    {
+        var minCount = ++highestIndex;
+        if (command.Arguments.Count < minCount)
+            throw new ArgumentException($"{command.Name} requires at least {minCount} arguments, got {command.Arguments.Count}");
     }
 }
