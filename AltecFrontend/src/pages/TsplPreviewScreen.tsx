@@ -24,9 +24,19 @@ export default function TsplScreen() {
             const reader = new FileReader()
             reader.onload = () => {
                 const base64 = (reader.result as string).split(',')[1]
+                let newFileName = ""
+                let fileIndex = file.name.lastIndexOf(".")
+                if (fileIndex != -1) {
+                    const fileName = file.name.slice(0, fileIndex)
+                    const fileExtension = file.name.slice(fileIndex+1)
+                    newFileName = fileName + "." + fileExtension.toUpperCase()
+                } else {
+                    newFileName = file.name
+                }
+                
                 setLabelImages(prev => ({
                     ...prev,
-                    [file.name]: base64
+                    [newFileName]: base64
                 }))
             }
             reader.readAsDataURL(file)
