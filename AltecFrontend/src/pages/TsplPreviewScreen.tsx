@@ -1,4 +1,4 @@
-import {useState} from "react"
+import {useRef, useState} from "react"
 import {getLabelPreview} from "../api/labels"
 import {useFetch} from "../hooks/useFetch"
 
@@ -7,6 +7,7 @@ export default function TsplScreen() {
     const [showBlockOutline, setBlockOutline] = useState<boolean>(false)
     const [labelImages, setLabelImages] = useState<Record<string, string>>({})
     const {loading, error, result, execute} = useFetch<string>()
+    const addImageInputRef = useRef<HTMLInputElement>(null)
 
     async function handlePreview() {
         await execute(() => getLabelPreview({
@@ -14,6 +15,13 @@ export default function TsplScreen() {
             showBlockOutlines: showBlockOutline,
             images: labelImages
         }))
+    }
+
+    function removeImage(fileName: string) {
+        setLabelImages(prev => {
+            const { [fileName]: _, ...rest } = prev
+            return rest
+        })
     }
 
     function handleImageImport(e: React.ChangeEvent<HTMLInputElement>) {
@@ -24,9 +32,19 @@ export default function TsplScreen() {
             const reader = new FileReader()
             reader.onload = () => {
                 const base64 = (reader.result as string).split(',')[1]
+                let newFileName = ""
+                let fileIndex = file.name.lastIndexOf(".")
+                if (fileIndex != -1) {
+                    const fileName = file.name.slice(0, fileIndex)
+                    const fileExtension = file.name.slice(fileIndex+1)
+                    newFileName = fileName + "." + fileExtension.toUpperCase()
+                } else {
+                    newFileName = file.name
+                }
+                
                 setLabelImages(prev => ({
                     ...prev,
-                    [file.name]: base64
+                    [newFileName]: base64
                 }))
             }
             reader.readAsDataURL(file)
@@ -61,16 +79,35 @@ export default function TsplScreen() {
 
                         <div>
                             <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide mb-2">Images</p>
-                            <label className="text-sm text-altec-teal border border-dashed border-altec-teal rounded-xl p-2 hover:bg-altec-light transition-colors cursor-pointer text-center block">
-                                {Object.keys(labelImages).length > 0 ? Object.keys(labelImages).join(", ") : "+ Select image"}
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    multiple
-                                    className="hidden"
-                                    onChange={(e) => handleImageImport(e)}
-                                />
-                            </label>
+
+                            <div className="flex flex-col gap-2 mb-2">
+                                {Object.keys(labelImages).map(fileName => (
+                                    <div key={fileName} className="flex items-center justify-between border border-altec-teal/40 rounded-xl p-2">
+                                        <span className="text-sm truncate">{fileName}</span>
+                                        <button
+                                            className="text-xs text-gray-400 hover:text-red-400 transition-colors ml-2 shrink-0"
+                                            onClick={() => removeImage(fileName)}
+                                        >
+                                            ✕
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <input
+                                type="file"
+                                accept="image/*"
+                                multiple
+                                className="hidden"
+                                ref={addImageInputRef}
+                                onChange={(e) => handleImageImport(e)}
+                            />
+                            <button
+                                className="text-sm text-altec-teal border border-dashed border-altec-teal rounded-xl p-2 hover:bg-altec-light transition-colors w-full"
+                                onClick={() => addImageInputRef.current?.click()}
+                            >
+                                + Select image
+                            </button>
                         </div>
                     </div>
                 </div>
