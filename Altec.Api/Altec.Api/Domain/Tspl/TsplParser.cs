@@ -1,5 +1,4 @@
-﻿using System.Text.RegularExpressions;
-using Altec.Api.Records;
+﻿using Altec.Api.Records;
 
 namespace Altec.Api.Domain.Tspl;
 
@@ -14,28 +13,28 @@ public class TsplParser
     public IReadOnlyList<TsplDrawCommand> Parse(string tspl)
     {
         var result = new List<TsplDrawCommand>();
-        string[] lines = tspl.Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+        string[] lines = tspl.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
         
-        foreach (var line in lines)
+        for (int i = 0; i < lines.Length; i++)
         {
-            var trimmedLine = line.Trim();
+            var trimmedLine = lines[i].Trim();
             var name = trimmedLine.Split(" ")[0];
             if (commandsToParse.Contains(name))
             {
-                result.Add(ParseTsplLine(trimmedLine));
+                result.Add(ParseTsplLine(trimmedLine, i+1));
             }
         }
         return result;
     }
 
-    private TsplDrawCommand ParseTsplLine(string line)
+    private TsplDrawCommand ParseTsplLine(string line, int lineNumber)
     {
         int firstSpace = line.IndexOf(" ");
         var name = line[..firstSpace];
         
-        if (firstSpace == -1) return new TsplDrawCommand(name, new List<string>());
+        if (firstSpace == -1) return new TsplDrawCommand(name, lineNumber, new List<string>());
         
-        return new TsplDrawCommand(name, ParseParameters(line[firstSpace..].Trim()));
+        return new TsplDrawCommand(name, lineNumber, ParseParameters(line[firstSpace..].Trim()));
     }
 
     private IReadOnlyList<string> ParseParameters(string arguments)
