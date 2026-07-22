@@ -1,4 +1,5 @@
 ﻿using Altec.Api.Records;
+using DocumentFormat.OpenXml.InkML;
 using SkiaSharp;
 using ZXing;
 using ZXing.Common;
@@ -181,6 +182,9 @@ public class TsplRender
         var yEnd = Dots2Pixels(int.Parse(command.Arguments[3]));
         var width = xEnd - x;
         var height = yEnd - y;
+        float radius = 0;
+
+        if (command.Arguments.Count > 5) radius = Dots2Pixels(int.Parse(command.Arguments[5]));
 
         using var paint = new SKPaint
         {
@@ -188,10 +192,10 @@ public class TsplRender
             Style = SKPaintStyle.Stroke,
             StrokeWidth = Dots2Pixels(int.Parse(command.Arguments[4]))
         };
-        
-        canvas.DrawRect(x, y, width, height, paint);
+
+        canvas.DrawRoundRect(x, y, width, height, radius, radius, paint);
     }
-    
+
     private void DrawCircleCommand(TsplDrawCommand command, SKCanvas canvas)
     {
         RequireArguments(command, 3);
