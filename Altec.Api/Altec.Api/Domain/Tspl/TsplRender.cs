@@ -19,13 +19,14 @@ public class TsplRender
 
         int width;
         int height;
-        
+
         try
         {
+            RequireArguments(sizeCommand, 1);
             width = Mm2Pixels(int.Parse(sizeCommand.Arguments[0]));
             height = Mm2Pixels(int.Parse(sizeCommand.Arguments[1]));
         }
-        catch (Exception ex) when (ex is System.FormatException || ex is IndexOutOfRangeException)
+        catch (Exception ex) when (ex is System.FormatException || ex is ArgumentException)
         {
             throw new TsplRenderException(sizeCommand.LineNumber, ex);
         }

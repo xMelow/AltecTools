@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import CodeEditorField from "./CodeEditorField"
 
 type EditorStatus = {
     type: "Success" | "Error"
@@ -43,14 +44,14 @@ export default function EditorView({ sending, onSend }: EditorViewProps) {
                 )
             )}
 
-            <textarea 
-                value={scriptInput} 
-                onChange={(e) => setScript(e.target.value)}
+            <CodeEditorField
+                value={scriptInput}
+                onChange={setScript}
                 disabled={sending}
                 placeholder="Enter your script here..."
-                className="bg-altec-light rounded-xl p-3 text-sm font-mono min-h-97 w-185"
-            >
-            </textarea>
+                className="bg-altec-light rounded-xl p-3 text-sm font-mono w-185"
+                height="16rem"
+            />
 
             <div>
                 <button
