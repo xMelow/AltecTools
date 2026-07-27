@@ -128,7 +128,7 @@ export default function TsplScreen() {
                     <hr className="border-b border-altec-teal mb-3" />
 
                     <CodeEditorField
-                        className="flex-1 text-sm font-mono bg-altec-light rounded-xl p-3 focus:outline-none focus:ring-1 focus:ring-altec-teal"
+                        className="flex-1 min-h-0 text-sm font-mono bg-altec-light rounded-xl p-3 focus:outline-none focus:ring-1 focus:ring-altec-teal"
                         height="100%"
                         value={labelTspl}
                         onChange={setLabelTspl}
