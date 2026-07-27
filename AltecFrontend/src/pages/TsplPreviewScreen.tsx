@@ -1,6 +1,7 @@
 import {useRef, useState} from "react"
 import {getLabelPreview} from "../api/labels"
 import {useFetch} from "../hooks/useFetch"
+import CodeEditorField from "../components/CodeEditorField"
 
 export default function TsplScreen() {
     const [labelTspl, setLabelTspl] = useState<string>("")
@@ -126,10 +127,11 @@ export default function TsplScreen() {
                     </div>
                     <hr className="border-b border-altec-teal mb-3" />
 
-                    <textarea
-                        className="flex-1 text-sm font-mono bg-altec-light rounded-xl p-3 resize-none focus:outline-none focus:ring-1 focus:ring-altec-teal"
+                    <CodeEditorField
+                        className="flex-1 text-sm font-mono bg-altec-light rounded-xl p-3 focus:outline-none focus:ring-1 focus:ring-altec-teal"
+                        height="100%"
                         value={labelTspl}
-                        onChange={e => setLabelTspl(e.target.value)}
+                        onChange={setLabelTspl}
                         placeholder="Enter TSPL code..."
                     />
                 </div>

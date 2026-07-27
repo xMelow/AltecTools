@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 import { LogEntry } from "../types/printerTerminal"
+import CodeEditorField from "./CodeEditorField"
 
 type TerminalViewProps = {
     log: LogEntry[]
@@ -21,13 +22,6 @@ export default function TerminalView({ log, sending, onSend, onClear }: Terminal
         if (!command) return
         setCommandInput("")
         await onSend(command)
-    }
-
-    function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
-        if (e.key === "Enter" && !e.shiftKey) {
-            e.preventDefault()
-            handleSend()
-        }
     }
 
     return (
@@ -62,13 +56,13 @@ export default function TerminalView({ log, sending, onSend, onClear }: Terminal
             </div>
 
             <div className="flex gap-2">
-                <textarea
-                    className="flex-1 border border-altec-teal rounded-xl p-2 text-sm font-mono resize-none bg-altec-white focus:outline-none focus:ring-1 focus:ring-altec-teal"
-                    rows={3}
+                <CodeEditorField
+                    className="flex-1 border border-altec-teal rounded-xl p-2 text-sm font-mono bg-altec-white focus:outline-none focus:ring-1 focus:ring-altec-teal"
+                    height="4.5rem"
                     value={commandInput}
-                    onChange={e => setCommandInput(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    placeholder="Enter TSPL command... (Enter to send, Shift+Enter for new line)"
+                    onChange={setCommandInput}
+                    onEnterKey={handleSend}
+                    placeholder="Enter TSPL command... (Shift+Enter to send, Enter for new line)"
                     disabled={sending}
                 />
                 <button
