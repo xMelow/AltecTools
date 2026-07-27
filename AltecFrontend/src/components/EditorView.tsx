@@ -50,7 +50,7 @@ export default function EditorView({ sending, onSend }: EditorViewProps) {
                 disabled={sending}
                 placeholder="Enter your script here..."
                 className="bg-altec-light rounded-xl p-3 text-sm font-mono w-185"
-                height="24rem"
+                height="16rem"
             />
 
             <div>
