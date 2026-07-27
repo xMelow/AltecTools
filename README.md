@@ -6,8 +6,8 @@ Internal tooling built for Altec to support day-to-day printing and label workfl
 
 - **TSPL** — Preview and validate TSPL label definitions
 - **Printers** — Discover and manage printers on the network
-- **NiceLabel** — Extract variables from and print NiceLabel label files
-- **Automations** — Predefined printing automations used at Altec (e.g. printing series numbers for printers)
+- **Automations** — Predefined printing automations used at Altec, including NiceLabel variable extraction/printing and series number printing
+- **Ink/Foil Calculator** — Calculate ink or foil usage for label print jobs
 
 ## Tech Stack
 
@@ -24,15 +24,6 @@ Internal tooling built for Altec to support day-to-day printing and label workfl
 
 ## Getting Started
 
-### 1. Backend
-
-```bash
-cd Altec.Api
-dotnet run --project Altec.Api
-```
-
-The API will start at `http://localhost:5258`.
-
 Update `Altec.Api/Altec.Api/appsettings.json` with your NiceLabel SDK URL:
 
 ```json
@@ -43,15 +34,14 @@ Update `Altec.Api/Altec.Api/appsettings.json` with your NiceLabel SDK URL:
 }
 ```
 
-### 2. Frontend
+From the repo root, install dependencies and start both the frontend and backend together:
 
 ```bash
-cd AltecFrontend
 npm install
 npm run dev
 ```
 
-The frontend will start at `http://localhost:5173` and proxies `/api` requests to the backend automatically.
+This runs the frontend (`http://localhost:5173`) and the backend (`http://localhost:5258`) concurrently. The frontend proxies `/api` requests to the backend automatically.
 
 ## Project Structure
 
