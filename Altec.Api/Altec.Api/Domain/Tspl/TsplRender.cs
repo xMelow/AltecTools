@@ -11,7 +11,10 @@ public class TsplRender
 {
     private const double PrinterDpi = 300.0;
     private const double ScreenDpi = 96.0;
-    
+
+    // Approximates the printer's built-in font (Monotype CG Triumvirate Bold Condensed) with a free look-alike until a licensed copy is available.
+    private static readonly SKTypeface LabelTypeface = SKTypeface.FromFile("./Resource/Fonts/RobotoCondensed-Variable.ttf") ?? SKTypeface.Default;
+
     public byte[] Render(IReadOnlyList<TsplDrawCommand> commands, bool showBlockOutline, Dictionary<string, string> images)
     {
         var sizeCommand = commands.FirstOrDefault(command => command.Name == "SIZE")
@@ -142,7 +145,9 @@ public class TsplRender
 
         using var font = new SKFont
         {
-            Size = fontSize
+            Typeface = LabelTypeface,
+            Size = fontSize,
+            Embolden = true
         };
         
         var textBounds = new SKRect();
@@ -222,7 +227,7 @@ public class TsplRender
         var (x, y, width, height, rotation, fontSize, align, text) = ParseBlockArguments(command);
     
         using var paint = new SKPaint { Color = SKColors.Black, IsAntialias = true };
-        using var font = new SKFont { Size = fontSize };
+        using var font = new SKFont { Typeface = LabelTypeface, Size = fontSize, Embolden = true };
 
         canvas.Save();
 
