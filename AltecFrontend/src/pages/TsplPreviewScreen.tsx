@@ -145,12 +145,11 @@ export default function TsplScreen() {
                     <div className="overflow-y-auto px-4 pb-4 grow">
                         {error && <p className="text-sm text-red-500">{error}</p>}
                         {result
-                            ? <img className="border-2 border-altec-blue rounded-sm w-full" src={result} alt="Label preview" />
+                            ? <img className="border-2 border-altec-blue rounded-sm w-full max-w-md" src={result} alt="Label preview" />
                             : <p className="text-xs text-gray-400">Preview will appear here...</p>
                         }
                     </div>
                 </div>
-
             </div>
         </div>
     )
