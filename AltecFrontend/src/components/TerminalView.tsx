@@ -31,8 +31,8 @@ export default function TerminalView({ log, sending, onSend, onClear }: Terminal
     }
 
     return (
-        <div>
-            <div className="flex-1 bg-altec-light rounded-xl p-3 font-mono text-sm overflow-y-auto mb-1 min-h-64">
+        <div className="flex flex-col h-full">
+            <div className="flex-1 min-h-0 bg-altec-light rounded-xl p-3 font-mono text-sm overflow-y-auto mb-1">
                 {log.length === 0 && (
                     <p className="text-gray-400 text-xs">Send a command to see output here...</p>
                 )}
@@ -52,7 +52,7 @@ export default function TerminalView({ log, sending, onSend, onClear }: Terminal
                 <div ref={logEndRef} />
             </div>
 
-            <div>
+            <div className="shrink-0">
                 <button
                     className="mb-2 text-xs border border-altec-teal text-altec-teal px-2 py-0.5 rounded-lg hover:bg-altec-light transition-colors disabled:opacity-50"
                     onClick={onClear}
@@ -61,7 +61,7 @@ export default function TerminalView({ log, sending, onSend, onClear }: Terminal
                 </button>
             </div>
 
-            <div className="flex gap-2">
+            <div className="flex gap-2 shrink-0">
                 <textarea
                     className="flex-1 border border-altec-teal rounded-xl p-2 text-sm font-mono resize-none bg-altec-white focus:outline-none focus:ring-1 focus:ring-altec-teal"
                     rows={3}

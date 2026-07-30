@@ -67,7 +67,7 @@ export default function PrinterDetailedScreen() {
                     className="text-sm px-3 py-1 rounded-xl border border-altec-teal bg-altec-teal text-altec-white"
                     state={{ connectionType }}
                 >
-                    {"< back"}
+                    {"< Back"}
                 </Link>
 
                 <h2 className="flex-1 text-center text-3xl font-bold text-altec-teal">
@@ -75,9 +75,8 @@ export default function PrinterDetailedScreen() {
                 </h2>
             </div>
 
-            <div className="flex gap-4 items-start">
-
-                <div className="w-1/5 flex flex-col border rounded-2xl border-altec-teal bg-altec-white max-h-[75vh]">
+            <div className="flex gap-4 items-stretch">
+                <div className="w-1/5 flex flex-col border rounded-2xl border-altec-teal bg-altec-white h-[75vh]">
                     <div className="px-4 pt-4 shrink-0">
                         <h3 className="text-lg font-semibold mb-2">Printer Commands</h3>
                         <hr className="border-b border-altec-teal mb-3" />
@@ -139,9 +138,9 @@ export default function PrinterDetailedScreen() {
                     </div>
                 </div>
 
-                <div className="flex-1 flex flex-col border rounded-2xl border-altec-teal bg-altec-white p-4 max-h-[75vh] overflow-y-auto">
+                <div className="flex-1 flex flex-col border rounded-2xl border-altec-teal bg-altec-white p-4 h-[75vh]">
                     <div className="flex justify-between items-center mb-2">
-                        <h3 className="text-lg font-semibold">Terminal</h3>
+                        <h3 className="text-lg font-semibold">{terminalTab == "terminal" ? "Terminal" : "Editor"}</h3>
                     </div>
                     <hr className="border-b border-altec-teal mb-3" />
 
@@ -168,11 +167,11 @@ export default function PrinterDetailedScreen() {
                         </button>
                     </div>
 
-                    <div className={terminalTab === "terminal" ? "" : "hidden"}> 
+                    <div className={`flex flex-col flex-1 min-h-0 ${terminalTab === "terminal" ? "" : "hidden"}`}>
                         <TerminalView log={log} sending={sending} onSend={(command) => sendCommand(command)} onClear={() => setLog([])}/>
                     </div>
 
-                    <div className={terminalTab === "editor" ? "" : "hidden"}> 
+                    <div className={`flex flex-col flex-1 min-h-0 ${terminalTab === "editor" ? "" : "hidden"}`}>
                         <EditorView sending={sending} onSend={(script) => sendScript(script)}/>
                     </div>
                 </div>

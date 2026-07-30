@@ -113,7 +113,7 @@ export default function TsplScreen() {
                         </div>
                     </div>
                 </div>
-
+                                
                 <div className="flex-1 flex flex-col border rounded-2xl border-altec-teal bg-altec-white p-4 h-[75vh]">
                     <div className="flex justify-between items-center mb-2">
                         <h3 className="text-lg font-semibold">TSPL Code</h3>
