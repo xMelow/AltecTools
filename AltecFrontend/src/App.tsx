@@ -13,7 +13,7 @@ export default function App() {
           <div className="min-h-screen bg-altec-light">
               <header className="bg-altec-gray px-8 py-4 shadow-md flex items-center justify-between">
                   <h1 className="text-black text-4xl font-bold tracking-wide">
-                      Altec tools
+                      Altec Tools
                   </h1>
                   <Navbar />
                   <img src="/src/assets/logo.png" alt="logo" className="h-15 w-auto"/>

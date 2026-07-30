@@ -67,7 +67,7 @@ export default function PrinterDetailedScreen() {
                     className="text-sm px-3 py-1 rounded-xl border border-altec-teal bg-altec-teal text-altec-white"
                     state={{ connectionType }}
                 >
-                    {"< back"}
+                    {"< Back"}
                 </Link>
 
                 <h2 className="flex-1 text-center text-3xl font-bold text-altec-teal">
@@ -140,7 +140,7 @@ export default function PrinterDetailedScreen() {
 
                 <div className="flex-1 flex flex-col border rounded-2xl border-altec-teal bg-altec-white p-4 h-[75vh]">
                     <div className="flex justify-between items-center mb-2">
-                        <h3 className="text-lg font-semibold">Terminal</h3>
+                        <h3 className="text-lg font-semibold">{terminalTab == "terminal" ? "Terminal" : "Editor"}</h3>
                     </div>
                     <hr className="border-b border-altec-teal mb-3" />
 
