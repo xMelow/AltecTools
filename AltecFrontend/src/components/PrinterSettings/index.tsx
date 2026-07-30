@@ -109,7 +109,7 @@ export default function PrinterSettingsPanel({ address, connectionType, onNetwor
     }
 
     return (
-        <div className="w-1/4 flex flex-col border rounded-2xl border-altec-teal bg-altec-white max-h-[75vh]">
+        <div className="w-1/4 flex flex-col border rounded-2xl border-altec-teal bg-altec-white h-[75vh]">
             <div className="px-4 pt-4 shrink-0">
                 <div className="flex justify-between items-center mb-2">
                     <h3 className="text-lg font-semibold">Printer Settings</h3>

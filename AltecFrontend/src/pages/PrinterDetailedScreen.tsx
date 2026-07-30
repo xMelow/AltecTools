@@ -75,9 +75,8 @@ export default function PrinterDetailedScreen() {
                 </h2>
             </div>
 
-            <div className="flex gap-4 items-start">
-
-                <div className="w-1/5 flex flex-col border rounded-2xl border-altec-teal bg-altec-white max-h-[75vh]">
+            <div className="flex gap-4 items-stretch">
+                <div className="w-1/5 flex flex-col border rounded-2xl border-altec-teal bg-altec-white h-[75vh]">
                     <div className="px-4 pt-4 shrink-0">
                         <h3 className="text-lg font-semibold mb-2">Printer Commands</h3>
                         <hr className="border-b border-altec-teal mb-3" />
@@ -139,7 +138,7 @@ export default function PrinterDetailedScreen() {
                     </div>
                 </div>
 
-                <div className="flex-1 flex flex-col border rounded-2xl border-altec-teal bg-altec-white p-4 max-h-[75vh] overflow-y-auto">
+                <div className="flex-1 flex flex-col border rounded-2xl border-altec-teal bg-altec-white p-4 h-[75vh] overflow-y-auto">
                     <div className="flex justify-between items-center mb-2">
                         <h3 className="text-lg font-semibold">Terminal</h3>
                     </div>
