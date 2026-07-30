@@ -138,7 +138,7 @@ export default function PrinterDetailedScreen() {
                     </div>
                 </div>
 
-                <div className="flex-1 flex flex-col border rounded-2xl border-altec-teal bg-altec-white p-4 h-[75vh] overflow-y-auto">
+                <div className="flex-1 flex flex-col border rounded-2xl border-altec-teal bg-altec-white p-4 h-[75vh]">
                     <div className="flex justify-between items-center mb-2">
                         <h3 className="text-lg font-semibold">Terminal</h3>
                     </div>
@@ -167,11 +167,11 @@ export default function PrinterDetailedScreen() {
                         </button>
                     </div>
 
-                    <div className={terminalTab === "terminal" ? "" : "hidden"}> 
+                    <div className={`flex flex-col flex-1 min-h-0 ${terminalTab === "terminal" ? "" : "hidden"}`}>
                         <TerminalView log={log} sending={sending} onSend={(command) => sendCommand(command)} onClear={() => setLog([])}/>
                     </div>
 
-                    <div className={terminalTab === "editor" ? "" : "hidden"}> 
+                    <div className={`flex flex-col flex-1 min-h-0 ${terminalTab === "editor" ? "" : "hidden"}`}>
                         <EditorView sending={sending} onSend={(script) => sendScript(script)}/>
                     </div>
                 </div>

@@ -35,12 +35,12 @@ export default function EditorView({ sending, onSend }: EditorViewProps) {
     }, [editorStatus])
 
     return (
-        <div className="">
+        <div className="flex flex-col h-full">
             {showSuccess && (
                 editorStatus?.type == "Success" ? (
-                    <p className="text-altec-teal font-semibold">{editorStatus?.message}</p>
+                    <p className="text-altec-teal font-semibold shrink-0">{editorStatus?.message}</p>
                 ) : (
-                    <p className="text-red-500">{editorStatus?.message}</p>
+                    <p className="text-red-500 shrink-0">{editorStatus?.message}</p>
                 )
             )}
 
@@ -49,11 +49,11 @@ export default function EditorView({ sending, onSend }: EditorViewProps) {
                 onChange={setScript}
                 disabled={sending}
                 placeholder="Enter your script here..."
-                className="bg-altec-light rounded-xl p-3 text-sm font-mono w-185"
-                height="16rem"
+                className="flex-1 min-h-0 bg-altec-light rounded-xl p-3 text-sm font-mono w-full"
+                height="100%"
             />
 
-            <div>
+            <div className="shrink-0">
                 <button
                     className="text-xs border border-altec-teal text-altec-teal px-2 py-0.5 rounded-lg hover:bg-altec-light transition-colors disabled:opacity-50"
                     onClick={() => setScript("")}
@@ -62,7 +62,7 @@ export default function EditorView({ sending, onSend }: EditorViewProps) {
                 </button>
             </div>
 
-            <div className="flex justify-end mt-1">
+            <div className="flex justify-end mt-1 shrink-0">
                 <button
                     className="py-4 border bg-altec-teal text-altec-white px-4 rounded-xl self-stretch disabled:opacity-50"
                     onClick={() => handleSend()}
