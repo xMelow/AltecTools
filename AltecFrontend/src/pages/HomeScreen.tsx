@@ -53,10 +53,10 @@ export default function HomeScreen() {
                                             </div>
                                             <p className="text-gray-600 text-sm">{sub.description}</p>
                                             <ul className="flex flex-col gap-1">
-                                                {sub.bullets.map((b) => (
-                                                    <li key={b} className="flex items-center gap-2 text-sm text-gray-500">
+                                                {sub.bullets.map((bullet) => (
+                                                    <li key={bullet} className="flex items-center gap-2 text-sm text-gray-500">
                                                         <span className="w-1.5 h-1.5 rounded-full bg-altec-teal shrink-0" />
-                                                        {b}
+                                                        {bullet}
                                                     </li>
                                                 ))}
                                             </ul>

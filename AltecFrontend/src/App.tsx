@@ -1,6 +1,7 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import HomeScreen from './pages/HomeScreen'
 import Navbar from './components/Navbar/Navbar'
+import ScrollToTop from './components/ScrollToTop'
 import TsplScreen from './pages/TsplPreviewScreen'
 import PrinterScreen from './pages/PrinterScreen'
 import AutomationsScreen from './pages/AutomationsScreen'
@@ -10,6 +11,7 @@ import InktFolieCalculatorScreen from './pages/InkFolieCalculatorScreen'
 export default function App() {
   return (
       <BrowserRouter>
+          <ScrollToTop />
           <div className="min-h-screen bg-altec-light">
               <header className="bg-altec-gray px-8 py-4 shadow-md flex items-center justify-between">
                   <h1 className="text-black text-4xl font-bold tracking-wide">
