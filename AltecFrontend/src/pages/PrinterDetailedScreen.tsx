@@ -177,7 +177,6 @@ export default function PrinterDetailedScreen() {
                 </div>
 
                 <PrinterSettingsPanel address={address} onNetworkName={setDnsName} connectionType={connectionType}/>
-
             </div>
         </div>
     )

@@ -14,29 +14,63 @@ export default function HomeScreen() {
             <div className="flex flex-col gap-6">
                 {features.map((feature) => (
                     <div
-                        key={feature.route}
+                        key={feature.title}
                         className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-col gap-3"
                     >
                         <div className="flex items-center justify-between">
                             <h3 className="text-xl font-bold text-altec-dark">
                                 {feature.title}
                             </h3>
-                            <Link
-                                to={feature.route}
-                                className="text-sm font-semibold text-altec-teal hover:underline"
-                            >
-                                Open →
-                            </Link>
+                            {feature.route && (
+                                <Link
+                                    to={feature.route}
+                                    className="text-sm font-semibold text-altec-teal hover:underline"
+                                >
+                                    Open →
+                                </Link>
+                            )}
                         </div>
                         <p className="text-gray-600 text-sm">{feature.description}</p>
-                        <ul className="flex flex-col gap-1">
-                            {feature.bullets.map((b) => (
-                                <li key={b} className="flex items-center gap-2 text-sm text-gray-500">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-altec-teal shrink-0" />
-                                    {b}
-                                </li>
-                            ))}
-                        </ul>
+                        {feature.bullets && (
+                            <ul className="flex flex-col gap-1">
+                                {feature.bullets.map((b) => (
+                                    <li key={b} className="flex items-center gap-2 text-sm text-gray-500">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-altec-teal shrink-0" />
+                                        {b}
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                        {feature.subFeatures && (
+                            <div className="flex flex-col gap-4 mt-1 pt-3 border-t border-gray-100">
+                                {feature.subFeatures.map((sub) => (
+                                    <div key={sub.title} className="flex flex-col gap-2">
+                                        <div className="flex items-center justify-between">
+                                            <h4 className="text-sm font-bold text-altec-dark tracking-wide">
+                                                {sub.title}
+                                            </h4>
+                                            {sub.route && (
+                                                <Link
+                                                    to={sub.route}
+                                                    className="text-sm font-semibold text-altec-teal hover:underline"
+                                                >
+                                                    Open →
+                                                </Link>
+                                            )}
+                                        </div>
+                                        <p className="text-gray-600 text-sm">{sub.description}</p>
+                                        <ul className="flex flex-col gap-1">
+                                            {sub.bullets.map((b) => (
+                                                <li key={b} className="flex items-center gap-2 text-sm text-gray-500">
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-altec-teal shrink-0" />
+                                                    {b}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 ))}
             </div>

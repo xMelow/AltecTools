@@ -87,8 +87,6 @@ export default function PrinterScreen() {
                             </button>
                         </>
                     )}
-
-                    
                 </div>
 
                 {connectError && <p className="text-red-500 text-sm">{connectError}</p>}
