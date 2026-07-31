@@ -5,13 +5,17 @@ export type SubFeature = {
     route?: string;
 };
 
-export type Feature = {
+type FeatureBase = {
     title: string;
     description: string;
-    route?: string;
     bullets?: string[];
-    subFeatures?: SubFeature[];
 };
+
+export type Feature = FeatureBase &
+    (
+        | { route: string; subFeatures?: never }
+        | { route?: never; subFeatures: SubFeature[] }
+    );
 
 export const features: Feature[] = [
     {
