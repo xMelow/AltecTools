@@ -250,7 +250,6 @@ public class TsplRender
         var y = Dots2Pixels(int.Parse(command.Arguments[1]));
         var width = Dots2Pixels(int.Parse(command.Arguments[2]));
         var height = Dots2Pixels(int.Parse(command.Arguments[3]));
-        var humanReadable = int.Parse(command.Arguments[4]) != 0;
         var rotation = int.Parse(command.Arguments[5]);
         var yScale = int.Parse(command.Arguments[7]);
         var text = command.Arguments[^1];
@@ -337,29 +336,7 @@ public class TsplRender
     
     private void DrawBarcodeCommand(TsplDrawCommand command, SKCanvas canvas)
     {
-        RequireArguments(command, 7);
-        var x = Dots2Pixels(int.Parse(command.Arguments[0]));
-        var y = Dots2Pixels(int.Parse(command.Arguments[1]));
-        var barcodeType = command.Arguments[2];
-        var height = Dots2Pixels(int.Parse(command.Arguments[3]));
-        var (showText, textAlign) = int.Parse(command.Arguments[4]) switch
-        {
-            1 => (true, SKTextAlign.Left),
-            2 => (true, SKTextAlign.Center),
-            3 => (true, SKTextAlign.Right),
-            _ => (false, SKTextAlign.Center),
-        };
-        var rotation = int.Parse(command.Arguments[5]);
-        var narrow = Dots2Pixels(int.Parse(command.Arguments[6]));
-        var content = command.Arguments[^1];
-        var barcodeFormat = barcodeType switch
-        {
-            "128" => BarcodeFormat.CODE_128,
-            "39" => BarcodeFormat.CODE_39,
-            "EAN13" => BarcodeFormat.EAN_13,
-            "EAN8" => BarcodeFormat.EAN_8,
-            _ => BarcodeFormat.CODE_128
-        };
+        var (x, y, height, showText, textAlign, rotation, narrow, content, barcodeFormat) = ParseBarcodeArguments(command);
         
         var writer = new BarcodeWriter<SKBitmap>
         {
@@ -375,7 +352,7 @@ public class TsplRender
 
         var naturalMatrix = writer.Encode(content);
         writer.Options.Width = (int)(naturalMatrix.Width * narrow);
-        
+
         var barcodeBitMap = writer.Write(content);
         canvas.Save();
         
@@ -414,6 +391,35 @@ public class TsplRender
         
         canvas.DrawBitmap(barcodeBitMap, x, y);
         canvas.Restore();
+    }
+
+    private (float x, float y, float height, bool showText, SKTextAlign textAlign, int rotation, float narrow, string content, BarcodeFormat barcodeFormat) ParseBarcodeArguments(TsplDrawCommand command)
+    {
+        RequireArguments(command, 7);
+        var x = Dots2Pixels(int.Parse(command.Arguments[0]));
+        var y = Dots2Pixels(int.Parse(command.Arguments[1]));
+        var barcodeType = command.Arguments[2];
+        var height = Dots2Pixels(int.Parse(command.Arguments[3]));
+        var (showText, textAlign) = int.Parse(command.Arguments[4]) switch
+        {
+            1 => (true, SKTextAlign.Left),
+            2 => (true, SKTextAlign.Center),
+            3 => (true, SKTextAlign.Right),
+            _ => (false, SKTextAlign.Center),
+        };
+        var rotation = int.Parse(command.Arguments[5]);
+        var narrow = Dots2Pixels(int.Parse(command.Arguments[6]));
+        var content = command.Arguments[^1];
+        var barcodeFormat = barcodeType switch
+        {
+            "128" => BarcodeFormat.CODE_128,
+            "39" => BarcodeFormat.CODE_39,
+            "EAN13" => BarcodeFormat.EAN_13,
+            "EAN8" => BarcodeFormat.EAN_8,
+            _ => BarcodeFormat.CODE_128
+        };
+        
+        return (x, y, height, showText, textAlign, rotation, narrow, content, barcodeFormat);
     }
     
     private void DrawBmpCommand(TsplDrawCommand command, SKCanvas canvas, Dictionary<string, string> images)
