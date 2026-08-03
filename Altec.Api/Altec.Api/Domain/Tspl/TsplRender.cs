@@ -1,4 +1,5 @@
 ﻿using Altec.Api.Records;
+using DocumentFormat.OpenXml.Drawing;
 using DocumentFormat.OpenXml.InkML;
 using SkiaSharp;
 using ZXing;
@@ -369,7 +370,7 @@ public class TsplRender
                 Width = (int)width,
                 Height = (int)height,
                 Margin = 1,
-                PureBarcode = showText
+                PureBarcode = true
             },
             Renderer = new SKBitmapRenderer()
         };
@@ -378,6 +379,36 @@ public class TsplRender
         
         if (rotation > 0)
             canvas.RotateDegrees(rotation, x, y);
+        
+        if (showText)
+        {
+            using var paint = new SKPaint
+            {
+                Color = SKColors.Black,
+                IsAntialias = true,
+                TextAlign = textAlign
+            };
+
+            using var font = new SKFont
+            {
+                Typeface = LabelTypeface,
+                Size = 12
+            };
+
+            var textBounds = new SKRect();
+            paint.MeasureText(content, ref textBounds);
+
+            var textX = textAlign switch
+            {
+                SKTextAlign.Left => x,
+                SKTextAlign.Right => x + barcodeBitMap.Width,
+                SKTextAlign.Center => x + barcodeBitMap.Width / 2,
+                _ => x
+            };
+            var textY = y + barcodeBitMap.Height + textBounds.Height;
+
+            canvas.DrawText(content, textX, textY, font, paint);
+        }
         
         canvas.DrawBitmap(barcodeBitMap, x, y);
         canvas.Restore();
