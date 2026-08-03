@@ -351,7 +351,6 @@ public class TsplRender
         };
         var rotation = int.Parse(command.Arguments[5]);
         var narrow = Dots2Pixels(int.Parse(command.Arguments[6]));
-        var width = narrow * 100;
         var content = command.Arguments[^1];
         var barcodeFormat = barcodeType switch
         {
@@ -367,13 +366,16 @@ public class TsplRender
             Format = barcodeFormat,
             Options = new EncodingOptions
             {
-                Width = (int)width,
                 Height = (int)height,
                 Margin = 1,
                 PureBarcode = true
             },
             Renderer = new SKBitmapRenderer()
         };
+
+        var naturalMatrix = writer.Encode(content);
+        writer.Options.Width = (int)(naturalMatrix.Width * narrow);
+        
         var barcodeBitMap = writer.Write(content);
         canvas.Save();
         
