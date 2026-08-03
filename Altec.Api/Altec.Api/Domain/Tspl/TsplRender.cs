@@ -249,6 +249,7 @@ public class TsplRender
         var y = Dots2Pixels(int.Parse(command.Arguments[1]));
         var width = Dots2Pixels(int.Parse(command.Arguments[2]));
         var height = Dots2Pixels(int.Parse(command.Arguments[3]));
+        var humanReadable = int.Parse(command.Arguments[4]) != 0;
         var rotation = int.Parse(command.Arguments[5]);
         var yScale = int.Parse(command.Arguments[7]);
         var text = command.Arguments[^1];
@@ -338,12 +339,19 @@ public class TsplRender
         RequireArguments(command, 7);
         var x = Dots2Pixels(int.Parse(command.Arguments[0]));
         var y = Dots2Pixels(int.Parse(command.Arguments[1]));
+        var barcodeType = command.Arguments[2];
         var height = Dots2Pixels(int.Parse(command.Arguments[3]));
+        var (showText, textAlign) = int.Parse(command.Arguments[4]) switch
+        {
+            1 => (true, SKTextAlign.Left),
+            2 => (true, SKTextAlign.Center),
+            3 => (true, SKTextAlign.Right),
+            _ => (false, SKTextAlign.Center),
+        };
         var rotation = int.Parse(command.Arguments[5]);
         var narrow = Dots2Pixels(int.Parse(command.Arguments[6]));
         var width = narrow * 100;
         var content = command.Arguments[^1];
-        var barcodeType = command.Arguments[2];
         var barcodeFormat = barcodeType switch
         {
             "128" => BarcodeFormat.CODE_128,
@@ -361,6 +369,7 @@ public class TsplRender
                 Width = (int)width,
                 Height = (int)height,
                 Margin = 1,
+                PureBarcode = showText
             },
             Renderer = new SKBitmapRenderer()
         };
