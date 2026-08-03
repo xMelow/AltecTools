@@ -338,56 +338,14 @@ public class TsplRender
     {
         var (x, y, height, showText, textAlign, rotation, narrow, content, barcodeFormat) = ParseBarcodeArguments(command);
         
-        var writer = new BarcodeWriter<SKBitmap>
-        {
-            Format = barcodeFormat,
-            Options = new EncodingOptions
-            {
-                Height = (int)height,
-                Margin = 1,
-                PureBarcode = true
-            },
-            Renderer = new SKBitmapRenderer()
-        };
-
-        var naturalMatrix = writer.Encode(content);
-        writer.Options.Width = (int)(naturalMatrix.Width * narrow);
-
-        var barcodeBitMap = writer.Write(content);
+        var barcodeBitMap = CreateBarcodeBitmap((int)height, barcodeFormat, content, narrow);
         canvas.Save();
         
         if (rotation > 0)
             canvas.RotateDegrees(rotation, x, y);
         
         if (showText)
-        {
-            using var paint = new SKPaint
-            {
-                Color = SKColors.Black,
-                IsAntialias = true,
-                TextAlign = textAlign
-            };
-
-            using var font = new SKFont
-            {
-                Typeface = LabelTypeface,
-                Size = 12
-            };
-
-            var textBounds = new SKRect();
-            paint.MeasureText(content, ref textBounds);
-
-            var textX = textAlign switch
-            {
-                SKTextAlign.Left => x,
-                SKTextAlign.Right => x + barcodeBitMap.Width,
-                SKTextAlign.Center => x + barcodeBitMap.Width / 2,
-                _ => x
-            };
-            var textY = y + barcodeBitMap.Height + textBounds.Height;
-
-            canvas.DrawText(content, textX, textY, font, paint);
-        }
+            DrawBarcodeText(x, y, canvas, textAlign, content, barcodeBitMap);
         
         canvas.DrawBitmap(barcodeBitMap, x, y);
         canvas.Restore();
@@ -418,8 +376,60 @@ public class TsplRender
             "EAN8" => BarcodeFormat.EAN_8,
             _ => BarcodeFormat.CODE_128
         };
-        
+
         return (x, y, height, showText, textAlign, rotation, narrow, content, barcodeFormat);
+    }
+
+    private SKBitmap CreateBarcodeBitmap(int height, BarcodeFormat barcodeFormat, string content, float narrow)
+    {
+        var writer = new BarcodeWriter<SKBitmap>
+        {
+            Format = barcodeFormat,
+            Options = new EncodingOptions
+            {
+                Height = height,
+                Margin = 1,
+                PureBarcode = true
+            },
+            Renderer = new SKBitmapRenderer()
+        };
+
+        var naturalMatrix = writer.Encode(content);
+        writer.Options.Width = (int)(naturalMatrix.Width * narrow);
+
+        var barcodeBitMap = writer.Write(content);
+        
+        return barcodeBitMap;
+    }
+
+    private void DrawBarcodeText(float x, float y, SKCanvas canvas, SKTextAlign textAlign, string content, SKBitmap barcodeBitMap)
+    {
+        using var paint = new SKPaint
+        {
+            Color = SKColors.Black,
+            IsAntialias = true,
+            TextAlign = textAlign
+        };
+
+        using var font = new SKFont
+        {
+            Typeface = LabelTypeface,
+            Size = 12
+        };
+
+        var textBounds = new SKRect();
+        paint.MeasureText(content, ref textBounds);
+
+        var textX = textAlign switch
+        {
+            SKTextAlign.Left => x,
+            SKTextAlign.Right => x + barcodeBitMap.Width,
+            SKTextAlign.Center => x + barcodeBitMap.Width / 2,
+            _ => x
+        };
+        var textY = y + barcodeBitMap.Height + textBounds.Height;
+
+        canvas.DrawText(content, textX, textY, font, paint);
     }
     
     private void DrawBmpCommand(TsplDrawCommand command, SKCanvas canvas, Dictionary<string, string> images)
