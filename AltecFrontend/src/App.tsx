@@ -7,6 +7,7 @@ import PrinterScreen from './pages/PrinterScreen'
 import AutomationsScreen from './pages/AutomationsScreen'
 import PrinterDetailedScreen from "./pages/PrinterDetailedScreen";
 import InktFolieCalculatorScreen from './pages/InkFolieCalculatorScreen'
+import ToolsScreen from './pages/ToolsScreen'
 
 export default function App() {
   return (
@@ -28,6 +29,7 @@ export default function App() {
                         <Route path='/printers/:ipAddress' element={<PrinterDetailedScreen />} />
                         <Route path='/tools/tspl-preview' element={<TsplScreen />} />
                         <Route path='/tools/ink-calculator' element={<InktFolieCalculatorScreen />} />
+                        <Route path='/tools' element={<ToolsScreen />} />
                   </Routes>
               </main>
             </div>
