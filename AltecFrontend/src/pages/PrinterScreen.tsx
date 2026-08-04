@@ -58,7 +58,8 @@ export default function PrinterScreen() {
                                     ? "bg-altec-teal text-white"
                                     : "bg-white text-altec-teal hover:bg-altec-teal/10"
                             }`}
-                            onClick={() => { setConnectionType(type); setAddress(""); reset() }}
+                            onClick={() => { setConnectionType(type); setAddress(""); if (connectionType !== type) reset() }}
+                            disabled={loading}
                         >
                             {type === "Wifi" ? "WiFi" : "USB"}
                         </button>
