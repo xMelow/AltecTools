@@ -1,4 +1,4 @@
-import CodeMirror, { keymap, lineNumbers } from "@uiw/react-codemirror"
+import CodeMirror, { EditorView, keymap, lineNumbers } from "@uiw/react-codemirror"
 
 type CodeEditorFieldProps = {
     value: string
@@ -30,7 +30,7 @@ export default function CodeEditorField({
         },
     ])
 
-    const extensions = onEnterKey ? [lineNumbers(), enterKeymap] : [lineNumbers()];
+    const extensions = onEnterKey ? [lineNumbers(), enterKeymap, EditorView.lineWrapping] : [lineNumbers(), EditorView.lineWrapping];
 
     return (
         <CodeMirror
