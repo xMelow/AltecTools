@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { features } from "../constants/homeFeatures";
+import SubFeatureCard from "../components/SubFeatureCard";
 
 export default function HomeScreen() {
     return (
@@ -38,48 +39,9 @@ export default function HomeScreen() {
                             )}
                             {feature.subFeatures && (
                                 <div className="flex flex-col gap-4 mt-1">
-                                {feature.subFeatures.map((sub) => {
-                                    const content = (
-                                        <>
-                                            <div className="flex items-center justify-between">
-                                                <h4 className="text-sm font-bold text-altec-dark tracking-wide">
-                                                    {sub.title}
-                                                </h4>
-                                                {sub.route && (
-                                                    <span className="text-sm font-semibold text-altec-teal">
-                                                        Open →
-                                                    </span>
-                                                )}
-                                            </div>
-                                            <p className="text-gray-600 text-sm">{sub.description}</p>
-                                            <ul className="flex flex-col gap-1">
-                                                {sub.bullets.map((bullet) => (
-                                                    <li key={bullet} className="flex items-center gap-2 text-sm text-gray-500">
-                                                        <span className="w-1.5 h-1.5 rounded-full bg-altec-teal shrink-0" />
-                                                        {bullet}
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                        </>
-                                    );
-
-                                    return sub.route ? (
-                                        <Link
-                                            key={sub.title}
-                                            to={sub.route}
-                                            className="flex flex-col gap-2 border border-gray-200 rounded-lg p-4 hover:border-altec-teal hover:shadow-sm transition-colors"
-                                        >
-                                            {content}
-                                        </Link>
-                                    ) : (
-                                        <div
-                                            key={sub.title}
-                                            className="flex flex-col gap-2 border border-gray-200 rounded-lg p-4"
-                                        >
-                                            {content}
-                                        </div>
-                                    );
-                                })}
+                                {feature.subFeatures.map((sub) => (
+                                    <SubFeatureCard bullets={sub.bullets} description={sub.description} title={sub.title} key={sub.title} route={sub.route} />
+                                ))}
                                 </div>
                             )}
                         </>
