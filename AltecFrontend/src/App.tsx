@@ -8,6 +8,7 @@ import AutomationsScreen from "./pages/AutomationsScreen"
 import PrinterDetailedScreen from "./pages/PrinterDetailedScreen";
 import InktFolieCalculatorScreen from "./pages/InkFolieCalculatorScreen"
 import ToolsScreen from "./pages/ToolsScreen"
+import { TsplProvider } from "./context/TsplContext"
 
 export default function App() {
     return (
@@ -22,15 +23,17 @@ export default function App() {
                     <img src="/src/assets/logo.png" alt="logo" className="h-15 w-auto"/>
                 </header>
                 <main className="max-w-10xl mx-auto px-6 py-8">
-                    <Routes>
-                        <Route path="/" element={<HomeScreen />}/>
-                        <Route path="/printers" element={<PrinterScreen />} />
-                        <Route path="/automations" element={<AutomationsScreen />} />
-                        <Route path="/printers/:ipAddress" element={<PrinterDetailedScreen />} />
-                        <Route path="/tools/tspl-preview" element={<TsplScreen />} />
-                        <Route path="/tools/ink-calculator" element={<InktFolieCalculatorScreen />} />
-                        <Route path="/tools" element={<ToolsScreen />} />
-                    </Routes>
+                    <TsplProvider>
+                        <Routes>
+                            <Route path="/" element={<HomeScreen />}/>
+                            <Route path="/printers" element={<PrinterScreen />} />
+                            <Route path="/automations" element={<AutomationsScreen />} />
+                            <Route path="/printers/:ipAddress" element={<PrinterDetailedScreen />} />
+                            <Route path="/tools/tspl-preview" element={ <TsplScreen/> } />
+                            <Route path="/tools/ink-calculator" element={<InktFolieCalculatorScreen />} />
+                            <Route path="/tools" element={<ToolsScreen />} />
+                        </Routes>
+                    </TsplProvider>
                 </main>
             </div>
         </BrowserRouter>
