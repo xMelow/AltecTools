@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, ReactNode } from "react"
-import { Printer, PrinterConnectionType } from "../types/printer"
+import { PrinterConnectionType, Printer } from "../types/printer"
 
 type PrinterContextType = {
     connectionType: PrinterConnectionType

@@ -10,6 +10,7 @@ import InktFolieCalculatorScreen from "./pages/InkFolieCalculatorScreen"
 import ToolsScreen from "./pages/ToolsScreen"
 import { TsplProvider } from "./context/TsplContext"
 import { InktFolieProvider } from "./context/InktFolieContext"
+import { PrinterProvider } from "./context/PrinterContext"
 
 export default function App() {
     return (
@@ -24,6 +25,7 @@ export default function App() {
                     <img src="/src/assets/logo.png" alt="logo" className="h-15 w-auto"/>
                 </header>
                 <main className="max-w-10xl mx-auto px-6 py-8">
+                    <PrinterProvider>
                     <InktFolieProvider>
                     <TsplProvider>
                         <Routes>
@@ -37,6 +39,7 @@ export default function App() {
                         </Routes>
                     </TsplProvider>
                     </InktFolieProvider>
+                    </PrinterProvider>
                 </main>
             </div>
         </BrowserRouter>

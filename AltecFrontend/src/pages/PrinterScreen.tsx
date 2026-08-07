@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { useLocation, useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { getPrinters, getPrinterSettings } from "../api/printers"
 import { PrinterConnectionType, PrinterResponse } from "../types/printer"
 import PrinterCard from "../components/PrinterCard"
@@ -8,16 +8,17 @@ import { usePrinterContext } from "../context/PrinterContext"
 
 export default function PrinterScreen() {
     const { connectionType, setConnectionType, printerList, setPrinterList} = usePrinterContext()
-    const {loading, error, result, execute, reset} = useFetch<PrinterResponse>()
+    const { loading, error, execute, reset } = useFetch<PrinterResponse>()
     const [address, setAddress] = useState("")
     const [connecting, setConnecting] = useState(false)
     const [connectError, setConnectError] = useState<string | null>(null)
     const navigate = useNavigate()
 
     async function discoverPrinters() {
-        await execute(() => getPrinters({
+        const printerResponse = await execute(() => getPrinters({
             printerConnectionType: connectionType
         }))
+        setPrinterList(printerResponse?.printers ?? [])
     }
 
     async function connectToIp() {
@@ -95,7 +96,7 @@ export default function PrinterScreen() {
             </div>
 
             <div className="flex flex-row justify-center flex-wrap gap-4">
-                    {result?.printers?.map(el => (
+                    {printerList.map(el => (
                         <PrinterCard printer={el} key={el.address} />
                     ))}
             </div>
