@@ -4,14 +4,12 @@ import FolieSettings from "../components/InkFolieCalculator/FolieSettings";
 import LabelList from "../components/InkFolieCalculator/LabelList";
 import {calculateFolieAmount} from "../utils/inkFolieCaluculator";
 import Results from "../components/InkFolieCalculator/Results";
+import { useInktFolieContext } from "../context/InktFolieContext";
 
 let nextId = 0;
 
 export default function InktFolieCalculatorScreen() {
-    const [clientOrder, setClientOrder] = useState<ClientOrder>({
-        foilLength: 300000,
-        labelOrders: []
-    })
+    const { clientOrder, setClientOrder } = useInktFolieContext()
     const result = calculateFolieAmount(clientOrder)
 
     function addClientOrder() {
