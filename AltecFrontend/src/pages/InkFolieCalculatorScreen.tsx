@@ -1,5 +1,4 @@
-import {useState} from "react";
-import type {ClientOrder, Label, LabelOrder} from "../types/label";
+import type { Label, LabelOrder} from "../types/label";
 import FolieSettings from "../components/InkFolieCalculator/FolieSettings";
 import LabelList from "../components/InkFolieCalculator/LabelList";
 import {calculateFolieAmount} from "../utils/inkFolieCaluculator";

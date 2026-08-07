@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import { getPrinters, getPrinterSettings } from "../api/printers"
-import {PrinterConnectionType, PrinterResponse} from "../types/printer"
+import { PrinterConnectionType, PrinterResponse } from "../types/printer"
 import PrinterCard from "../components/PrinterCard"
-import {useFetch} from "../hooks/useFetch";
+import { useFetch } from "../hooks/useFetch";
+import { usePrinterContext } from "../context/PrinterContext"
 
 export default function PrinterScreen() {
-    const location = useLocation()
+    const { connectionType, setConnectionType, printerList, setPrinterList} = usePrinterContext()
     const {loading, error, result, execute, reset} = useFetch<PrinterResponse>()
     const [address, setAddress] = useState("")
     const [connecting, setConnecting] = useState(false)
-    const [connectionType, setConnectionType] = useState<PrinterConnectionType>(location.state?.connectionType ?? "Wifi")
     const [connectError, setConnectError] = useState<string | null>(null)
     const navigate = useNavigate()
 
