@@ -21,12 +21,12 @@ public class TsplController : ControllerBase
     {
         try
         {
-            var imageBytes = _tsplService.RenderPreview(request.Tspl, request.ShowBlockOutlines, request.Images);
-            return File(imageBytes, "image/png");
+            var (imageBytes, imageWidth, imageHeight) = _tsplService.RenderPreview(request.Tspl, request.ShowBlockOutlines, request.Images);
+            return Ok(new TsplPreviewResponse(imageBytes, imageWidth, imageHeight));
         }
         catch (TsplRenderException ex)
         {
-            return BadRequest(new TsplPreviewResponse(ex.LineNumber, ex.Message));
+            return BadRequest(new TsplErrorResponse(ex.LineNumber, ex.Message));
         }
         
     }
