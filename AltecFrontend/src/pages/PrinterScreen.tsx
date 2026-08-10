@@ -7,7 +7,7 @@ import { useFetch } from "../hooks/useFetch";
 import { usePrinterContext } from "../context/PrinterContext"
 
 export default function PrinterScreen() {
-    const { connectionType, setConnectionType, printerList, setPrinterList} = usePrinterContext()
+    const { connectionType, setConnectionType, printerList, setPrinterList, isDiscovering, setIsDiscovering} = usePrinterContext()
     const { loading, error, execute, reset } = useFetch<PrinterResponse>()
     const [address, setAddress] = useState("")
     const [connecting, setConnecting] = useState(false)
@@ -15,10 +15,12 @@ export default function PrinterScreen() {
     const navigate = useNavigate()
 
     async function discoverPrinters() {
+        setIsDiscovering(true)
         const printerResponse = await execute(() => getPrinters({
             printerConnectionType: connectionType
         }))
         setPrinterList(printerResponse?.printers ?? [])
+        setIsDiscovering(false)
     }
 
     async function connectToIp() {
@@ -41,6 +43,8 @@ export default function PrinterScreen() {
     }
 
     useEffect(() => {
+        setPrinterList([])
+
         if (connectionType == "Usb")
             discoverPrinters()
     }, [connectionType])
@@ -77,13 +81,13 @@ export default function PrinterScreen() {
                                 value={address}
                                 onChange={e => { setAddress(e.target.value); setConnectError(null) }}
                                 onKeyDown={handleIpKeyDown}
-                                disabled={connecting}
+                                disabled={isDiscovering}
                             />
                             
                             <button
                                 className="bg-altec-teal text-white px-3 py-1.5 rounded-xl text-sm disabled:opacity-50"
                                 onClick={connectToIp}
-                                disabled={!address.trim() || connecting}
+                                disabled={!address.trim() || isDiscovering}
                             >
                                 {connecting ? "Connecting..." : "Connect"}
                             </button>
@@ -97,7 +101,7 @@ export default function PrinterScreen() {
 
             <div className="flex flex-row justify-center flex-wrap gap-4">
                     {printerList.map(el => (
-                        <PrinterCard printer={el} key={el.address} />
+                        <PrinterCard printer={el} key={el.address} disabled={isDiscovering}/>
                     ))}
             </div>
             <div className="flex justify-center">

@@ -3,13 +3,19 @@ import {Link} from "react-router-dom";
 
 type PrinterCardProps = {
     printer: Printer
+    disabled: boolean
 }
 
-export default function PrinterCard({printer}: PrinterCardProps) {
+export default function PrinterCard({printer, disabled}: PrinterCardProps) {
     return (
         <div
             className="w-1/5 max-w-xs h-1/4 pl-5 pb-5 pr-5 flex flex-col border rounded-2xl border-altec-teal bg-altec-white justify-center">
-            <Link to={`/printers/${encodeURIComponent(printer.address)}`} state={{ name: printer.name, connectionType: printer.connectionType, model: printer.model }}>
+            <Link 
+                className={disabled ? "cursor-not-allowed opacity-50" : ""}
+                to={`/printers/${encodeURIComponent(printer.address)}`} 
+                state={{ name: printer.name, connectionType: printer.connectionType, model: printer.model }}
+                onClick={(e) => {if (disabled) e.preventDefault()}}
+            >
 
                 <div className="flex justify-between items-center pt-2 pb-2">
                     <p className="font-semibold">{printer.name || printer.address}</p>
