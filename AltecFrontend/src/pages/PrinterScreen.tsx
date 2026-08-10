@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { getPrinters, getPrinterSettings } from "../api/printers"
 import { PrinterConnectionType, PrinterResponse } from "../types/printer"
@@ -12,15 +12,21 @@ export default function PrinterScreen() {
     const [address, setAddress] = useState("")
     const [connecting, setConnecting] = useState(false)
     const [connectError, setConnectError] = useState<string | null>(null)
+    const connectionTypeRef = useRef(connectionType)
     const navigate = useNavigate()
 
     async function discoverPrinters() {
+        const requestedType = connectionType
         setIsDiscovering(true)
+
         const printerResponse = await execute(() => getPrinters({
             printerConnectionType: connectionType
         }))
-        setPrinterList(printerResponse?.printers ?? [])
-        setIsDiscovering(false)
+
+        if (requestedType === connectionTypeRef.current) {
+            setPrinterList(printerResponse?.printers ?? [])
+            setIsDiscovering(false)
+        }
     }
 
     async function connectToIp() {
@@ -43,10 +49,7 @@ export default function PrinterScreen() {
     }
 
     useEffect(() => {
-        setPrinterList([])
-
-        if (connectionType == "Usb")
-            discoverPrinters()
+        connectionTypeRef.current = connectionType
     }, [connectionType])
 
     return (
@@ -63,8 +66,8 @@ export default function PrinterScreen() {
                                     ? "bg-altec-teal text-white"
                                     : "bg-white text-altec-teal hover:bg-altec-teal/10"
                             }`}
-                            onClick={() => { setConnectionType(type); setAddress(""); if (connectionType !== type) reset() }}
-                            disabled={loading}
+                            onClick={() => { setConnectionType(type); setAddress(""); if (connectionType !== type) {setPrinterList([]); setIsDiscovering(false); reset()} }}
+                            disabled={isDiscovering}
                         >
                             {type === "Wifi" ? "WiFi" : "USB"}
                         </button>
@@ -110,9 +113,9 @@ export default function PrinterScreen() {
                             <button
                             className="bg-altec-teal text-white px-3 py-1.5 rounded-xl text-sm disabled:opacity-50"
                             onClick={discoverPrinters}
-                            disabled={loading}
+                            disabled={isDiscovering}
                             >
-                                {loading ? "Loading..." : "Refresh"}
+                                {loading ? "Loading..." : "Discover"}
                             </button>
                         </>
                     )}
