@@ -1,21 +1,21 @@
-import {useRef, useState} from "react"
-import {getLabelPreview} from "../api/labels"
-import {useFetch} from "../hooks/useFetch"
+import { useRef } from "react"
+import { getLabelPreview } from "../api/labels"
+import { useFetch } from "../hooks/useFetch"
 import CodeEditorField from "../components/CodeEditorField"
+import { useTsplContext } from "../context/TsplContext"
 
 export default function TsplScreen() {
-    const [labelTspl, setLabelTspl] = useState<string>("")
-    const [showBlockOutline, setBlockOutline] = useState<boolean>(false)
-    const [labelImages, setLabelImages] = useState<Record<string, string>>({})
-    const {loading, error, result, execute} = useFetch<string>()
+    const { labelTspl, setLabelTspl, showBlockOutline, setBlockOutline, labelImages, setLabelImages, labelPreview, setLabelPreview } = useTsplContext()
+    const { loading, error, execute } = useFetch<string>()
     const addImageInputRef = useRef<HTMLInputElement>(null)
 
     async function handlePreview() {
-        await execute(() => getLabelPreview({
+        const data = await execute(() => getLabelPreview({
             tspl: labelTspl,
             showBlockOutlines: showBlockOutline,
             images: labelImages
         }))
+        setLabelPreview(data)
     }
 
     function removeImage(fileName: string) {
@@ -144,8 +144,8 @@ export default function TsplScreen() {
 
                     <div className="overflow-y-auto px-4 pb-4 grow">
                         {error && <p className="text-sm text-red-500">{error}</p>}
-                        {result
-                            ? <img className="border-2 border-altec-blue rounded-sm w-full max-w-md" src={result} alt="Label preview" />
+                        {labelPreview
+                            ? <img className="border-2 border-altec-blue rounded-sm w-full max-w-md" src={labelPreview} alt="Label preview" />
                             : <p className="text-xs text-gray-400">Preview will appear here...</p>
                         }
                     </div>

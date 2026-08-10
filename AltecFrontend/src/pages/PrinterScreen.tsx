@@ -1,23 +1,32 @@
-import { useEffect, useState } from "react"
-import { useLocation, useNavigate } from "react-router-dom"
+import { useEffect, useRef, useState } from "react"
+import { useNavigate } from "react-router-dom"
 import { getPrinters, getPrinterSettings } from "../api/printers"
-import {PrinterConnectionType, PrinterResponse} from "../types/printer"
+import { PrinterConnectionType, PrinterResponse } from "../types/printer"
 import PrinterCard from "../components/PrinterCard"
-import {useFetch} from "../hooks/useFetch";
+import { useFetch } from "../hooks/useFetch";
+import { usePrinterContext } from "../context/PrinterContext"
 
 export default function PrinterScreen() {
-    const location = useLocation()
-    const {loading, error, result, execute, reset} = useFetch<PrinterResponse>()
+    const { connectionType, setConnectionType, printerList, setPrinterList, isDiscovering, setIsDiscovering} = usePrinterContext()
+    const { loading, error, execute, reset } = useFetch<PrinterResponse>()
     const [address, setAddress] = useState("")
     const [connecting, setConnecting] = useState(false)
-    const [connectionType, setConnectionType] = useState<PrinterConnectionType>(location.state?.connectionType ?? "Wifi")
     const [connectError, setConnectError] = useState<string | null>(null)
+    const connectionTypeRef = useRef(connectionType)
     const navigate = useNavigate()
 
     async function discoverPrinters() {
-        await execute(() => getPrinters({
+        const requestedType = connectionType
+        setIsDiscovering(true)
+
+        const printerResponse = await execute(() => getPrinters({
             printerConnectionType: connectionType
         }))
+
+        if (requestedType === connectionTypeRef.current) {
+            setPrinterList(printerResponse?.printers ?? [])
+            setIsDiscovering(false)
+        }
     }
 
     async function connectToIp() {
@@ -40,8 +49,7 @@ export default function PrinterScreen() {
     }
 
     useEffect(() => {
-        if (connectionType == "Usb")
-            discoverPrinters()
+        connectionTypeRef.current = connectionType
     }, [connectionType])
 
     return (
@@ -58,8 +66,8 @@ export default function PrinterScreen() {
                                     ? "bg-altec-teal text-white"
                                     : "bg-white text-altec-teal hover:bg-altec-teal/10"
                             }`}
-                            onClick={() => { setConnectionType(type); setAddress(""); if (connectionType !== type) reset() }}
-                            disabled={loading}
+                            onClick={() => { setConnectionType(type); setAddress(""); if (connectionType !== type) {setPrinterList([]); setIsDiscovering(false); reset()} }}
+                            disabled={isDiscovering}
                         >
                             {type === "Wifi" ? "WiFi" : "USB"}
                         </button>
@@ -76,13 +84,13 @@ export default function PrinterScreen() {
                                 value={address}
                                 onChange={e => { setAddress(e.target.value); setConnectError(null) }}
                                 onKeyDown={handleIpKeyDown}
-                                disabled={connecting}
+                                disabled={isDiscovering}
                             />
                             
                             <button
                                 className="bg-altec-teal text-white px-3 py-1.5 rounded-xl text-sm disabled:opacity-50"
                                 onClick={connectToIp}
-                                disabled={!address.trim() || connecting}
+                                disabled={!address.trim() || isDiscovering}
                             >
                                 {connecting ? "Connecting..." : "Connect"}
                             </button>
@@ -95,8 +103,8 @@ export default function PrinterScreen() {
             </div>
 
             <div className="flex flex-row justify-center flex-wrap gap-4">
-                    {result?.printers?.map(el => (
-                        <PrinterCard printer={el} key={el.address} />
+                    {printerList.map(el => (
+                        <PrinterCard printer={el} key={el.address} disabled={isDiscovering}/>
                     ))}
             </div>
             <div className="flex justify-center">
@@ -105,9 +113,9 @@ export default function PrinterScreen() {
                             <button
                             className="bg-altec-teal text-white px-3 py-1.5 rounded-xl text-sm disabled:opacity-50"
                             onClick={discoverPrinters}
-                            disabled={loading}
+                            disabled={isDiscovering}
                             >
-                                {loading ? "Loading..." : "Refresh"}
+                                {loading ? "Loading..." : "Discover"}
                             </button>
                         </>
                     )}

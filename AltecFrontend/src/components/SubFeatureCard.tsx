@@ -31,6 +31,7 @@ export default function SubFeatureCard({title, description, bullets, route }: Su
             </ul>
         </>
     )
+    
     return route ? (
         <Link
             to={route}
