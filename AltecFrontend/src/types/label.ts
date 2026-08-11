@@ -5,7 +5,13 @@ export type LabelPreviewRequest = {
 }
 
 export type LabelPreviewResponse = {
-    labelPreview: string
+    labelPreview: LabelPreview
+}
+
+export type LabelPreview = {
+    src: string
+    labelWidth: number
+    labelHeight: number
 }
 
 export type Label = {

@@ -1,3 +1,3 @@
 namespace Altec.Api.Records;
 
-public record TsplPreviewResponse(byte[] labelPreivew, float previewWdith, float previewHeight);
+public record TsplPreviewResponse(byte[] LabelPreview, float PreviewWidth, float PreviewHeight);
