@@ -35,6 +35,7 @@ public static class PrinterCommands
             "OUT \"REFERENCE Y=\";GETSETTING$(\"CONFIG\",\"TSPL\",\"REFERENCE Y\")",
             "OUT \"COUNTRY CODE=\";GETSETTING$(\"CONFIG\",\"TSPL\",\"COUNTRY CODE\")",
             "OUT \"CODEPAGE=\";GETSETTING$(\"CONFIG\",\"TSPL\",\"CODEPAGE\")",
+            "OUT \"END\"",
             "END"
       );
 

@@ -1,4 +1,3 @@
-using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using Altec.Api.Domain.Printers.Communication;
@@ -11,27 +10,41 @@ public class WifiConnector : IPrinterConnection, IDisposable
     private readonly NetworkStream _stream;
     private const int PrinterPort = 9100;
     
-    public WifiConnector(IPAddress ipAddress)
+    public WifiConnector(string address)
     {
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
         _client = new TcpClient();
-        _client.ConnectAsync(ipAddress, PrinterPort, cts.Token).GetAwaiter().GetResult();
+        _client.ConnectAsync(address, PrinterPort, cts.Token).GetAwaiter().GetResult();
         _stream = _client.GetStream();
     }
 
-    public async Task<string> Read()
+    public async Task<string> Read(string? terminator = null)
     {
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
         var buffer = new byte[4096];
-        var readTask = _stream.ReadAsync(buffer, cts.Token).AsTask();
-        var timeoutTask = Task.Delay(TimeSpan.FromSeconds(1), cts.Token);
-        
-        var completed = await Task.WhenAny(readTask, timeoutTask);
-        if (completed != readTask)
-            return "Printer didn't respond in time.";
-            
-        var bytesRead = await readTask;
-        return Encoding.ASCII.GetString(buffer, 0, bytesRead);
+
+        if (terminator == null)
+        {
+            var readTask = _stream.ReadAsync(buffer, cts.Token).AsTask();
+            var timeoutTask = Task.Delay(TimeSpan.FromSeconds(4), cts.Token);
+
+            var completed = await Task.WhenAny(readTask, timeoutTask);
+            if (completed != readTask)
+                return string.Empty;
+
+            var bytesRead = await readTask;
+            return Encoding.ASCII.GetString(buffer, 0, bytesRead);
+        }
+
+        var response = new StringBuilder();
+        while (!response.ToString().EndsWith(terminator))
+        {
+            var bytesRead = await _stream.ReadAsync(buffer, cts.Token);
+            var data = Encoding.ASCII.GetString(buffer, 0, bytesRead);
+            response.Append(data);
+        }
+
+        return response.ToString();
     }
 
     public async Task Send(string command)

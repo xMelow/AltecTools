@@ -23,7 +23,6 @@ builder.Services.AddScoped<TsplParser>();
 builder.Services.AddScoped<TsplRender>();
 builder.Services.AddScoped<TsplValidator>();
 builder.Services.AddScoped<ITsplService, TsplService>();
-builder.Services.AddScoped<WifiDiscovery>();
 builder.Services.AddScoped<UsbDiscovery>();
 builder.Services.AddScoped<IPrinterService, PrinterService>();
 builder.Services.AddScoped<PrinterResponseParser>();

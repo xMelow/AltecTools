@@ -11,10 +11,10 @@ public class PrinterClient : IDisposable
         _printerConnection = printerConnection;
     }
 
-    public async Task<string> SendCommand(string command)
+    public async Task<string> SendCommand(string command, string? terminator = null)
     {
         await _printerConnection.Send(command);
-        return await _printerConnection.Read();
+        return await _printerConnection.Read(terminator);
     }
 
     public async Task SendFile(IEnumerable<PrinterFile> files)

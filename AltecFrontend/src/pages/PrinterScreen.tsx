@@ -80,7 +80,7 @@ export default function PrinterScreen() {
                             <input
                                 type="text"
                                 className="border border-altec-teal rounded-xl px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-altec-teal w-64"
-                                placeholder={"Enter printer IP Address ..."}
+                                placeholder={"Enter printer Hostname or IP Address ..."}
                                 value={address}
                                 onChange={e => { setAddress(e.target.value); setConnectError(null) }}
                                 onKeyDown={handleIpKeyDown}

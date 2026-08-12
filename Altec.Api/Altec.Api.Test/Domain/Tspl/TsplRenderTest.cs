@@ -7,13 +7,14 @@ namespace Altec.Api.Test.Domain.Tspl;
 public class TsplRenderTest
 {
     private readonly TsplRender _render = new();
+    private readonly TsplParser _parser = new();
     private readonly ITestOutputHelper _output;
 
     public TsplRenderTest(ITestOutputHelper output)
     {
         _output = output;
     }
-    
+
     [Fact]
     public void Render_TextCommand_SavesToPng()
     {
@@ -22,11 +23,40 @@ public class TsplRenderTest
             new("SIZE", new List<string> { "103", "110" }),
             new("TEXT", new List<string> { "10", "10", "0", "0", "16", "16", "Hello Altec" })
         };
-    
-        var result = _render.Render(commands, false, null);
-    
-        File.WriteAllBytes("C:/temp/test_label.png", result);
-        Assert.NotEmpty(result);
+
+        var (imageBytes, _, _) = _render.Render(commands, false, null);
+
+        File.WriteAllBytes("C:/temp/test_label.png", imageBytes);
+        Assert.NotEmpty(imageBytes);
+    }
+
+    [Fact]
+    public void Render_ParkingLabel_SavesToPng()
+    {
+        const string tspl = "SIZE 100 mm,295 mm\n" +
+            "GAP 0.00 mm, 0.00 mm\n" +
+            "REFERENCE 0,0\n" +
+            "DIRECTION 0,0\n" +
+            "CLS\n" +
+            "QRCODE 685,2930,Q,14,A,90,M2,S7,\"https://beta-app.eaglebe.com/nl-be/map/details/1020150\"\n" +
+            "TEXT 1135,46,\"0\",90,36,36,\"VAN\"\n" +
+            "TEXT 1135,1775,\"0\",90,36,36,\"T.E.M\"\n" +
+            "TEXT 990,46,\"0\",90,80,80,\"31/07/2025\"\n" +
+            "TEXT 990,1775,\"0\",90,80,80,\"31/07/2025\"\n" +
+            "TEXT 650,2105,\"0\",90,80,80,\"20:00\"\n" +
+            "TEXT 650,376,\"0\",90,80,80,\"7:04\"\n" +
+            "TEXT 590,1775,\"0\",90,36,36,\"TOT\"\n" +
+            "TEXT 590,46,\"0\",90,36,36,\"VAN\"\n" +
+            "TEXT 300,525,\"0\",90,30,30,\"UITGEZONDERD VERGUNNINGSHOUDERS\"\n" +
+            "TEXT 150,500,\"0\",90,30,30,\"ENKEL GELDIG OP WERKDAGEN (MA-VRIJ)\"\n" +
+            "PRINT 1\n";
+
+        var commands = _parser.Parse(tspl);
+        var (imageBytes, width, height) = _render.Render(commands, false, new Dictionary<string, string>());
+
+        File.WriteAllBytes("C:/temp/parking_label.png", imageBytes);
+        _output.WriteLine($"width={width}mm height={height}mm");
+        Assert.NotEmpty(imageBytes);
     }
 
     [Fact]
@@ -50,12 +80,12 @@ public class TsplRenderTest
             new("TEXT", new List<string> { "396", "502", "0", "0", "16", "16", "Altec" }),
         };
 
-        var result = _render.Render(commands, false, null);
-        
-        File.WriteAllBytes("C:/temp/testLabel.png", result);
-        Assert.NotEmpty(result);
+        var (imageBytes, _, _) = _render.Render(commands, false, null);
+
+        File.WriteAllBytes("C:/temp/testLabel.png", imageBytes);
+        Assert.NotEmpty(imageBytes);
     }
-    
+
     [Fact]
     public void Render_FullComplicatedTsplLabel_SavesToPng()
     {
@@ -70,12 +100,12 @@ public class TsplRenderTest
             new("QRCODE", new List<string> { "700", "900", "L", "10", "A", "0", "M2", "S7", "132465789" }),
         };
 
-        var result = _render.Render(commands, true, null);
-        
-        File.WriteAllBytes("C:/temp/testLabel.png", result);
-        Assert.NotEmpty(result);
+        var (imageBytes, _, _) = _render.Render(commands, true, null);
+
+        File.WriteAllBytes("C:/temp/testLabel.png", imageBytes);
+        Assert.NotEmpty(imageBytes);
     }
-    
+
     [Fact]
     public void Render_Label3()
     {
@@ -92,9 +122,9 @@ public class TsplRenderTest
             new("QRCODE", new List<string> { "867", "218", "L", "11", "A", "0", "M2", "S7", "flor@stellamans.be" }),
         };
 
-        var result = _render.Render(commands, true, null);
-        
-        File.WriteAllBytes("C:/temp/testLabel.png", result);
-        Assert.NotEmpty(result);
+        var (imageBytes, _, _) = _render.Render(commands, true, null);
+
+        File.WriteAllBytes("C:/temp/testLabel.png", imageBytes);
+        Assert.NotEmpty(imageBytes);
     }
 }
