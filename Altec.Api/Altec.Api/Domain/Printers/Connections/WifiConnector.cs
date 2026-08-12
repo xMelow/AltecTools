@@ -19,19 +19,33 @@ public class WifiConnector : IPrinterConnection, IDisposable
         _stream = _client.GetStream();
     }
 
-    public async Task<string> Read()
+    public async Task<string> Read(string? terminator = null)
     {
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
         var buffer = new byte[4096];
-        var readTask = _stream.ReadAsync(buffer, cts.Token).AsTask();
-        var timeoutTask = Task.Delay(TimeSpan.FromSeconds(1), cts.Token);
-        
-        var completed = await Task.WhenAny(readTask, timeoutTask);
-        if (completed != readTask)
-            return "Printer didn't respond in time.";
-            
-        var bytesRead = await readTask;
-        return Encoding.ASCII.GetString(buffer, 0, bytesRead);
+
+        if (terminator == null)
+        {
+            var readTask = _stream.ReadAsync(buffer, cts.Token).AsTask();
+            var timeoutTask = Task.Delay(TimeSpan.FromSeconds(4), cts.Token);
+
+            var completed = await Task.WhenAny(readTask, timeoutTask);
+            if (completed != readTask)
+                throw new InvalidDataException("Printer didn't respond in time.");
+
+            var bytesRead = await readTask;
+            return Encoding.ASCII.GetString(buffer, 0, bytesRead);
+        }
+
+        var response = new StringBuilder();
+        while (!response.ToString().EndsWith(terminator))
+        {
+            var bytesRead = await _stream.ReadAsync(buffer, cts.Token);
+            var data = Encoding.ASCII.GetString(buffer, 0, bytesRead);
+            response.Append(data);
+        }
+
+        return response.ToString();
     }
 
     public async Task Send(string command)

@@ -34,7 +34,7 @@ public class PrinterService : IPrinterService
 
         var connection = CreateConnection(connectionType, address);
         using var client = new PrinterClient(connection);
-        var result = await client.SendCommand(PrinterCommands.GetAllSettings());
+        var result = await client.SendCommand(PrinterCommands.GetAllSettings(), "END\r\n");
         return _parser.ParseSettings(result);
     }
 

@@ -45,12 +45,12 @@ public class UsbConnector : IDisposable, IPrinterConnection
         _stream = new FileStream(_handle, FileAccess.ReadWrite, bufferSize: 4096, isAsync: true);
     }
 
-    public async Task<string> Read()
+    public async Task<string> Read(string? terminator = null)
     {
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
         var sb = new StringBuilder();
 
-        while (true)
+        while (terminator == null || !sb.ToString().EndsWith(terminator))
         {
             var buffer = new byte[4096];
             var readTask = _stream.ReadAsync(buffer, cts.Token).AsTask();
@@ -65,9 +65,14 @@ public class UsbConnector : IDisposable, IPrinterConnection
             }
             else
             {
+                if (terminator != null)
+                    throw new InvalidDataException("Printer didn't respond in time.");
+
                return sb.ToString();
             }
         }
+
+        return sb.ToString();
     }
 
     public async Task Send(string command) 
