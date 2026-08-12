@@ -13,10 +13,13 @@ export default function PrinterFilesTab({address, sending, setSending, addLog }:
     const connectionType = location.state?.connectionType ?? "Wifi"
     const addInputRef = useRef<HTMLInputElement>(null)
 
-    function handleAddFileSelected(file: File | null) {
-        if (!file) return
-        const entry = newEntry(file)
-        setFileEntries(prev => [...prev, entry])
+    function handleAddFileSelected(files: FileList | null) {
+        if (!files) return
+        
+        Array.from(files)?.forEach(file => {
+            const entry = newEntry(file)
+            setFileEntries(prev => [...prev, entry])
+        })
     }
 
     function removeEntry(index: number) {
@@ -118,7 +121,8 @@ export default function PrinterFilesTab({address, sending, setSending, addLog }:
             <input type="file" 
                 className="hidden" ref={addInputRef}                                 
                 accept=".bas,.bmp"
-                onChange={(e) => handleAddFileSelected(e.target.files?.[0] ?? null)}
+                multiple
+                onChange={(e) => handleAddFileSelected(e.target.files ?? null)}
             />
 
             <button
