@@ -1,4 +1,3 @@
-using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using Altec.Api.Domain.Printers.Communication;
@@ -31,7 +30,7 @@ public class WifiConnector : IPrinterConnection, IDisposable
 
             var completed = await Task.WhenAny(readTask, timeoutTask);
             if (completed != readTask)
-                throw new InvalidDataException("Printer didn't respond in time.");
+                return string.Empty;
 
             var bytesRead = await readTask;
             return Encoding.ASCII.GetString(buffer, 0, bytesRead);
