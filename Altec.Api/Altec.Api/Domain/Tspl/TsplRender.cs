@@ -1,6 +1,4 @@
 ﻿using Altec.Api.Records;
-using DocumentFormat.OpenXml.Drawing;
-using DocumentFormat.OpenXml.InkML;
 using SkiaSharp;
 using ZXing;
 using ZXing.Common;
@@ -11,36 +9,41 @@ namespace Altec.Api.Domain.Tspl;
 public class TsplRender
 {
     private const double PrinterDpi = 300.0;
-    private const double ScreenDpi = 96.0;
 
     private static readonly SKTypeface LabelTypeface = SKTypeface.FromFile("./Resource/Fonts/RobotoCondensed-Variable.ttf") ?? SKTypeface.Default;
 
-    public byte[] Render(IReadOnlyList<TsplDrawCommand> commands, bool showBlockOutline, Dictionary<string, string> images)
+    public (byte[], float, float) Render(IReadOnlyList<TsplDrawCommand> commands, bool showBlockOutline, Dictionary<string, string> images)
     {
         var sizeCommand = commands.FirstOrDefault(command => command.Name == "SIZE")
             ?? throw new TsplRenderException(0, "SIZE command must be present");
 
         int width;
         int height;
+        float previewWdith;
+        float previewHeight;
 
         try
         {
             RequireArguments(sizeCommand, 1);
-            width = Mm2Pixels(int.Parse(sizeCommand.Arguments[0]));
-            height = Mm2Pixels(int.Parse(sizeCommand.Arguments[1]));
+            var widthMm = float.Parse(sizeCommand.Arguments[0]);
+            var heightMm = float.Parse(sizeCommand.Arguments[1]);
+
+            width = Mm2Dots(widthMm);
+            height = Mm2Dots(heightMm);
+            previewWdith = widthMm;
+            previewHeight = heightMm;
         }
         catch (Exception ex) when (ex is System.FormatException || ex is ArgumentException)
         {
             throw new TsplRenderException(sizeCommand.LineNumber, ex);
         }
 
-        return CreateBitMap(width, height, commands, showBlockOutline, images);
+        return (CreateBitMap(width, height, commands, showBlockOutline, images), previewWdith, previewHeight);
     }
 
-    private int Mm2Pixels(int mm)
+    private int Mm2Dots(float mm)
     {
-        var dots = (mm / 25.4) * PrinterDpi;
-        return Convert.ToInt32(Dots2Pixels((int) dots));
+        return Convert.ToInt32(mm / 25.4 * PrinterDpi);
     }
     
     private byte[] CreateBitMap(int width, int height, IReadOnlyList<TsplDrawCommand> commands, bool showBlockOutline, Dictionary<string, string> images)
@@ -120,20 +123,15 @@ public class TsplRender
             canvas.Scale(-1, 1);
         }   
     }
-
-    private float Dots2Pixels(int dots)
-    {
-        return Convert.ToSingle(dots * (ScreenDpi / PrinterDpi));
-    }
     
     private void DrawTextCommand(TsplDrawCommand command, SKCanvas canvas)
     {  
         RequireArguments(command, 6);      
         const double baseDotHeight = 3.6;
-        var x = Dots2Pixels(int.Parse(command.Arguments[0]));
-        var y = Dots2Pixels(int.Parse(command.Arguments[1]));
+        var x = int.Parse(command.Arguments[0]);
+        var y = int.Parse(command.Arguments[1]);
         var yScale = int.Parse(command.Arguments[5]);
-        var fontSize = Dots2Pixels((int)(baseDotHeight * yScale));
+        var fontSize = (int)(baseDotHeight * yScale);
         var rotation = int.Parse(command.Arguments[3]);
         var text = command.Arguments[^1];
 
@@ -165,10 +163,10 @@ public class TsplRender
     private void DrawBarCommand(TsplDrawCommand command, SKCanvas canvas)
     {
         RequireArguments(command, 3);
-        var x = Dots2Pixels(int.Parse(command.Arguments[0]));
-        var y = Dots2Pixels(int.Parse(command.Arguments[1]));
-        var width = Dots2Pixels(int.Parse(command.Arguments[2]));
-        var height = Dots2Pixels(int.Parse(command.Arguments[3]));
+        var x = int.Parse(command.Arguments[0]);
+        var y = int.Parse(command.Arguments[1]);
+        var width = int.Parse(command.Arguments[2]);
+        var height = int.Parse(command.Arguments[3]);
 
         using var paint = new SKPaint
         {
@@ -182,21 +180,21 @@ public class TsplRender
     private void DrawBoxCommand(TsplDrawCommand command, SKCanvas canvas)
     {
         RequireArguments(command, 4);
-        var x = Dots2Pixels(int.Parse(command.Arguments[0]));
-        var y = Dots2Pixels(int.Parse(command.Arguments[1]));
-        var xEnd = Dots2Pixels(int.Parse(command.Arguments[2]));
-        var yEnd = Dots2Pixels(int.Parse(command.Arguments[3]));
+        var x = int.Parse(command.Arguments[0]);
+        var y = int.Parse(command.Arguments[1]);
+        var xEnd = int.Parse(command.Arguments[2]);
+        var yEnd = int.Parse(command.Arguments[3]);
         var width = xEnd - x;
         var height = yEnd - y;
         float radius = 0;
 
-        if (command.Arguments.Count > 5) radius = Dots2Pixels(int.Parse(command.Arguments[5]));
+        if (command.Arguments.Count > 5) radius = int.Parse(command.Arguments[5]);
 
         using var paint = new SKPaint
         {
             Color = SKColors.Black,
             Style = SKPaintStyle.Stroke,
-            StrokeWidth = Dots2Pixels(int.Parse(command.Arguments[4]))
+            StrokeWidth = int.Parse(command.Arguments[4])
         };
 
         canvas.DrawRoundRect(x, y, width, height, radius, radius, paint);
@@ -205,9 +203,9 @@ public class TsplRender
     private void DrawCircleCommand(TsplDrawCommand command, SKCanvas canvas)
     {
         RequireArguments(command, 3);
-        var x = Dots2Pixels(int.Parse(command.Arguments[0]));
-        var y = Dots2Pixels(int.Parse(command.Arguments[1]));
-        var diameter = Dots2Pixels(int.Parse(command.Arguments[2]));
+        var x = int.Parse(command.Arguments[0]);
+        var y = int.Parse(command.Arguments[1]);
+        var diameter = int.Parse(command.Arguments[2]);
         var radius = diameter / 2;
         var centerX = x + radius;
         var centerY = y + radius;
@@ -216,7 +214,7 @@ public class TsplRender
         {
             Color = SKColors.Black,
             Style = SKPaintStyle.Stroke,
-            StrokeWidth = Dots2Pixels(int.Parse(command.Arguments[3]))
+            StrokeWidth = int.Parse(command.Arguments[3])
         };
         
         canvas.DrawCircle(centerX, centerY, diameter / 2, paint);
@@ -246,14 +244,14 @@ public class TsplRender
     {
         RequireArguments(command, 8);
         const double baseDotHeight = 3.6;
-        var x = Dots2Pixels(int.Parse(command.Arguments[0]));
-        var y = Dots2Pixels(int.Parse(command.Arguments[1]));
-        var width = Dots2Pixels(int.Parse(command.Arguments[2]));
-        var height = Dots2Pixels(int.Parse(command.Arguments[3]));
+        var x = int.Parse(command.Arguments[0]);
+        var y = int.Parse(command.Arguments[1]);
+        var width = int.Parse(command.Arguments[2]);
+        var height = int.Parse(command.Arguments[3]);
         var rotation = int.Parse(command.Arguments[5]);
         var yScale = int.Parse(command.Arguments[7]);
         var text = command.Arguments[^1];
-        var fontSize = Dots2Pixels((int)(baseDotHeight * yScale));
+        var fontSize = (int)(baseDotHeight * yScale);
         var align = command.Arguments.Count >= 11
             ? int.Parse(command.Arguments[9])
             : 0;
@@ -306,12 +304,12 @@ public class TsplRender
     {
         RequireArguments(command, 6);
         const int qrGridCells = 25;
-        var x = Dots2Pixels(int.Parse(command.Arguments[0]));
-        var y = Dots2Pixels(int.Parse(command.Arguments[1]));
+        var x = int.Parse(command.Arguments[0]);
+        var y = int.Parse(command.Arguments[1]);
         var content = command.Arguments[^1];
         var cellWidth = int.Parse(command.Arguments[3]);
         var rotation = int.Parse(command.Arguments[5]);
-        var size = Dots2Pixels(cellWidth * qrGridCells);
+        var size = cellWidth * qrGridCells;
 
         var writer = new BarcodeWriter<SKBitmap>
         {
@@ -354,10 +352,10 @@ public class TsplRender
     private (float x, float y, float height, bool showText, SKTextAlign textAlign, int rotation, float narrow, string content, BarcodeFormat barcodeFormat) ParseBarcodeArguments(TsplDrawCommand command)
     {
         RequireArguments(command, 7);
-        var x = Dots2Pixels(int.Parse(command.Arguments[0]));
-        var y = Dots2Pixels(int.Parse(command.Arguments[1]));
+        var x = int.Parse(command.Arguments[0]);
+        var y = int.Parse(command.Arguments[1]);
         var barcodeType = command.Arguments[2];
-        var height = Dots2Pixels(int.Parse(command.Arguments[3]));
+        var height = int.Parse(command.Arguments[3]);
         var (showText, textAlign) = int.Parse(command.Arguments[4]) switch
         {
             1 => (true, SKTextAlign.Left),
@@ -366,7 +364,7 @@ public class TsplRender
             _ => (false, SKTextAlign.Center),
         };
         var rotation = int.Parse(command.Arguments[5]);
-        var narrow = Dots2Pixels(int.Parse(command.Arguments[6]));
+        var narrow = int.Parse(command.Arguments[6]);
         var content = command.Arguments[^1];
         var barcodeFormat = barcodeType switch
         {
@@ -439,18 +437,13 @@ public class TsplRender
         
         if (!images.ContainsKey(filename)) return;
 
-        var x = Dots2Pixels(int.Parse(command.Arguments[0]));
-        var y = Dots2Pixels(int.Parse(command.Arguments[1]));
+        var x = int.Parse(command.Arguments[0]);
+        var y = int.Parse(command.Arguments[1]);
 
         var imageBytes = Convert.FromBase64String(images[filename]);
         var bitmap = SKBitmap.Decode(imageBytes);
-
-        var scaledWidth = (int)(bitmap.Width * (ScreenDpi / PrinterDpi));
-        var scaledHeight = (int)(bitmap.Height * (ScreenDpi / PrinterDpi));
-
-        var scaledBitmap = bitmap.Resize(new SKImageInfo(scaledWidth, scaledHeight), SKFilterQuality.High);
     
-        canvas.DrawBitmap(scaledBitmap, x, y);
+        canvas.DrawBitmap(bitmap, x, y);
     }
 
     private void RequireArguments(TsplDrawCommand command, int highestIndex)

@@ -1,6 +1,6 @@
-import { LabelPreviewRequest } from "../types/label";
+import { LabelPreview, LabelPreviewRequest } from "../types/label";
 
-export async function getLabelPreview(data: LabelPreviewRequest): Promise<string> {
+export async function getLabelPreview(data: LabelPreviewRequest): Promise<LabelPreview> {
     const res = await fetch('/api/tspl/preview', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -12,6 +12,8 @@ export async function getLabelPreview(data: LabelPreviewRequest): Promise<string
         throw new Error(error.message)
     }
 
-    const blob = await res.blob()
-    return URL.createObjectURL(blob)
+    const response = await res.json()
+    const labelPreview = {src: "data:image/png;base64," + response.labelPreview, labelWidth: response.previewWidth, labelHeight: response.previewHeight }
+
+    return labelPreview
 }

@@ -1,3 +1,3 @@
 namespace Altec.Api.Records;
 
-public record TsplPreviewResponse(int LineNumber, string Message);
+public record TsplPreviewResponse(byte[] LabelPreview, float PreviewWidth, float PreviewHeight);

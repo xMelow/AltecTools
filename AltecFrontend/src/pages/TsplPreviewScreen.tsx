@@ -3,19 +3,22 @@ import { getLabelPreview } from "../api/labels"
 import { useFetch } from "../hooks/useFetch"
 import CodeEditorField from "../components/CodeEditorField"
 import { useTsplContext } from "../context/TsplContext"
+import { LabelPreview } from "../types/label"
 
 export default function TsplScreen() {
     const { labelTspl, setLabelTspl, showBlockOutline, setBlockOutline, labelImages, setLabelImages, labelPreview, setLabelPreview } = useTsplContext()
-    const { loading, error, execute } = useFetch<string>()
+    const { loading, error, execute } = useFetch<LabelPreview>()
     const addImageInputRef = useRef<HTMLInputElement>(null)
+    const screenDpi = 96
+    const inchToMm = 25.4
 
     async function handlePreview() {
-        const data = await execute(() => getLabelPreview({
+        const preview = await execute(() => getLabelPreview({
             tspl: labelTspl,
             showBlockOutlines: showBlockOutline,
             images: labelImages
         }))
-        setLabelPreview(data)
+        setLabelPreview(preview)
     }
 
     function removeImage(fileName: string) {
@@ -145,7 +148,12 @@ export default function TsplScreen() {
                     <div className="overflow-y-auto px-4 pb-4 grow">
                         {error && <p className="text-sm text-red-500">{error}</p>}
                         {labelPreview
-                            ? <img className="border-2 border-altec-blue rounded-sm w-full max-w-md" src={labelPreview} alt="Label preview" />
+                            ? <img 
+                                className="border-2 border-altec-blue rounded-sm"
+                                style={{ width: (labelPreview.labelWidth / inchToMm) * screenDpi }}
+                                src={labelPreview.src} 
+                                alt="Label preview" 
+                            />
                             : <p className="text-xs text-gray-400">Preview will appear here...</p>
                         }
                     </div>
