@@ -11,11 +11,11 @@ public class WifiConnector : IPrinterConnection, IDisposable
     private readonly NetworkStream _stream;
     private const int PrinterPort = 9100;
     
-    public WifiConnector(IPAddress ipAddress)
+    public WifiConnector(string address)
     {
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
         _client = new TcpClient();
-        _client.ConnectAsync(ipAddress, PrinterPort, cts.Token).GetAwaiter().GetResult();
+        _client.ConnectAsync(address, PrinterPort, cts.Token).GetAwaiter().GetResult();
         _stream = _client.GetStream();
     }
 
