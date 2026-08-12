@@ -13,10 +13,13 @@ export default function PrinterFilesTab({address, sending, setSending, addLog }:
     const connectionType = location.state?.connectionType ?? "Wifi"
     const addInputRef = useRef<HTMLInputElement>(null)
 
-    function handleAddFileSelected(file: File | null) {
-        if (!file) return
-        const entry = newEntry(file)
-        setFileEntries(prev => [...prev, entry])
+    function handleAddFileSelected(files: FileList | null) {
+        if (!files) return
+        
+        Array.from(files)?.forEach(file => {
+            const entry = newEntry(file)
+            setFileEntries(prev => [...prev, entry])
+        })
     }
 
     function removeEntry(index: number) {
@@ -40,6 +43,15 @@ export default function PrinterFilesTab({address, sending, setSending, addLog }:
     async function handleSend() {
         const files = checkFilesToSend(fileEntries)
         if (!files) return
+
+        for (let i = 0; i < files.length; i++) {
+            try {
+                await files[i].file!.arrayBuffer()
+            } catch {
+                addLog("error", `${files[i].fileName} file content was updated reselect the file`)
+                return
+            }
+        }
 
         addLog("sent", `Files: ${files.map(e => e.fileName).join(", ")}`)
         setSending(true)
@@ -118,7 +130,8 @@ export default function PrinterFilesTab({address, sending, setSending, addLog }:
             <input type="file" 
                 className="hidden" ref={addInputRef}                                 
                 accept=".bas,.bmp"
-                onChange={(e) => handleAddFileSelected(e.target.files?.[0] ?? null)}
+                multiple
+                onChange={(e) => handleAddFileSelected(e.target.files ?? null)}
             />
 
             <button
@@ -133,7 +146,7 @@ export default function PrinterFilesTab({address, sending, setSending, addLog }:
                 onClick={handleSend}
                 disabled={!fileEntries.some(e => e.file !== null) || sending}
             >
-                {sending ? "Sending..." : "Send to Printer"}
+                {sending ? "Sending..." : "Send"}
             </button>
         </div>
     )
