@@ -44,6 +44,15 @@ export default function PrinterFilesTab({address, sending, setSending, addLog }:
         const files = checkFilesToSend(fileEntries)
         if (!files) return
 
+        for (let i = 0; i < files.length; i++) {
+            try {
+                await files[i].file!.arrayBuffer()
+            } catch {
+                addLog("error", `${files[i].fileName} file content was updated reselect the file`)
+                return
+            }
+        }
+
         addLog("sent", `Files: ${files.map(e => e.fileName).join(", ")}`)
         setSending(true)
         try {
@@ -137,7 +146,7 @@ export default function PrinterFilesTab({address, sending, setSending, addLog }:
                 onClick={handleSend}
                 disabled={!fileEntries.some(e => e.file !== null) || sending}
             >
-                {sending ? "Sending..." : "Send to Printer"}
+                {sending ? "Sending..." : "Send"}
             </button>
         </div>
     )
