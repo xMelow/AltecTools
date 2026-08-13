@@ -1,7 +1,6 @@
 import { useState } from "react"
 import { previewSerialNumbers, printSerialNumbers } from "../../api/automation"
 import { useFetch } from "../../hooks/useFetch";
-import { SerialNumberRequest } from "../../types/automation";
 
 export default function PrintSerialNumbers() {
     const [excelFile, setExcelFile] = useState<File | null>(null)
@@ -30,8 +29,6 @@ export default function PrintSerialNumbers() {
             <h2 className="text-xl font-semibold pt-1 mb-2 text-center">Serie nummers nieuwe printers</h2>
 
             <hr className="border-b border-altec-teal mb-4" />
-
-            
 
             <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide mb-1">File</p>
             <div className="flex flex-col gap-2 mb-4">

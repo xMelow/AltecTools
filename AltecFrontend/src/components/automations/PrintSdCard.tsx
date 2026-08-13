@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { useFetch } from "../../hooks/useFetch"
-import { SdCardRequest } from "../../types/automation"
 import { previewSdCardLabel, printSdCard } from "../../api/automation"
+import AutomationSpecs from "./AutomationSpecs"
 
 
 export default function PrintSdCard() {
@@ -47,7 +47,9 @@ export default function PrintSdCard() {
         <div className="shadow-md rounded-2xl p-3 bg-white w-1/4 border border-altec-teal">
             <h2 className="text-xl font-semibold pt-1 mb-2 text-center">Sd Kaart</h2>
 
-            <hr className="border-b border-altec-teal mb-4" />
+            <hr className="border-b border-altec-teal mb-3" />
+
+            <AutomationSpecs material="I00180" inktFolie="AR-10" printer="ATP-300 Pro"/>
 
             <div className="flex flex-col gap-2 mb-4">
                 <label className="text-xs font-semibold text-altec-teal uppercase tracking-wide mb-1">Order nummer</label>
