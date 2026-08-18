@@ -16,14 +16,14 @@ public class AutomationController : ControllerBase
     }
 
     [HttpPost("serialNumbersNewPrinters")]
-    public async Task<IActionResult> SerialNumbersNewPrinters(IFormFile excelFile, [FromForm] string printerType, [FromForm] string? printerName)
+    public async Task<IActionResult> SerialNumbersNewPrinters(IFormFile csvFile, [FromForm] string printerType, [FromForm] string? printerName)
     {
-        if (excelFile == null || excelFile.Length == 0) return BadRequest("Excel file must be present");
+        if (csvFile == null || csvFile.Length == 0) return BadRequest("Csv file must be present");
         if (printerType == null) return BadRequest("Printer Type must be present");
 
         try
         {
-            await _automationService.PrintSerialNumbers(excelFile, printerType, printerName);
+            await _automationService.PrintSerialNumbers(csvFile, printerType, printerName);
             return Ok("Labels printed");
         }
         catch (Exception ex)

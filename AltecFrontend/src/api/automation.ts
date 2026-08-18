@@ -2,7 +2,7 @@ import { SdCardRequest, SerialNumberRequest } from "../types/automation";
 
 export async function printSerialNumbers(body: SerialNumberRequest): Promise<string> {
     const formData = new FormData()
-    formData.append('excelFile', body.excelFile)
+    formData.append('csvFile', body.csvFile)
     formData.append('printerType', body.type)
 
     const res = await fetch(`/api/automation/serialNumbersNewPrinters`, {
@@ -17,7 +17,7 @@ export async function printSerialNumbers(body: SerialNumberRequest): Promise<str
 
 export async function previewSerialNumbers(body: SerialNumberRequest): Promise<string[]> {
     const formData = new FormData()
-    formData.append('excelFile', body.excelFile)
+    formData.append('csvFile', body.csvFile)
     formData.append('printerType', body.type)
 
     const res = await fetch(`/api/automation/serialNumbersLabelPreview`, {

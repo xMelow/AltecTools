@@ -13,14 +13,14 @@ export default function PrintSerialNumbers() {
         if (excelFile == null) return
 
         await execute(() => printSerialNumbers({
-            excelFile: excelFile,
+            csvFile: excelFile,
             type: printerType
         }))
     }
 
     async function getLabelPreview(file: File, type: string) {
         await executePreview(() => previewSerialNumbers({
-            excelFile: file,
+            csvFile: file,
             type: type,
         }))
     }
@@ -39,7 +39,7 @@ export default function PrintSerialNumbers() {
                     {excelFile?.name ?? "+ Select excel"}
                     <input
                         type="file"
-                        accept=".xlsx"
+                        accept=".csv"
                         className="hidden"
                         onChange={(e) => {
                             const file = e.target.files?.[0] ?? null

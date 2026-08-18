@@ -1,7 +1,5 @@
-﻿using System.Diagnostics;
-using System.Text.Json;
+﻿using System.Text.Json;
 using Altec.Api.Record.NiceLabel;
-using ClosedXML.Excel;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
@@ -19,9 +17,9 @@ public class AutomationService : IAutomationService
         _httpClient = httpClient;
     }
     
-    public async Task PrintSerialNumbers(IFormFile excelFile, string printerType, string? printerName)
+    public async Task PrintSerialNumbers(IFormFile csvFile, string printerType, string? printerName)
     {
-        var excelData = ReadExcelData(excelFile, printerType);
+        var excelData = ReadCsvData(csvFile, printerType);
         var requestData = BuildSerialNumbersContent(excelData, printerName);
         var request = new HttpRequestMessage(HttpMethod.Post, "/api/nicelabel/printLabelVariables")
         {
@@ -32,20 +30,19 @@ public class AutomationService : IAutomationService
         response.EnsureSuccessStatusCode();
     }
     
-    private List<SerialNumberData> ReadExcelData(IFormFile excelFile, string printerType)
+    private List<SerialNumberData> ReadCsvData(IFormFile csvFile, string printerType)
     {
-        var stream = excelFile.OpenReadStream();
-        var workbook = new XLWorkbook(stream);
-        var sheet1 = workbook.Worksheets.Worksheet("blad1");
+        using var reader = new StreamReader(csvFile.OpenReadStream());
         var serialNumbersList = new List<SerialNumberData>();
-
-        foreach (var row in sheet1.Rows().Skip(1))
+        string? line;
+        bool isFirstLine = true;
+        while ((line = reader.ReadLine()) != null)
         {
-            var sn = row.Cell(1).Value.ToString() ?? "";
-            var mac = row.Cell(2).Value.ToString() ?? "";
-            serialNumbersList.Add(new SerialNumberData(sn, mac, printerType));
+            if (isFirstLine) { isFirstLine = false; continue; }
+            var parts = line.Split(",");
+            if (parts.Length > 1) serialNumbersList.Add(new SerialNumberData(parts[0].Trim(), parts[1].Trim(), printerType));
         }
-        
+
         return serialNumbersList.OrderBy(serialData => int.Parse(new string(serialData.SerialNumber.Where(char.IsDigit).ToArray()))).ToList();
     }
     
@@ -53,7 +50,6 @@ public class AutomationService : IAutomationService
     {
         var requestData = new MultipartFormDataContent();
         var fileStream = File.OpenRead(_config["LabelPaths:SerialNewPrintersLabel"]);
-        
         var allVariables = serialNumbersList.Select(s => new Dictionary<string, string> {
             ["sn"] = s.SerialNumber,
             ["mac"] = s.MacAddress,
@@ -72,12 +68,11 @@ public class AutomationService : IAutomationService
         return requestData;
     }
 
-    public async Task<List<string>> PreviewSerialNumbers(IFormFile excelFile, string printerType)
+    public async Task<List<string>> PreviewSerialNumbers(IFormFile csvFile, string printerType)
     {
         const int labelsPerPage = 10;
-        var excelData = ReadExcelData(excelFile, printerType).Take(labelsPerPage).ToList();
+        var excelData = ReadCsvData(csvFile, printerType).Take(labelsPerPage).ToList();
         var requestData = BuildSerialNumbersContent(excelData, null);
-        
         var request = new HttpRequestMessage(HttpMethod.Post, "/api/nicelabel/labelPreviewBatch")
         {
             Content = requestData
