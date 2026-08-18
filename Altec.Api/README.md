@@ -24,118 +24,20 @@ Update `appsettings.json` with the NiceLabel SDK API URL:
 ```
 
 ## Endpoints
-All API endpoints.
+All API endpoints are documented via Swagger UI, available at `/swagger` when running in development.
 
-### TSPL
-
-#### Preview
-Returns an label preview of format png.
-
-`POST /api/tspl/preview`
-
-**Request**
-
-`json`
-
-| Parameter  | Type | Required | Description |
-|------------|------|----------|-------------|
-| tspl | string | yes | The label TSPL |
-| showBlockOutline | boolean | no | Show to outlining of block commands |
-| images | dictionary | no | Images on the label |
-
-**Response**
-
-```json
+## Project Structure
 
 ```
-- `200 OK` - Returns the label preview
-- `400 Bad Request` - If parameters fails
-
-### Printers
-
-#### Discover
-Returns a list of printers on the network
-
-`GET /api/printers/discover`
-
-**Request**
-
-`query parameters`
-
-| Parameter  | Type | Required | Description |
-|------------|------|----------|-------------|
-| subnets | string | no | The subnets to search on |
-
-**Response**
-
-```json
-{
-	"printers": [
-		{
-			"dnsName": "PRN-Ken.impuls-benelux.local",
-			"ipAddress": "192.168.0.62",
-			"model": "ATP-300 Pro",
-			"port": 9100
-		},
-		{
-			"dnsName": "PRN_Mikael.impuls-benelux.local",
-			"ipAddress": "192.168.0.69",
-			"model": "ATP-300Pro",
-			"port": 9100
-		},
-    ]
-}
-
-
+Altec.Api/
+├── Altec.Api/          # Main project
+│   ├── Controllers/    # API endpoints (Automation, NiceLabel, Printer, Tspl)
+│   ├── Domain/         # Core domain logic (Printers, Tspl)
+│   ├── Services/       # Application services (Automation, NiceLabel, Printers, Tspl)
+│   ├── Record/         # DTOs / request-response models
+│   └── Resource/       # Static assets (fonts, label templates)
+└── Altec.Api.Test/     # Tests
 ```
-- `200 OK` - Returns the list of printers
-- `400 Bad Request` - If parameters fails
-
-### NiceLabel
-
-#### Variables
-Returns a list of variables from a NiceLabel label file.
-
-`POST /api/nicelabel/variables`
-
-**Request**
-
-`multipart/form-data`
-
-| Parameter  | Type | Required | Description |
-|------------|------|----------|-------------|
-| label | file | yes | The NiceLabel label file |
-
-**Response**
-
-```json
-[
-  "Teller",
-  "Name"
-]
-```
-- `200 OK` - Returns list of strings
-- `400 Bad Request` - If parameters fails
-
-#### Print
-Prints a NiceLabel label file.
-
-`POST /api/nicelabel/print`
-
-**Request**
-
-`multipart/form-data`
-
-| Parameter   | Type | Required | Description                                                                 |
-|-------------|------|----------|-----------------------------------------------------------------------------|
-| label       | file | yes | The NiceLabel label file                                                    |
-| quantity    | int | yes | The print amount                                                            |
-| printerName | string | no | The name of the printer to print to if no printer is specified in the label |
-
-**Response**
-- `200 OK` - "Printing label..."
-- `400 Bad Request` - If validation fails
-- `500 Internal Server Error` - If printing fails
 
 ## License
 This is an internal tool developed for Altec. All rights reserved.

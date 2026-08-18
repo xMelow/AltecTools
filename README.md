@@ -24,7 +24,9 @@ Internal tooling built for Altec to support day-to-day printing and label workfl
 
 ## Getting Started
 
-Update `Altec.Api/Altec.Api/appsettings.json` with your NiceLabel SDK URL:
+Automations depend on [NiceLabelApi](https://github.com/xMelow/NiceLabelApi), a separate service that wraps the NiceLabel SDK. Clone it and follow its README to get it running before continuing.
+
+Update `Altec.Api/Altec.Api/appsettings.json` with your NiceLabel API URL:
 
 ```json
 {
