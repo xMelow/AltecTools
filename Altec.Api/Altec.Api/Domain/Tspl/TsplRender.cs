@@ -126,14 +126,19 @@ public class TsplRender
     
     private void DrawTextCommand(TsplDrawCommand command, SKCanvas canvas)
     {  
-        RequireArguments(command, 6);      
+        RequireArguments(command, 6);
         const double baseDotHeight = 3.6;
+        const double pointsPerInch = 72.0;
         var x = int.Parse(command.Arguments[0]);
         var y = int.Parse(command.Arguments[1]);
+        var printerFont = int.Parse(command.Arguments[2]);
         var yScale = int.Parse(command.Arguments[5]);
-        var fontSize = (int)(baseDotHeight * yScale);
         var rotation = int.Parse(command.Arguments[3]);
         var text = command.Arguments[^1];
+
+        var fontSize = printerFont < 1
+            ? (int)(yScale * (PrinterDpi / pointsPerInch))
+            : (int)(baseDotHeight * yScale);
 
         using var paint = new SKPaint
         {
@@ -148,9 +153,8 @@ public class TsplRender
             Embolden = true
         };
         
-        var textBounds = new SKRect();
-        paint.MeasureText(text, ref textBounds);
-        var yBaseline = y + textBounds.Height;
+        font.GetFontMetrics(out var metrics);
+        var yBaseline = y + Math.Abs(metrics.Ascent);
 
         canvas.Save();
         if (rotation > 0)
