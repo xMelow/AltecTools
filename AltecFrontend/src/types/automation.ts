@@ -1,6 +1,6 @@
 
 export type SerialNumberRequest = {
-    excelFile: File,
+    csvFile: File,
     type: string
 } 
 

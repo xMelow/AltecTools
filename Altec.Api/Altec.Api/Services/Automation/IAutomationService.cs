@@ -2,8 +2,8 @@
 
 public interface IAutomationService
 {
-    Task PrintSerialNumbers(IFormFile excelFile, string printerType, string? printerName);
-    Task<List<string>> PreviewSerialNumbers(IFormFile excelFile, string printerType);
+    Task PrintSerialNumbers(IFormFile csvFile, string printerType, string? printerName);
+    Task<List<string>> PreviewSerialNumbers(IFormFile csvFile, string printerType);
     Task PrintSdCardLabel(string orderNumber, string version, int amount);
     Task<string> SdCardLabelPreview(string orderNumber, string version);
 }

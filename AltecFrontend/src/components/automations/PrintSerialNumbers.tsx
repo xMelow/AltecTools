@@ -13,14 +13,14 @@ export default function PrintSerialNumbers() {
         if (excelFile == null) return
 
         await execute(() => printSerialNumbers({
-            excelFile: excelFile,
+            csvFile: excelFile,
             type: printerType
         }))
     }
 
     async function getLabelPreview(file: File, type: string) {
         await executePreview(() => previewSerialNumbers({
-            excelFile: file,
+            csvFile: file,
             type: type,
         }))
     }
@@ -36,10 +36,10 @@ export default function PrintSerialNumbers() {
             <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide mb-1">File</p>
             <div className="flex flex-col gap-2 mb-4">
                 <label className="text-sm text-altec-teal border border-dashed border-altec-teal rounded-xl p-2 hover:bg-altec-light transition-colors cursor-pointer text-center">
-                    {excelFile?.name ?? "+ Select excel"}
+                    {excelFile?.name ?? "+ Select csv"}
                     <input
                         type="file"
-                        accept=".xlsx"
+                        accept=".csv"
                         className="hidden"
                         onChange={(e) => {
                             const file = e.target.files?.[0] ?? null
