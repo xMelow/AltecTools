@@ -34,5 +34,4 @@ appsettings.Development.json
 Thumbs.db
 
 # ===== Claude Code =====
-CLAUDE.md
 .claude
