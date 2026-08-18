@@ -20,6 +20,7 @@ public class AutomationService : IAutomationService
     public async Task PrintSerialNumbers(IFormFile csvFile, string printerType, string? printerName)
     {
         var excelData = ReadCsvData(csvFile, printerType);
+        Console.WriteLine(excelData);
         var requestData = BuildSerialNumbersContent(excelData, printerName);
         var request = new HttpRequestMessage(HttpMethod.Post, "/api/nicelabel/printLabelVariables")
         {
@@ -36,13 +37,17 @@ public class AutomationService : IAutomationService
         var serialNumbersList = new List<SerialNumberData>();
         string? line;
         bool isFirstLine = true;
+        var lineNumber = 0;
+
         while ((line = reader.ReadLine()) != null)
         {
+            lineNumber++;
             if (isFirstLine) { isFirstLine = false; continue; }
-            var parts = line.Split(",");
-            if (parts.Length > 1) serialNumbersList.Add(new SerialNumberData(parts[0].Trim(), parts[1].Trim(), printerType));
+            var parts = line.Split(";");
+            if (parts.Length < 2) throw new ArgumentException($"Unable to parse: line:{lineNumber}");
+            
+            serialNumbersList.Add(new SerialNumberData(parts[0].Trim(), parts[1].Trim(), printerType));
         }
-
         return serialNumbersList.OrderBy(serialData => int.Parse(new string(serialData.SerialNumber.Where(char.IsDigit).ToArray()))).ToList();
     }
     

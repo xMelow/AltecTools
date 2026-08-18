@@ -36,7 +36,7 @@ export default function PrintSerialNumbers() {
             <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide mb-1">File</p>
             <div className="flex flex-col gap-2 mb-4">
                 <label className="text-sm text-altec-teal border border-dashed border-altec-teal rounded-xl p-2 hover:bg-altec-light transition-colors cursor-pointer text-center">
-                    {excelFile?.name ?? "+ Select excel"}
+                    {excelFile?.name ?? "+ Select csv"}
                     <input
                         type="file"
                         accept=".csv"
