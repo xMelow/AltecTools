@@ -56,6 +56,12 @@ export default function TsplScreen() {
         })
     }
 
+    function handleClear() {
+        console.log("test")
+        setLabelTspl("")
+        setLabelPreview(undefined)
+    }
+
     return (
         <div>
             <h2 className="text-center text-3xl font-bold text-altec-teal mb-4">TSPL Preview</h2>
@@ -120,13 +126,23 @@ export default function TsplScreen() {
                 <div className="flex-1 flex flex-col border rounded-2xl border-altec-teal bg-altec-white p-4 h-[75vh]">
                     <div className="flex justify-between items-center mb-2">
                         <h3 className="text-lg font-semibold">TSPL Code</h3>
-                        <button
-                            className="border bg-altec-teal text-altec-white px-4 py-1 rounded-xl text-sm disabled:opacity-50"
-                            onClick={handlePreview}
-                            disabled={loading}
-                        >
-                            {loading ? "Loading..." : "Preview"}
-                        </button>
+                        <div>
+                            <button
+                                className="border border-altec-teal text-altec-teal px-4 py-1 rounded-xl text-sm mr-2 hover:bg-altec-teal hover:text-altec-light"
+                                onClick={handleClear}
+                            >
+                                Clear
+                            </button>
+
+                            <button
+                                className="border bg-altec-teal text-altec-white text-altec-white px-4 py-1 rounded-xl text-sm disabled:opacity-50"
+                                onClick={handlePreview}
+                                disabled={loading}
+                            >
+                                {loading ? "Loading..." : "Preview"}
+                            </button>
+                        </div>
+                        
                     </div>
                     <hr className="border-b border-altec-teal mb-3" />
 
