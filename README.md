@@ -4,10 +4,10 @@ Internal tooling built for Altec to support day-to-day printing and label workfl
 
 ## Features
 
-- **TSPL** — Preview and validate TSPL label definitions
-- **Printers** — Discover and manage printers on the network
-- **Automations** — Predefined printing automations used at Altec, including NiceLabel variable extraction/printing and series number printing
-- **Ink/Foil Calculator** — Calculate ink or foil usage for label print jobs
+- **TSPL** — Preview TSPL label
+- **Printers** — Discover and manage printers
+- **Automations** — Predefined printing automations used at Altec
+- **Ink/Foil Calculator** — Calculate ink or foil usage
 
 ## Tech Stack
 
