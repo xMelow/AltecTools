@@ -49,7 +49,7 @@ export default function PrintSdCard() {
 
             <hr className="border-b border-altec-teal mb-3" />
 
-            <AutomationSpecs printer="ATP-300 Pro" material="I00180" inktFolie="AR-10"/>
+            <AutomationSpecs material="I00180" inktFolie="AR-10"/>
 
             <div className="flex flex-col gap-2 mb-4">
                 <label className="text-xs font-semibold text-altec-teal uppercase tracking-wide mb-1">Order nummer</label>

@@ -1,7 +1,7 @@
 type AutomationSpecsProps = {
     material?: string
     inktFolie?: string
-    printer: string
+    printer?: string
 }
 
 export default function AutomationSpecs({ material, inktFolie, printer }: AutomationSpecsProps) {
