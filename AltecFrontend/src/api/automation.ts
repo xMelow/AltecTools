@@ -68,8 +68,8 @@ export async function printTestRoom(body: TestRoomRequest): Promise<string> {
     formData.append('sensorType', body.sensorType)
     formData.append('speed', body.speed.toString())
     formData.append('density', body.density.toString())
-    formData.append('cutter', body.cutter)
-    formData.append('userLabel', body.userLabel.valueOf())
+    formData.append('cutter', body.cutter.toString())
+    formData.append('userLabel', body.userLabel.toString())
     formData.append('printer', body.printer)
 
     const res = await fetch(`/api/automation/testRoom`, {

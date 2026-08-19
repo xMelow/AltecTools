@@ -9,7 +9,7 @@ export default function TestRoom() {
     const [sensor, setSensor] = useState<string>("Gap")
     const [speed, setSpeed] = useState<number>(2)
     const [density, setDensity] = useState<number>(8)
-    const [printer, setPrinter] = useState<string>("Altec ATP-300 Pro")
+    const [printer, setPrinter] = useState<string>()
     const [printerList, setPrinterList] = useState<Printer[]>([])
     const [cutter, setCutter] = useState<boolean>(false)
     const [userLabel, setUserLabel] = useState<boolean>(false)
@@ -17,6 +17,7 @@ export default function TestRoom() {
     const { loading: loadingPrint, error: errorPrint, result: resultPrint, execute: executePrint } = useFetch<string>()
     
     async function sendPrint() {
+        if (printer == undefined) return
         await executePrint(() => printTestRoom({
             sensorType: sensor,
             speed: speed,
@@ -30,8 +31,12 @@ export default function TestRoom() {
     useEffect(() => {
         async function getPrinters() {        
             const response = await execute(() => getPrintersList())
-            if (response != undefined) setPrinterList(response)
-        }
+            if (response != undefined) {
+                setPrinterList(response)
+                setPrinter(response.find(p => p.name === "Altec ATP-300 Pro")?.name ?? response[0]?.name)
+            }
+        }   
+        
         getPrinters()
     }, [])
 
