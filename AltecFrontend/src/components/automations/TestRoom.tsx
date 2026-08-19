@@ -1,22 +1,27 @@
 import { useState } from "react"
 import AutomationSpecs from "./AutomationSpecs"
 import { useFetch } from "../../hooks/useFetch"
+import { getPrintersList } from "../../api/nicelabel"
+import { Printer } from "../../types/printer"
 
 export default function TestRoom() {
     const [sensor, setSensor] = useState<string>("Gap")
     const [speed, setSpeed] = useState<number>(2)
     const [density, setDensity] = useState<number>(8)
     const [printer, setPrinter] = useState<string>()
+    const [printerList, setPrinterList] = useState<Printer[]>([])
     const [cutter, setCutter] = useState<boolean>(false)
     const [userLabel, setUserLabel] = useState<boolean>(false)
-    const { loading, error, result, execute } = useFetch<string>()
+    const { loading, error, result, execute } = useFetch<Printer[]>()
     
     function sendPrint() {
 
     }
 
-    function getPrinters() {        
-        
+    async function getPrinters() {        
+        await execute(() => getPrintersList())
+        if (result != undefined) setPrinterList(result)
+        console.log(result)
     }
 
     return ( 
@@ -123,7 +128,7 @@ export default function TestRoom() {
 
             <button
                 className="w-full border bg-altec-teal text-altec-white p-1.5 rounded-xl mt-2"
-                onClick={sendPrint}
+                onClick={getPrinters}
                 disabled={loading}
             >
                 {loading ? 'Loading...' : 'Print'}
