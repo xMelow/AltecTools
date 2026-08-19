@@ -3,6 +3,8 @@ using Microsoft.Extensions.Options;
 using SkiaSharp;
 using ZXing;
 using ZXing.Common;
+using ZXing.QrCode;
+using ZXing.QrCode.Internal;
 using ZXing.SkiaSharp.Rendering;
 
 namespace Altec.Api.Domain.Tspl;
@@ -310,6 +312,7 @@ public class TsplRender
         RequireArguments(command, 6);
         var x = int.Parse(command.Arguments[0]);
         var y = int.Parse(command.Arguments[1]);
+        var correctionLevel = command.Arguments[2];
         var cellWidth = int.Parse(command.Arguments[3]);
         var rotation = int.Parse(command.Arguments[5]);
         var content = command.Arguments[^1];
@@ -317,7 +320,18 @@ public class TsplRender
         var writer = new BarcodeWriter<SKBitmap>
         {
             Format = BarcodeFormat.QR_CODE,
-            Options = new EncodingOptions { Margin = 1 },
+            Options = new QrCodeEncodingOptions 
+            { 
+                Margin = 1,
+                ErrorCorrection = correctionLevel switch 
+                { 
+                    "L" => ErrorCorrectionLevel.L, 
+                    "M" => ErrorCorrectionLevel.M, 
+                    "Q" => ErrorCorrectionLevel.Q, 
+                    "H" => ErrorCorrectionLevel.H,
+                    _ => throw new ArgumentException($"Unknown QR code error correction level '{correctionLevel}'. Expected L, M, Q, or H.")
+                }
+            },
             Renderer = new SKBitmapRenderer()
         };
 
