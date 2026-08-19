@@ -1,8 +1,11 @@
-﻿namespace Altec.Api.Services.NiceLabel;
+﻿using Altec.Api.Record.Printers;
+
+namespace Altec.Api.Services.NiceLabel;
 
 public interface INiceLabelClient
 { 
     Task<IReadOnlyList<string>> GetVariables(IFormFile labelFile);
     Task PrintLabel(IFormFile labelFile,int quantity, string? printerIpAddress);
     Task<byte[]> GetLabelPreview(IFormFile labelFile, Dictionary<string, string> variables, int width, int height);
+    Task<List<Printer>> GetPrinters();
 }

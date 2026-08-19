@@ -74,4 +74,18 @@ public class NiceLabelController : ControllerBase
             return BadRequest($"Error creating label preview : {ex.Message}" );
         }
     }
+
+    [HttpGet("printers")]
+    public async Task<IActionResult> GetPrinters()
+    {
+        try
+        {
+            var printers = await _niceLabelClient.GetPrinters();
+            return Ok(printers);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest($"Error getting label variables : {ex.Message}" );
+        }
+    }
 }
