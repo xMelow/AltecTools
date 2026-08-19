@@ -1,7 +1,10 @@
 ﻿using Altec.Api.Records;
+using Microsoft.Extensions.Options;
 using SkiaSharp;
 using ZXing;
 using ZXing.Common;
+using ZXing.QrCode;
+using ZXing.QrCode.Internal;
 using ZXing.SkiaSharp.Rendering;
 
 namespace Altec.Api.Domain.Tspl;
@@ -307,26 +310,39 @@ public class TsplRender
     private void DrawQrcodeCommand(TsplDrawCommand command, SKCanvas canvas)
     {
         RequireArguments(command, 6);
-        const int qrGridCells = 25;
         var x = int.Parse(command.Arguments[0]);
         var y = int.Parse(command.Arguments[1]);
-        var content = command.Arguments[^1];
+        var correctionLevel = command.Arguments[2];
         var cellWidth = int.Parse(command.Arguments[3]);
         var rotation = int.Parse(command.Arguments[5]);
-        var size = cellWidth * qrGridCells;
+        var content = command.Arguments[^1];
 
         var writer = new BarcodeWriter<SKBitmap>
         {
             Format = BarcodeFormat.QR_CODE,
-            Options = new EncodingOptions
-            {
-                Width = (int)size,
-                Height = (int)size,
-                Margin = 1
+            Options = new QrCodeEncodingOptions 
+            { 
+                Margin = 4,
+                ErrorCorrection = correctionLevel switch 
+                { 
+                    "L" => ErrorCorrectionLevel.L, 
+                    "M" => ErrorCorrectionLevel.M, 
+                    "Q" => ErrorCorrectionLevel.Q, 
+                    "H" => ErrorCorrectionLevel.H,
+                    _ => throw new ArgumentException($"Unknown QR code error correction level '{correctionLevel}'. Expected L, M, Q, or H.")
+                }
             },
             Renderer = new SKBitmapRenderer()
         };
+
+        var bitMatrix = writer.Encode(content);
+        var qrSize = cellWidth * bitMatrix.Width;
+
+        writer.Options.Width = qrSize;
+        writer.Options.Height = qrSize;
+
         var qrBitmap = writer.Write(content);
+
         canvas.Save();
         
         if (rotation > 0)
