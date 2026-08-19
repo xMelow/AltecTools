@@ -1,28 +1,39 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import AutomationSpecs from "./AutomationSpecs"
 import { useFetch } from "../../hooks/useFetch"
 import { getPrintersList } from "../../api/nicelabel"
 import { Printer } from "../../types/printer"
+import { printTestRoom } from "../../api/automation"
 
 export default function TestRoom() {
     const [sensor, setSensor] = useState<string>("Gap")
     const [speed, setSpeed] = useState<number>(2)
     const [density, setDensity] = useState<number>(8)
-    const [printer, setPrinter] = useState<string>()
+    const [printer, setPrinter] = useState<string>("Altec ATP-300 Pro")
     const [printerList, setPrinterList] = useState<Printer[]>([])
     const [cutter, setCutter] = useState<boolean>(false)
     const [userLabel, setUserLabel] = useState<boolean>(false)
     const { loading, error, result, execute } = useFetch<Printer[]>()
+    const { loading: loadingPrint, error: errorPrint, result: resultPrint, execute: executePrint } = useFetch<string>()
     
-    function sendPrint() {
-
+    async function sendPrint() {
+        await executePrint(() => printTestRoom({
+            sensorType: sensor,
+            speed: speed,
+            density: density,
+            cutter: cutter,
+            userLabel: userLabel,
+            printer: printer
+        }))
     }
 
-    async function getPrinters() {        
-        await execute(() => getPrintersList())
-        if (result != undefined) setPrinterList(result)
-        console.log(result)
-    }
+    useEffect(() => {
+        async function getPrinters() {        
+            const response = await execute(() => getPrintersList())
+            if (response != undefined) setPrinterList(response)
+        }
+        getPrinters()
+    }, [])
 
     return ( 
         <div className="shadow-md rounded-2xl p-3 bg-white w-1/4 border border-altec-teal">
@@ -122,13 +133,15 @@ export default function TestRoom() {
                     value={printer}
                     onChange={(e) => setPrinter(e.target.value)}
                 >
-                    <option value="ATP">ATP 300 Pro</option>
+                    {printerList.map(printer => (
+                        <option key={printer.name} value={printer.name}>{printer.name}</option>
+                    ))}
                 </select>
             </div>
 
             <button
                 className="w-full border bg-altec-teal text-altec-white p-1.5 rounded-xl mt-2"
-                onClick={getPrinters}
+                onClick={sendPrint}
                 disabled={loading}
             >
                 {loading ? 'Loading...' : 'Print'}
