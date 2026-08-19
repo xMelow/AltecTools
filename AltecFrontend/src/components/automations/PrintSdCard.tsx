@@ -9,7 +9,7 @@ export default function PrintSdCard() {
     const [version, setVersion] = useState<string>("v1")
     const [amount, setAmount] = useState<number>(1)
     const { loading, error, result, execute } = useFetch<string>()
-     const { loading: previewLoading, error: previewError, result: labelPreview, execute: executePreview } = useFetch<string>()
+    const { loading: previewLoading, error: previewError, result: labelPreview, execute: executePreview } = useFetch<string>()
 
     function sendRequest() {
         if (orderNumber == null || version == null || amount == null || amount == 0) return
