@@ -322,7 +322,7 @@ public class TsplRender
             Format = BarcodeFormat.QR_CODE,
             Options = new QrCodeEncodingOptions 
             { 
-                Margin = 1,
+                Margin = 4,
                 ErrorCorrection = correctionLevel switch 
                 { 
                     "L" => ErrorCorrectionLevel.L, 
