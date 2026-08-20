@@ -22,7 +22,7 @@ public class AutomationService : IAutomationService
         var excelData = ReadCsvData(csvFile, printerType);
         Console.WriteLine(excelData);
         var requestData = BuildSerialNumbersContent(excelData, printerName);
-        var request = new HttpRequestMessage(HttpMethod.Post, "/api/nicelabel/printLabelVariables")
+        var request = new HttpRequestMessage(HttpMethod.Post, "/api/nicelabel/printVariableLabel")
         {
             Content = requestData
         };
@@ -139,7 +139,7 @@ public class AutomationService : IAutomationService
         StreamContent labelStream = new StreamContent(fileStream);
         requestData.Add(labelStream, "label");
             
-        var request = new HttpRequestMessage(HttpMethod.Post, "/api/nicelabel/printLabelVariables")
+        var request = new HttpRequestMessage(HttpMethod.Post, "/api/nicelabel/printVariableLabel")
         {
             Content = requestData
         };
@@ -212,7 +212,7 @@ public class AutomationService : IAutomationService
             var json = JsonSerializer.Serialize(variables);
             requestData.Add(new StringContent(json), "variables");
             
-            var request = new HttpRequestMessage(HttpMethod.Post, "/api/nicelabel/")
+            var request = new HttpRequestMessage(HttpMethod.Post, "/api/nicelabel/printLabelWithSettings")
             {
                 Content = requestData
             };

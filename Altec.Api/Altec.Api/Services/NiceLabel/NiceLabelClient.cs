@@ -42,7 +42,7 @@ public class NiceLabelClient : INiceLabelClient
         if (printerName != null)
             content.Add(new StringContent(printerName), "printerName");
         
-        var request = new HttpRequestMessage(HttpMethod.Post, "/api/nicelabel/print");
+        var request = new HttpRequestMessage(HttpMethod.Post, "/api/nicelabel/printLabel");
         request.Content = content;
         
         var response = await _httpClient.SendAsync(request);
