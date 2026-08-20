@@ -162,7 +162,7 @@ public class AutomationService : IAutomationService
 
         var json = JsonSerializer.Serialize(data);
         requestData.Add(new StringContent(json), "variables");
-                
+        
         StreamContent labelStream = new StreamContent(fileStream);
         requestData.Add(labelStream, "label");
             
@@ -179,5 +179,46 @@ public class AutomationService : IAutomationService
         if (result == null) throw new InvalidOperationException("Failed to deserialize label preview response");
 
         return Convert.ToBase64String(result[0]);
+    }
+
+    public async Task PrintTestRoomLabel(string sensorType, int speed, int density, bool cutter, bool userLabel, string printer)
+    {
+        string sensorLabel = sensorType;
+        var labelAmount = userLabel ? 5 : 4;
+        var variables = new Dictionary<string, string>
+        {
+            ["Speed"] = speed.ToString(),
+            ["Density"] = density.ToString(),
+            ["Cutter"] = cutter.ToString(),
+            ["Printer"] = printer
+        };
+
+        for (int i = 0; i < labelAmount; i++)
+        {
+            var requestData = new MultipartFormDataContent();
+            var labelCount = i + 1;
+
+            if (sensorType == "Beide")
+            {
+                if (labelCount is 1 or 2 or 4) sensorLabel = "Gap";
+                else sensorLabel = "Mark";
+            }
+            
+            using var fileStream = File.OpenRead(_config[$"LabelPaths:Testlabel-{sensorLabel}-{labelCount}"]);
+
+            StreamContent labelStream = new StreamContent(fileStream);
+            requestData.Add(labelStream, "label");
+
+            var json = JsonSerializer.Serialize(variables);
+            requestData.Add(new StringContent(json), "variables");
+            
+            var request = new HttpRequestMessage(HttpMethod.Post, "/api/nicelabel/")
+            {
+                Content = requestData
+            };
+
+            var response = await _httpClient.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+        }
     }
 }

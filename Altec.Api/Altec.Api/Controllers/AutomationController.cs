@@ -81,4 +81,21 @@ public class AutomationController : ControllerBase
             return BadRequest($"Error: {ex.Message}");
         }
     }
+
+    [HttpPost("printTestRoom")]
+    public async Task<IActionResult> PrintTestRoomLabel([FromForm] string sensorType, [FromForm] int speed, [FromForm] int density, [FromForm] bool cutter, [FromForm] bool userLabel, [FromForm] string printer)
+    {
+        if (string.IsNullOrEmpty(sensorType)) return BadRequest("Sensor type must be present");
+        // add more param checks
+
+        try
+        {
+            await _automationService.PrintTestRoomLabel(sensorType, speed, density, cutter, userLabel, printer);
+            return Ok("Labels printed");
+        }
+        catch (Exception ex)
+        {
+            return BadRequest($"Error: {ex.Message}");
+        }
+    }
 }

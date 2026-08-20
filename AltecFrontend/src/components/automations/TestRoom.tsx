@@ -147,7 +147,7 @@ export default function TestRoom() {
             <button
                 className="w-full border bg-altec-teal text-altec-white p-1.5 rounded-xl mt-2"
                 onClick={sendPrint}
-                disabled={loading}
+                disabled={loadingPrint}
             >
                 {loading ? 'Loading...' : 'Print'}
             </button>
