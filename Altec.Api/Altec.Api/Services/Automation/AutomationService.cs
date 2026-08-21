@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using Altec.Api.Record.NiceLabel;
+using DocumentFormat.OpenXml.Drawing.Charts;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
@@ -183,23 +184,12 @@ public class AutomationService : IAutomationService
 
     public async Task PrintTestRoomLabel(string sensorType, int speed, int density, bool cutter, bool userLabel, string printer)
     {
-        string sensorLabel = sensorType;
-        var labelAmount = userLabel ? 5 : 4;
-        var printSettings = new Dictionary<string, string>
-        {
-            ["PrintSpeed"] = speed.ToString(),
-            ["PrintDarkness"] = density.ToString(),
-        };
-        var labelVariables = new Dictionary<string, string>
-        {
-            ["cutLabel"] = cutter.ToString(),
-            ["PrinterTeGebruiken"] = printer
-        };
+        var (sensorLabel, labelCount, labelVariables, printSettings) = BuildTestRoomData(sensorType, speed, density, cutter, userLabel, printer);
 
-        for (int i = 0; i < labelAmount; i++)
+        for (int i = 0; i < labelCount; i++)
         {
             var requestData = new MultipartFormDataContent();
-            var labelCount = i + 1;
+            var labelCounter = i + 1;
 
             if (sensorType == "BOTH")
             {
@@ -207,7 +197,7 @@ public class AutomationService : IAutomationService
                 else sensorLabel = "Mark";
             }
             
-            using var fileStream = File.OpenRead(_config[$"LabelPaths:Testlabel-{sensorLabel}-{labelCount}"]);
+            using var fileStream = File.OpenRead(_config[$"LabelPaths:Testlabel-{sensorLabel}-{labelCounter}"]);
 
             StreamContent labelStream = new StreamContent(fileStream);
             requestData.Add(labelStream, "label");
@@ -226,9 +216,36 @@ public class AutomationService : IAutomationService
             };
 
             var response = await _httpClient.SendAsync(request);
-            var body = await response.Content.ReadAsStringAsync();
-            Console.WriteLine(body);
             response.EnsureSuccessStatusCode();
         }
     }
+
+    private (string sensorLabel, int labelCounter, Dictionary<string, string> labelVariables, Dictionary<string,string> printSettings) BuildTestRoomData(string sensorType, int speed, int density, bool cutter, bool userLabel, string printer)
+    {
+        string sensorLabel = sensorType;
+        var labelCounter = userLabel ? 5 : 4;
+        var printSettings = new Dictionary<string, string>
+        {
+            ["PrintSpeed"] = speed.ToString(),
+            ["PrintDarkness"] = density.ToString(),
+        };
+        var labelVariables = new Dictionary<string, string>
+        {
+            ["cutLabel"] = cutter.ToString(),
+            ["PrinterTeGebruiken"] = printer
+        };
+
+        return (sensorLabel, labelCounter, labelVariables, printSettings);
+    }
+
+    private string PrintTestRoomAsignSensor(string sensor)
+    {
+        
+    }
+
+    private void BuildPrintTestRoomRequest(Stream label, string printerName, Dictionary<string, string> labelVariables, Dictionary<string, string> printSettings)
+    {
+        
+    }
+
 }
