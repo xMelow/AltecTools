@@ -185,12 +185,10 @@ public class AutomationService : IAutomationService
     {
         string sensorLabel = sensorType;
         var labelAmount = userLabel ? 5 : 4;
-        var variables = new Dictionary<string, string>
+        var printSettings = new Dictionary<string, string>
         {
-            ["Speed"] = speed.ToString(),
-            ["Density"] = density.ToString(),
-            ["Cutter"] = cutter.ToString(),
-            ["Printer"] = printer
+            ["PrintSpeed"] = speed.ToString(),
+            ["PrintDarkness"] = density.ToString(),
         };
 
         for (int i = 0; i < labelAmount; i++)
@@ -198,7 +196,7 @@ public class AutomationService : IAutomationService
             var requestData = new MultipartFormDataContent();
             var labelCount = i + 1;
 
-            if (sensorType == "Beide")
+            if (sensorType == "BOTH")
             {
                 if (labelCount is 1 or 2 or 4) sensorLabel = "Gap";
                 else sensorLabel = "Mark";
@@ -209,8 +207,10 @@ public class AutomationService : IAutomationService
             StreamContent labelStream = new StreamContent(fileStream);
             requestData.Add(labelStream, "label");
 
-            var json = JsonSerializer.Serialize(variables);
-            requestData.Add(new StringContent(json), "variables");
+            requestData.Add(new StringContent(printer), "printerName");
+
+            var json = JsonSerializer.Serialize(printSettings);
+            requestData.Add(new StringContent(json), "printSettings");
             
             var request = new HttpRequestMessage(HttpMethod.Post, "/api/nicelabel/printLabelWithSettings")
             {

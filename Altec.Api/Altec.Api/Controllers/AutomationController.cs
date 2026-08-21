@@ -82,7 +82,7 @@ public class AutomationController : ControllerBase
         }
     }
 
-    [HttpPost("printTestRoom")]
+    [HttpPost("testRoom")]
     public async Task<IActionResult> PrintTestRoomLabel([FromForm] string sensorType, [FromForm] int speed, [FromForm] int density, [FromForm] bool cutter, [FromForm] bool userLabel, [FromForm] string printer)
     {
         if (string.IsNullOrEmpty(sensorType)) return BadRequest("Sensor type must be present");
