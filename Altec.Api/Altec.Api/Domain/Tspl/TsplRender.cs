@@ -321,13 +321,13 @@ public class TsplRender
         {
             Format = BarcodeFormat.QR_CODE,
             Options = new QrCodeEncodingOptions 
-            { 
+            {
                 Margin = 4,
-                ErrorCorrection = correctionLevel switch 
+                ErrorCorrection = correctionLevel switch
                 { 
-                    "L" => ErrorCorrectionLevel.L, 
-                    "M" => ErrorCorrectionLevel.M, 
-                    "Q" => ErrorCorrectionLevel.Q, 
+                    "L" => ErrorCorrectionLevel.L,
+                    "M" => ErrorCorrectionLevel.M,
+                    "Q" => ErrorCorrectionLevel.Q,
                     "H" => ErrorCorrectionLevel.H,
                     _ => throw new ArgumentException($"Unknown QR code error correction level '{correctionLevel}'. Expected L, M, Q, or H.")
                 }

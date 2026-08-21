@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using Altec.Api.Record.NiceLabel;
+using DocumentFormat.OpenXml.Drawing.Charts;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
@@ -22,7 +23,7 @@ public class AutomationService : IAutomationService
         var excelData = ReadCsvData(csvFile, printerType);
         Console.WriteLine(excelData);
         var requestData = BuildSerialNumbersContent(excelData, printerName);
-        var request = new HttpRequestMessage(HttpMethod.Post, "/api/nicelabel/printLabelVariables")
+        var request = new HttpRequestMessage(HttpMethod.Post, "/api/nicelabel/printVariableLabel")
         {
             Content = requestData
         };
@@ -139,7 +140,7 @@ public class AutomationService : IAutomationService
         StreamContent labelStream = new StreamContent(fileStream);
         requestData.Add(labelStream, "label");
             
-        var request = new HttpRequestMessage(HttpMethod.Post, "/api/nicelabel/printLabelVariables")
+        var request = new HttpRequestMessage(HttpMethod.Post, "/api/nicelabel/printVariableLabel")
         {
             Content = requestData
         };
@@ -162,7 +163,7 @@ public class AutomationService : IAutomationService
 
         var json = JsonSerializer.Serialize(data);
         requestData.Add(new StringContent(json), "variables");
-                
+        
         StreamContent labelStream = new StreamContent(fileStream);
         requestData.Add(labelStream, "label");
             
@@ -179,5 +180,72 @@ public class AutomationService : IAutomationService
         if (result == null) throw new InvalidOperationException("Failed to deserialize label preview response");
 
         return Convert.ToBase64String(result[0]);
+    }
+
+    public async Task PrintTestRoomLabel(string sensorType, int speed, int density, bool cutter, bool userLabel, string printer)
+    {
+        var (totalLabels, labelVariables, printSettings) = BuildTestRoomData(sensorType, speed, density, cutter, userLabel, printer);
+
+        for (int i = 0; i < totalLabels; i++)
+        {
+            var labelNumber = i + 1;
+            var sensorLabel = AssignLabelSensor(sensorType, labelNumber);
+            var requestData = BuildPrintTestRoomRequestData(sensorLabel, labelNumber, printer, labelVariables, printSettings);
+
+            var request = new HttpRequestMessage(HttpMethod.Post, "/api/nicelabel/printLabelWithSettings")
+            {
+                Content = requestData
+            };
+
+            var response = await _httpClient.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+        }
+    }
+
+    private (int totalLabels, Dictionary<string, string> labelVariables, Dictionary<string,string> printSettings) BuildTestRoomData(string sensorType, int speed, int density, bool cutter, bool userLabel, string printer)
+    {
+        var totalLabels = userLabel ? 5 : 4;
+        var printSettings = new Dictionary<string, string>
+        {
+            ["PrintSpeed"] = speed.ToString(),
+            ["PrintDarkness"] = density.ToString(),
+        };
+        var labelVariables = new Dictionary<string, string>
+        {
+            ["cutLabel"] = cutter.ToString(),
+            ["PrinterTeGebruiken"] = printer
+        };
+
+        return (totalLabels, labelVariables, printSettings);
+    }
+
+    private string AssignLabelSensor(string sensor, int labelNumber)
+    {
+        if (sensor == "BOTH")
+        {
+            if (labelNumber is 1 or 2 or 4) return "Gap";
+            else return "Mark";
+        }
+
+        return sensor;
+    }
+
+    private MultipartFormDataContent BuildPrintTestRoomRequestData(string sensorLabel, int labelNumber, string printerName, Dictionary<string, string> labelVariables, Dictionary<string, string> printSettings)
+    {
+        var requestData = new MultipartFormDataContent();
+        using var fileStream = File.OpenRead(_config[$"LabelPaths:Testlabel-{sensorLabel}-{labelNumber}"]);
+
+        StreamContent labelStream = new StreamContent(fileStream);
+        requestData.Add(labelStream, "label");
+
+        requestData.Add(new StringContent(printerName), "printerName");
+
+        var jsonSettings = JsonSerializer.Serialize(printSettings);
+        requestData.Add(new StringContent(jsonSettings), "printSettings");
+
+        var jsonVariables = JsonSerializer.Serialize(labelVariables);
+        requestData.Add(new StringContent(jsonVariables), "labelVariables");
+
+        return requestData;
     }
 }

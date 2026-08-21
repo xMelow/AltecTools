@@ -1,4 +1,4 @@
-import { SdCardRequest, SerialNumberRequest } from "../types/automation";
+import { SdCardRequest, SerialNumberRequest, TestRoomRequest } from "../types/automation";
 
 export async function printSerialNumbers(body: SerialNumberRequest): Promise<string> {
     const formData = new FormData()
@@ -61,4 +61,23 @@ export async function previewSdCardLabel(body: SdCardRequest): Promise<string> {
     const data = await res.json()
 
     return data.image
+}
+
+export async function printTestRoom(body: TestRoomRequest): Promise<string> {
+    const formData = new FormData()
+    formData.append('sensorType', body.sensorType)
+    formData.append('speed', body.speed.toString())
+    formData.append('density', body.density.toString())
+    formData.append('cutter', body.cutter.toString())
+    formData.append('userLabel', body.userLabel.toString())
+    formData.append('printer', body.printer)
+
+    const res = await fetch(`/api/automation/testRoom`, {
+        method: 'POST',
+        body: formData
+    })
+
+    if (!res.ok) throw new Error("Failed to print test room label")
+
+    return await res.text()
 }

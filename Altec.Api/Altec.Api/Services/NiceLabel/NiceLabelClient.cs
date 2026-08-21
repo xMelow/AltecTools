@@ -1,9 +1,5 @@
-﻿using System.Net.Http.Headers;
-using System.Text.Json;
-using Altec.Api.Record.NiceLabel;
-using ClosedXML.Excel;
-using DocumentFormat.OpenXml.Drawing.Charts;
-using DocumentFormat.OpenXml.Office2010.ExcelAc;
+﻿using System.Text.Json;
+using Altec.Api.Record.Printers;
 
 namespace Altec.Api.Services.NiceLabel;
 
@@ -46,7 +42,7 @@ public class NiceLabelClient : INiceLabelClient
         if (printerName != null)
             content.Add(new StringContent(printerName), "printerName");
         
-        var request = new HttpRequestMessage(HttpMethod.Post, "/api/nicelabel/print");
+        var request = new HttpRequestMessage(HttpMethod.Post, "/api/nicelabel/printLabel");
         request.Content = content;
         
         var response = await _httpClient.SendAsync(request);
@@ -77,6 +73,20 @@ public class NiceLabelClient : INiceLabelClient
         response.EnsureSuccessStatusCode();
         
         var result = await response.Content.ReadAsByteArrayAsync();
+        return result;
+    }
+
+    public async Task<List<Printer>> GetPrinters()
+    {
+        var request = new HttpRequestMessage(HttpMethod.Get, "/api/nicelabel/printers");
+        var response = await _httpClient.SendAsync(request);
+        
+        response.EnsureSuccessStatusCode();
+        
+        var result = await response.Content.ReadFromJsonAsync<List<Printer>>();
+
+        if (result == null) throw new InvalidOperationException("Failed to deserialize printers response");
+
         return result;
     }
 }
