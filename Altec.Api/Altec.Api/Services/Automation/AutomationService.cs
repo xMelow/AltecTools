@@ -190,6 +190,11 @@ public class AutomationService : IAutomationService
             ["PrintSpeed"] = speed.ToString(),
             ["PrintDarkness"] = density.ToString(),
         };
+        var labelVariables = new Dictionary<string, string>
+        {
+            ["cutLabel"] = cutter.ToString(),
+            ["PrinterTeGebruiken"] = printer
+        };
 
         for (int i = 0; i < labelAmount; i++)
         {
@@ -209,8 +214,11 @@ public class AutomationService : IAutomationService
 
             requestData.Add(new StringContent(printer), "printerName");
 
-            var json = JsonSerializer.Serialize(printSettings);
-            requestData.Add(new StringContent(json), "printSettings");
+            var jsonSettings = JsonSerializer.Serialize(printSettings);
+            requestData.Add(new StringContent(jsonSettings), "printSettings");
+
+            var jsonVariables = JsonSerializer.Serialize(labelVariables);
+            requestData.Add(new StringContent(jsonVariables), "labelVariables");
             
             var request = new HttpRequestMessage(HttpMethod.Post, "/api/nicelabel/printLabelWithSettings")
             {
@@ -218,6 +226,8 @@ public class AutomationService : IAutomationService
             };
 
             var response = await _httpClient.SendAsync(request);
+            var body = await response.Content.ReadAsStringAsync();
+            Console.WriteLine(body);
             response.EnsureSuccessStatusCode();
         }
     }
