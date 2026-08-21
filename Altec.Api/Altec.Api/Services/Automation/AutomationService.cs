@@ -184,32 +184,14 @@ public class AutomationService : IAutomationService
 
     public async Task PrintTestRoomLabel(string sensorType, int speed, int density, bool cutter, bool userLabel, string printer)
     {
-        var (sensorLabel, labelCount, labelVariables, printSettings) = BuildTestRoomData(sensorType, speed, density, cutter, userLabel, printer);
+        var (totalLabels, labelVariables, printSettings) = BuildTestRoomData(sensorType, speed, density, cutter, userLabel, printer);
 
-        for (int i = 0; i < labelCount; i++)
+        for (int i = 0; i < totalLabels; i++)
         {
-            var requestData = new MultipartFormDataContent();
-            var labelCounter = i + 1;
+            var labelNumber = i + 1;
+            var sensorLabel = AssignLabelSensor(sensorType, labelNumber);
+            var requestData = BuildPrintTestRoomRequestData(sensorLabel, labelNumber, printer, labelVariables, printSettings);
 
-            if (sensorType == "BOTH")
-            {
-                if (labelCount is 1 or 2 or 4) sensorLabel = "Gap";
-                else sensorLabel = "Mark";
-            }
-            
-            using var fileStream = File.OpenRead(_config[$"LabelPaths:Testlabel-{sensorLabel}-{labelCounter}"]);
-
-            StreamContent labelStream = new StreamContent(fileStream);
-            requestData.Add(labelStream, "label");
-
-            requestData.Add(new StringContent(printer), "printerName");
-
-            var jsonSettings = JsonSerializer.Serialize(printSettings);
-            requestData.Add(new StringContent(jsonSettings), "printSettings");
-
-            var jsonVariables = JsonSerializer.Serialize(labelVariables);
-            requestData.Add(new StringContent(jsonVariables), "labelVariables");
-            
             var request = new HttpRequestMessage(HttpMethod.Post, "/api/nicelabel/printLabelWithSettings")
             {
                 Content = requestData
@@ -220,10 +202,9 @@ public class AutomationService : IAutomationService
         }
     }
 
-    private (string sensorLabel, int labelCounter, Dictionary<string, string> labelVariables, Dictionary<string,string> printSettings) BuildTestRoomData(string sensorType, int speed, int density, bool cutter, bool userLabel, string printer)
+    private (int totalLabels, Dictionary<string, string> labelVariables, Dictionary<string,string> printSettings) BuildTestRoomData(string sensorType, int speed, int density, bool cutter, bool userLabel, string printer)
     {
-        string sensorLabel = sensorType;
-        var labelCounter = userLabel ? 5 : 4;
+        var totalLabels = userLabel ? 5 : 4;
         var printSettings = new Dictionary<string, string>
         {
             ["PrintSpeed"] = speed.ToString(),
@@ -235,17 +216,36 @@ public class AutomationService : IAutomationService
             ["PrinterTeGebruiken"] = printer
         };
 
-        return (sensorLabel, labelCounter, labelVariables, printSettings);
+        return (totalLabels, labelVariables, printSettings);
     }
 
-    private string PrintTestRoomAsignSensor(string sensor)
+    private string AssignLabelSensor(string sensor, int labelNumber)
     {
-        
+        if (sensor == "BOTH")
+        {
+            if (labelNumber is 1 or 2 or 4) return "Gap";
+            else return "Mark";
+        }
+
+        return sensor;
     }
 
-    private void BuildPrintTestRoomRequest(Stream label, string printerName, Dictionary<string, string> labelVariables, Dictionary<string, string> printSettings)
+    private MultipartFormDataContent BuildPrintTestRoomRequestData(string sensorLabel, int labelNumber, string printerName, Dictionary<string, string> labelVariables, Dictionary<string, string> printSettings)
     {
-        
-    }
+        var requestData = new MultipartFormDataContent();
+        using var fileStream = File.OpenRead(_config[$"LabelPaths:Testlabel-{sensorLabel}-{labelNumber}"]);
 
+        StreamContent labelStream = new StreamContent(fileStream);
+        requestData.Add(labelStream, "label");
+
+        requestData.Add(new StringContent(printerName), "printerName");
+
+        var jsonSettings = JsonSerializer.Serialize(printSettings);
+        requestData.Add(new StringContent(jsonSettings), "printSettings");
+
+        var jsonVariables = JsonSerializer.Serialize(labelVariables);
+        requestData.Add(new StringContent(jsonVariables), "labelVariables");
+
+        return requestData;
+    }
 }
