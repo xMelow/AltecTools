@@ -64,10 +64,10 @@ export default function TestRoom() {
             </div>
 
             <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide mb-1">Print Quality</p>
-            <div className="flex flex-row items-center gap-2 mb-4">
-                <p className="text-xs mb-1">Speed:</p>
+            <div className="flex flex-col start gap-2 mb-4">
+                <p className="text-xs">Speed:</p>
                 <select
-                    className="text-sm border border-altec-teal rounded-lg px-2 py-1.5 bg-altec-white focus:outline-none focus:ring-1 focus:ring-altec-teal"
+                    className="text-base border border-altec-teal rounded-lg px-2 py-1.5 bg-altec-white focus:outline-none focus:ring-1 focus:ring-altec-teal"
                     name="speed"
                     id="speed"
                     value={speed}
@@ -81,9 +81,9 @@ export default function TestRoom() {
                     <option value="6">6</option>
                 </select>
 
-                <p className="text-xs mb-1">Density:</p>
+                <p className="text-xs">Density:</p>
                 <select
-                    className="text-sm border border-altec-teal rounded-lg px-2 py-1.5 bg-altec-white focus:outline-none focus:ring-1 focus:ring-altec-teal"
+                    className="text-base border border-altec-teal rounded-lg px-2 py-1.5 bg-altec-white focus:outline-none focus:ring-1 focus:ring-altec-teal"
                     name="denisty"
                     id="denisty"
                     value={density}
@@ -108,25 +108,30 @@ export default function TestRoom() {
             </div>
 
             <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide mb-1">Extra</p>
-            <div className="flex flex-row items-center gap-2 mb-4">
-                <p className="text-xs mb-1">Cutter</p>
-                <input 
-                    className="" 
-                    type="checkbox"
-                    id="cutter" 
-                    name="cutter"
-                    checked={cutter}
-                    onChange={(e) => setCutter(e.target.checked)}
-                />
-                <p className="text-xs mb-1">Gebruiker label</p>
-                <input 
-                    className="text-sm border border-altec-teal rounded-lg px-2 py-1.5 bg-altec-white focus:outline-none focus:ring-1 focus:ring-altec-teal" 
-                    type="checkbox"
-                    id="userLabel" 
-                    name="userLabel"
-                    checked={userLabel}
-                    onChange={(e) => setUserLabel(e.target.checked)}
-                />
+            <div className="flex flex-col gap-2 mb-4">
+                <div className="flex flex-row">
+                    <p className="text-sm mr-2">Cutter</p>
+                    <input 
+                        className="" 
+                        type="checkbox"
+                        id="cutter" 
+                        name="cutter"
+                        checked={cutter}
+                        onChange={(e) => setCutter(e.target.checked)}
+                    />
+                </div>
+                
+                <div className="flex flex-row">
+                    <p className="text-sm mr-2">Gebruiker label</p>
+                    <input 
+                        className="" 
+                        type="checkbox"
+                        id="userLabel" 
+                        name="userLabel"
+                        checked={userLabel}
+                        onChange={(e) => setUserLabel(e.target.checked)}
+                    />
+                </div>
             </div>
                 
             <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide mb-1">Printer</p>
@@ -149,7 +154,7 @@ export default function TestRoom() {
                 onClick={sendPrint}
                 disabled={loadingPrint}
             >
-                {loading ? 'Loading...' : 'Print'}
+                {loadingPrint ? 'Loading...' : 'Print'}
             </button>
         </div>
     )
