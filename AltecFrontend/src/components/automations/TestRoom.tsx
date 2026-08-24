@@ -35,7 +35,7 @@ export default function TestRoom() {
                 setPrinterList(response)
                 setPrinter(response.find(p => p.name === "Altec ATP-300 Pro")?.name ?? response[0]?.name)
             }
-        }   
+        }
         
         getPrinters()
     }, [])
@@ -72,7 +72,7 @@ export default function TestRoom() {
                     id="speed"
                     value={speed}
                     onChange={(e) => setSpeed(Number(e.target.value))}
-                >
+                > 
                     <option value="1.5">1.5</option>
                     <option value="2">2</option>
                     <option value="3">3</option>
@@ -111,8 +111,8 @@ export default function TestRoom() {
             <div className="flex flex-col gap-2 mb-4">
                 <div className="flex flex-row">
                     <p className="text-sm mr-2">Cutter</p>
-                    <input 
-                        className="" 
+                    <input
+                        className="accent-altec-teal w-3 h-6" 
                         type="checkbox"
                         id="cutter" 
                         name="cutter"
@@ -123,8 +123,8 @@ export default function TestRoom() {
                 
                 <div className="flex flex-row">
                     <p className="text-sm mr-2">Gebruiker label</p>
-                    <input 
-                        className="" 
+                    <input
+                        className="accent-altec-teal w-3 h-6"
                         type="checkbox"
                         id="userLabel" 
                         name="userLabel"
@@ -133,8 +133,11 @@ export default function TestRoom() {
                     />
                 </div>
             </div>
-                
+            
             <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide mb-1">Printer</p>
+
+            {error && <p className="text-red-500">{error}</p>}
+
             <div className="flex flex-row gap-2 mb-4">
                 <select
                     className="text-sm border border-altec-teal rounded-lg px-2 py-1.5 bg-altec-white focus:outline-none focus:ring-1 focus:ring-altec-teal"
@@ -152,7 +155,7 @@ export default function TestRoom() {
             <button
                 className="w-full border bg-altec-teal text-altec-white p-1.5 rounded-xl mt-2"
                 onClick={sendPrint}
-                disabled={loadingPrint}
+                disabled={!!error || loadingPrint}
             >
                 {loadingPrint ? 'Loading...' : 'Print'}
             </button>
