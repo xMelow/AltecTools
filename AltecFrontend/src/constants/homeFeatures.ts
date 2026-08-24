@@ -84,6 +84,15 @@ export const features: Feature[] = [
                     "Configurable print amount",
                 ],
             },
+            {
+                title: "Testruimte systeem",
+                route: "/automations",
+                description: "Print testruimte label with configurable sensor type, speed, and density settings.",
+                bullets: [
+                    "Cutter and user label toggles for extra options",
+                    "Select a printer from the NiceLabel installed printers"
+                ]
+            }
         ],
     },
 ];
