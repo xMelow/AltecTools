@@ -248,4 +248,9 @@ public class AutomationService : IAutomationService
 
         return requestData;
     }
+
+    public Task<string> PrintQlickPrintLicensie(IFormFile dataFile)
+    {
+        throw new NotImplementedException();
+    }
 }

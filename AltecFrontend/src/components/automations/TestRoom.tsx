@@ -46,7 +46,7 @@ export default function TestRoom() {
 
             <hr className="border-b border-altec-teal mb-3" />
 
-            <AutomationSpecs material="I00180" inktFolie="AR-10"/>
+            <AutomationSpecs material="I023345" inktFolie="AR-10"/>
 
             <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide mb-1">Sensor Type</p>
             <div className="flex flex-col gap-2 mb-4">

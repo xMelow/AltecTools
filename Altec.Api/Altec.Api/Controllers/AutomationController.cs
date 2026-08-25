@@ -98,4 +98,20 @@ public class AutomationController : ControllerBase
             return BadRequest($"Error: {ex.Message}");
         }
     }
+
+    [HttpPost("qlickprintLicensie")]
+    public async Task<IActionResult> PrintQlickPrintLicensie(IFormFile dataFile)
+    {
+        if (dataFile == null) return BadRequest("Data file must be present");
+
+        try
+        {
+            await _automationService.PrintQlickPrintLicensie(dataFile);
+            return Ok("Labels printed");
+        }
+        catch (Exception ex)
+        {
+            return BadRequest($"Error: {ex.Message}");
+        }
+    }
 }
