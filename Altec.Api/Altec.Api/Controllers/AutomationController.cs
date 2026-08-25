@@ -99,7 +99,7 @@ public class AutomationController : ControllerBase
         }
     }
 
-    [HttpPost("qlickprintLicensie")]
+    [HttpPost("qlickPrintLicensie")]
     public async Task<IActionResult> PrintQlickPrintLicensie(IFormFile dataFile)
     {
         if (dataFile == null) return BadRequest("Data file must be present");
