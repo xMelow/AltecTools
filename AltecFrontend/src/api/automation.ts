@@ -83,5 +83,15 @@ export async function printTestRoom(body: TestRoomRequest): Promise<string> {
 }
 
 export async function printQlickPrintLicensie(body: QlickPrintRequest): Promise<string> {
-    return ""
+    const formData = new FormData()
+    formData.append('dataFile', body.dataFile)
+
+    const res = await fetch(`/api/automation/qlickPrintLicensie`, {
+        method: 'POST',
+        body: formData
+    })
+
+    if (!res.ok) throw new Error("Failed to print QlickPrint licensies")
+
+    return await res.json()
 }
