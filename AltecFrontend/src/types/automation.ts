@@ -18,3 +18,7 @@ export type TestRoomRequest = {
     userLabel: boolean
     printer: string
 }
+
+export type QlickPrintRequest = {
+    dataFile: File
+}

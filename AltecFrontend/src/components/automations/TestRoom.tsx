@@ -136,7 +136,7 @@ export default function TestRoom() {
 
             {error && <p className="text-red-500">{error}</p>}
 
-            <div className="flex flex-row gap-2 mb-4">
+            <div className="flex flex-col gap-2 mb-4">
                 <select
                     className="text-sm border border-altec-teal rounded-lg px-2 py-1.5 bg-altec-white focus:outline-none focus:ring-1 focus:ring-altec-teal"
                     name="printer"

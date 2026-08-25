@@ -1,4 +1,4 @@
-import { SdCardRequest, SerialNumberRequest, TestRoomRequest } from "../types/automation";
+import { QlickPrintRequest, SdCardRequest, SerialNumberRequest, TestRoomRequest } from "../types/automation";
 
 export async function printSerialNumbers(body: SerialNumberRequest): Promise<string> {
     const formData = new FormData()
@@ -80,4 +80,18 @@ export async function printTestRoom(body: TestRoomRequest): Promise<string> {
     if (!res.ok) throw new Error("Failed to print test room label")
 
     return await res.text()
+}
+
+export async function printQlickPrintLicensie(body: QlickPrintRequest): Promise<string> {
+    const formData = new FormData()
+    formData.append('dataFile', body.dataFile)
+
+    const res = await fetch(`/api/automation/qlickPrintLicensie`, {
+        method: 'POST',
+        body: formData
+    })
+
+    if (!res.ok) throw new Error("Failed to print QlickPrint licensies")
+
+    return await res.json()
 }

@@ -1,5 +1,6 @@
 import PrintSdCard from "../components/automations/PrintSdCard"
 import PrintSerialNumbers from "../components/automations/PrintSerialNumbers"
+import QlickPrintLicensie from "../components/automations/QlickPrintLicensie"
 import TestRoom from "../components/automations/TestRoom"
 
 export default function AutomationsScreen() {
@@ -11,6 +12,7 @@ export default function AutomationsScreen() {
                 <PrintSerialNumbers />
                 <PrintSdCard />
                 <TestRoom />
+                <QlickPrintLicensie />
             </div>
         </div>
     )
