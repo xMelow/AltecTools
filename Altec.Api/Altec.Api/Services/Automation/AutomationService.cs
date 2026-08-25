@@ -184,13 +184,13 @@ public class AutomationService : IAutomationService
 
     public async Task PrintTestRoomLabel(string sensorType, int speed, int density, bool cutter, bool userLabel, string printer)
     {
-        var (totalLabels, labelVariables, printSettings) = BuildTestRoomData(sensorType, speed, density, cutter, userLabel, printer);
+        var (totalLabels, labelVariables, printSettings) = BuildTestRoomData(speed, density, cutter, userLabel, printer);
 
         for (int i = 0; i < totalLabels; i++)
         {
             var labelNumber = i + 1;
             var sensorLabel = AssignLabelSensor(sensorType, labelNumber);
-            var requestData = BuildPrintTestRoomRequestData(sensorLabel, labelNumber, printer, labelVariables, printSettings);
+            using var requestData = BuildPrintTestRoomRequestData(sensorLabel, labelNumber, printer, labelVariables, printSettings);
 
             var request = new HttpRequestMessage(HttpMethod.Post, "/api/nicelabel/printLabelWithSettings")
             {
@@ -202,7 +202,7 @@ public class AutomationService : IAutomationService
         }
     }
 
-    private (int totalLabels, Dictionary<string, string> labelVariables, Dictionary<string,string> printSettings) BuildTestRoomData(string sensorType, int speed, int density, bool cutter, bool userLabel, string printer)
+    private (int totalLabels, Dictionary<string, string> labelVariables, Dictionary<string,string> printSettings) BuildTestRoomData(int speed, int density, bool cutter, bool userLabel, string printer)
     {
         var totalLabels = userLabel ? 5 : 4;
         var printSettings = new Dictionary<string, string>
@@ -233,7 +233,7 @@ public class AutomationService : IAutomationService
     private MultipartFormDataContent BuildPrintTestRoomRequestData(string sensorLabel, int labelNumber, string printerName, Dictionary<string, string> labelVariables, Dictionary<string, string> printSettings)
     {
         var requestData = new MultipartFormDataContent();
-        using var fileStream = File.OpenRead(_config[$"LabelPaths:Testlabel-{sensorLabel}-{labelNumber}"]);
+        var fileStream = File.OpenRead(_config[$"LabelPaths:Testlabel-{sensorLabel}-{labelNumber}"]);
 
         StreamContent labelStream = new StreamContent(fileStream);
         requestData.Add(labelStream, "label");
