@@ -73,7 +73,6 @@ export default function TestRoom() {
                     value={speed}
                     onChange={(e) => setSpeed(Number(e.target.value))}
                 > 
-                    <option value="1.5">1.5</option>
                     <option value="2">2</option>
                     <option value="3">3</option>
                     <option value="4">4</option>
@@ -112,7 +111,7 @@ export default function TestRoom() {
                 <div className="flex flex-row">
                     <p className="text-sm mr-2">Cutter</p>
                     <input
-                        className="accent-altec-teal w-3 h-6" 
+                        className="accent-altec-teal w-4 h-4" 
                         type="checkbox"
                         id="cutter" 
                         name="cutter"
@@ -124,16 +123,15 @@ export default function TestRoom() {
                 <div className="flex flex-row">
                     <p className="text-sm mr-2">Gebruiker label</p>
                     <input
-                        className="accent-altec-teal w-3 h-6"
+                        className="accent-altec-teal w-4 h-4"
                         type="checkbox"
-                        id="userLabel" 
+                        id="userLabel"
                         name="userLabel"
                         checked={userLabel}
                         onChange={(e) => setUserLabel(e.target.checked)}
                     />
                 </div>
             </div>
-            
             <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide mb-1">Printer</p>
 
             {error && <p className="text-red-500">{error}</p>}
