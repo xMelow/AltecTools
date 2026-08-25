@@ -1,6 +1,8 @@
-﻿using System.Text.Json;
+﻿using System.Reflection.Emit;
+using System.Text.Json;
 using Altec.Api.Record.NiceLabel;
 using DocumentFormat.OpenXml.Drawing.Charts;
+using DocumentFormat.OpenXml.Math;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
@@ -21,7 +23,6 @@ public class AutomationService : IAutomationService
     public async Task PrintSerialNumbers(IFormFile csvFile, string printerType, string? printerName)
     {
         var excelData = ReadCsvData(csvFile, printerType);
-        Console.WriteLine(excelData);
         var requestData = BuildSerialNumbersContent(excelData, printerName);
         var request = new HttpRequestMessage(HttpMethod.Post, "/api/nicelabel/printVariableLabel")
         {
@@ -249,8 +250,52 @@ public class AutomationService : IAutomationService
         return requestData;
     }
 
-    public Task<string> PrintQlickPrintLicensie(IFormFile dataFile)
+    public async Task PrintQlickPrintLicensie(IFormFile dataFile)
     {
-        throw new NotImplementedException();
+        var labelData = ReadFileData(dataFile);
+        PrintQlickPrintLicensieATP(labelData);
+    }
+
+    private async void PrintQlickPrintLicensieATP(List<Dictionary<string, int>> labelData)
+    {
+        var requestData = BuildQlickPrintContentATP(labelData);
+        var request = new HttpRequestMessage(HttpMethod.Post, "/api/nicelabel/printVariableLabel")
+        {
+            Content = requestData
+        };
+
+        var response = await _httpClient.SendAsync(request);
+        response.EnsureSuccessStatusCode();
+    }
+
+    private MultipartFormDataContent BuildQlickPrintContentATP(List<Dictionary<string, int>> dataFile)
+    {
+        var requestData = new MultipartFormDataContent();
+        var fileStream = File.OpenRead(_config[$"LabelPaths:QlickPrintATP"]);
+
+        StreamContent labelStream = new StreamContent(fileStream);
+        requestData.Add(labelStream, "label");
+        
+        var json = JsonSerializer.Serialize(dataFile);
+        requestData.Add(new StringContent(json), "variables");
+
+        return requestData;
+    }
+
+    private List<Dictionary<string, int>> ReadFileData(IFormFile dataFile)
+    {
+        using var reader = new StreamReader(dataFile.OpenReadStream());
+        var labelData = new List<Dictionary<string, int>>();
+        string? line;
+        var lineNumber = 0;
+
+        while ((line = reader.ReadLine()) != null)
+        {
+            lineNumber++;
+            var barcode = int.Parse(line);
+            if (barcode == 0) throw new ArgumentException($"Unable to parse line: {lineNumber}");
+            labelData.Add(new Dictionary<string, int>{["barcode"] = barcode});
+        }
+        return labelData.OrderBy(barcode => barcode["barcode"]).ToList();
     }
 }
