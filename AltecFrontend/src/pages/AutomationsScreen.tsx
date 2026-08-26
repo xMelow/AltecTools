@@ -8,12 +8,21 @@ export default function AutomationsScreen() {
         <div>
             <h1 className="text-center text-3xl font-bold text-altec-teal mb-3">Automations</h1>
 
-            <div className="flex items-stretch gap-5">
-                <PrintSerialNumbers />
-                <PrintSdCard />
-                <TestRoom />
-                <QlickPrintLicensie />
-            </div>
+            <section>
+                <h2 className="text-xl mb-4 font-bold">Support</h2>
+                <div className="flex items-start gap-5">
+                    <TestRoom />
+                    <PrintSdCard />
+                </div>
+            </section>
+
+            <section>
+                <h2 className="text-xl mb-4 mt-4 font-bold">Administration</h2>
+                <div className="flex items-start gap-5">
+                    <PrintSerialNumbers />
+                    <QlickPrintLicensie />
+                </div>
+            </section>
         </div>
     )
 }
