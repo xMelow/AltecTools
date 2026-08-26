@@ -1,6 +1,7 @@
 import PrintSdCard from "../components/automations/PrintSdCard"
 import PrintSerialNumbers from "../components/automations/PrintSerialNumbers"
 import QlickPrintLicensie from "../components/automations/QlickPrintLicensie"
+import RmaSystem from "../components/automations/RmaSystem"
 import TestRoom from "../components/automations/TestRoom"
 
 export default function AutomationsScreen() {
@@ -13,6 +14,7 @@ export default function AutomationsScreen() {
                 <div className="flex items-start gap-5">
                     <TestRoom />
                     <PrintSdCard />
+                    <RmaSystem />
                 </div>
             </section>
 

@@ -3,7 +3,6 @@ import AutomationSpecs from "./AutomationSpecs";
 import { useFetch } from "../../hooks/useFetch";
 import { printQlickPrintLicensie } from "../../api/automation";
 
-
 export default function QlickPrintLicensie() {
     const [dataFile, setDataFile] = useState<File | null>(null)
     const { loading, error, result, execute } = useFetch<string>()
