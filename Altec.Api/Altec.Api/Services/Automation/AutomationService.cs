@@ -1,8 +1,5 @@
-﻿using System.Reflection.Emit;
-using System.Text.Json;
+﻿using System.Text.Json;
 using Altec.Api.Record.NiceLabel;
-using DocumentFormat.OpenXml.Drawing.Charts;
-using DocumentFormat.OpenXml.Math;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
@@ -297,7 +294,7 @@ public class AutomationService : IAutomationService
             {
                 var barcode = long.Parse(line);
                 labelData.Add(new Dictionary<string, long>{["barcode"] = barcode});
-            } 
+            }
             catch (FormatException ex)
             {
                 throw new FormatException($"Unable to parse barcode: {lineNumber}", ex);

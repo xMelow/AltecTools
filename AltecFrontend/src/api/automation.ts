@@ -93,5 +93,5 @@ export async function printQlickPrintLicensie(body: QlickPrintRequest): Promise<
 
     if (!res.ok) throw new Error("Failed to print QlickPrint licensies")
 
-    return await res.json()
+    return await res.text()
 }
