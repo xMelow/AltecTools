@@ -102,6 +102,7 @@ const DONT_SEND_OPTIONS = [
     "Inkt folie",
     "Inkt cartridge",
     "Toetsenboard",
+    "Scanner"
 ]
 
 export default function RmaSystem() {
@@ -131,8 +132,8 @@ export default function RmaSystem() {
         }
     }
 
-    function createPdf() {
-
+    async function createPdf() {
+        
     }
 
     function sendEmail() {
