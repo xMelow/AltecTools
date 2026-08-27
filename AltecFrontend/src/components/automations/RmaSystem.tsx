@@ -3,6 +3,7 @@ import AutomationSpecs from "./AutomationSpecs";
 import { useFetch } from "../../hooks/useFetch";
 
 const MODEL_OPTIONS = [
+    "--",
     "3100S",
     "384M",
     "Altec-O-Matic",
@@ -92,6 +93,17 @@ const MODEL_OPTIONS = [
     "Zebra ZXP7",
 ]
 
+const DONT_SEND_OPTIONS = [
+    "Printer",
+    "Voedingsadapter",
+    "Batterij",
+    "Stroomkabel",
+    "Labels",
+    "Inkt folie",
+    "Inkt cartridge",
+    "Toetsenboard",
+]
+
 export default function RmaSystem() {
     const [language, setLanguage] = useState<string>("Nederlands")
     const [ticketNumber, setTicketNumber] = useState<number>()
@@ -101,14 +113,24 @@ export default function RmaSystem() {
     const [email, setEmail] = useState<string>("")
     const [street, setStreet] = useState<string>("")
     const [place, setPlace] = useState<string>("")
-    const [model, setModel] = useState<string>("")
+    const [model, setModel] = useState<string>("ATP-300PRO")
     const [serienummer, setSerienummer] = useState<number>()
-    const [warrenty, setWarrenty] = useState<string>("")
+    const [warrenty, setWarrenty] = useState<string>("Warranty")
     const [problem1, setProblem1] = useState<string>("")
     const [problem2, setProblem2] = useState<string>("")
+    const [dontSendItems, setDontSendItems] = useState<string[]>([])
     const { loading: loadingPdf, error: errorPdf, result: resultPdf, execute: executePdf } = useFetch<string>()
     const { loading: loadingEmail, error: errorEmail, result: resultEmail, execute: executeEmail } = useFetch<string>()
     
+    function toggleDontSendItem(item: string) {
+        if (dontSendItems.includes(item)) {
+            setDontSendItems(dontSendItems.filter(el => el !== item))
+        } 
+        else {
+            setDontSendItems([...dontSendItems, item])
+        }
+    }
+
     function createPdf() {
 
     }
@@ -131,14 +153,14 @@ export default function RmaSystem() {
                     name="language"
                     id="language"
                     value={language}
-                    onChange={(e) => setLanguage(e.target.value)}
+                    onChange={(e) => setLanguage(e.target.value) }
                 >
                     <option value="NL">Nederlands</option>
                     <option value="EN">Engels</option>
                     <option value="FR">Frans</option>
                 </select>
 
-                <label className="text-xs font-semibold text-altec-teal uppercase tracking-wide mb-1">Ticket nummer</label>
+                <label className="text-xs font-semibold text-altec-teal uppercase tracking-wide">Ticket nummer</label>
                 <input 
                     className="text-sm border border-altec-teal rounded-lg px-2 py-1.5 bg-altec-white focus:outline-none focus:ring-1 focus:ring-altec-teal" 
                     type="number"
@@ -148,7 +170,7 @@ export default function RmaSystem() {
                     onChange={(e) => setTicketNumber(Number(e.target.value)) }
                 />
 
-                <label className="text-xs font-semibold text-altec-teal uppercase tracking-wide mb-1">Bedrijf</label>
+                <label className="text-xs font-semibold text-altec-teal uppercase tracking-wide">Bedrijf</label>
                 <input 
                     className="text-sm border border-altec-teal rounded-lg px-2 py-1.5 bg-altec-white focus:outline-none focus:ring-1 focus:ring-altec-teal" 
                     type="text"
@@ -180,7 +202,7 @@ export default function RmaSystem() {
                     />
                 </div>
 
-                <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide mb-1">Email</p>
+                <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide">Email</p>
                 <input 
                     className="text-sm border border-altec-teal rounded-lg px-2 py-1.5 bg-altec-white focus:outline-none focus:ring-1 focus:ring-altec-teal" 
                     type="text"
@@ -190,7 +212,7 @@ export default function RmaSystem() {
                     onChange={(e) => setEmail(e.target.value) }
                 />
 
-                <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide mb-1">Straat</p>
+                <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide">Straat</p>
                 <input 
                     className="text-sm border border-altec-teal rounded-lg px-2 py-1.5 bg-altec-white focus:outline-none focus:ring-1 focus:ring-altec-teal" 
                     type="text"
@@ -200,7 +222,7 @@ export default function RmaSystem() {
                     onChange={(e) => setStreet(e.target.value) }
                 />
 
-                <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide mb-1">Plaats</p>
+                <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide">Plaats</p>
                 <input 
                     className="text-sm border border-altec-teal rounded-lg px-2 py-1.5 bg-altec-white focus:outline-none focus:ring-1 focus:ring-altec-teal" 
                     type="text"
@@ -210,20 +232,20 @@ export default function RmaSystem() {
                     onChange={(e) => setPlace(e.target.value) } 
                 />
 
-                <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide mb-1">Model</p>
+                <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide">Model</p>
                 <select
                     className="mr-2 text-sm border border-altec-teal rounded-lg px-2 py-1.5 bg-altec-white focus:outline-none focus:ring-1 focus:ring-altec-teal"
                     name="model"
                     id="model"
                     value={model}
-                    onChange={(e) => setModel(e.target.value)}
+                    onChange={(e) => setModel(e.target.value) }
                 >
                     {MODEL_OPTIONS.map((modelOption) => (
                         <option key={modelOption} value={modelOption}>{modelOption}</option>
                     ))}
                 </select>
 
-                <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide mb-1">Serienummer</p>
+                <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide">Serienummer</p>
                 <input 
                     className="text-sm border border-altec-teal rounded-lg px-2 py-1.5 bg-altec-white focus:outline-none focus:ring-1 focus:ring-altec-teal" 
                     type="number"
@@ -233,20 +255,20 @@ export default function RmaSystem() {
                     onChange={(e) => setSerienummer(Number(e.target.value)) }
                 />
 
-                <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide mb-1">Contact persoon</p>
+                <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide">Warrenty</p>
                 <select
                     className="mr-2 text-sm border border-altec-teal rounded-lg px-2 py-1.5 bg-altec-white focus:outline-none focus:ring-1 focus:ring-altec-teal"
                     name="warrenty"
                     id="warrenty"
                     value={warrenty}
-                    onChange={(e) => setWarrenty(e.target.value)}
+                    onChange={(e) => setWarrenty(e.target.value) }
                 >
-                    <option value="Out of warranty">Out of warranty</option>
                     <option value="Warranty">Warranty</option>
+                    <option value="Out of warranty">Out of warranty</option>
                     <option value="In evaluation">In evaluation</option>
                 </select>
 
-                <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide mb-1">Probleem 1</p>
+                <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide">Probleem 1</p>
                 <input
                     className="text-sm border border-altec-teal rounded-lg px-2 py-1.5 bg-altec-white focus:outline-none focus:ring-1 focus:ring-altec-teal" 
                     type="text"
@@ -256,15 +278,34 @@ export default function RmaSystem() {
                     onChange={(e) => setProblem1(e.target.value) }
                 />
 
-                <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide mb-1">Probleem 2</p>
+                <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide">Probleem 2</p>
                 <input 
                     className="text-sm border border-altec-teal rounded-lg px-2 py-1.5 bg-altec-white focus:outline-none focus:ring-1 focus:ring-altec-teal" 
                     type="text"
-                    id="problem2" 
+                    id="problem2"
                     name="problem2"
                     value={problem2}
                     onChange={(e) => setProblem2(e.target.value) }
                 />
+
+                <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide">Niet mee sturen</p>
+                <div className="flex flex-wrap gap-2 mb-2">
+                    {DONT_SEND_OPTIONS.map((option) => {
+                        const isSelected = dontSendItems.includes(option)
+                        return (
+                            <button
+                                key={option}
+                                type="button"
+                                className={`text-sm px-2 py-1.5 rounded-lg border border-altec-teal focus:outline-none focus:ring-1 focus:ring-altec-teal ${
+                                    isSelected ? "bg-altec-teal text-altec-white" : "bg-altec-white"
+                                }`}
+                                onClick={() => toggleDontSendItem(option)}
+                            >
+                                {option}
+                            </button>
+                        )
+                    })}
+                </div>
 
                 <div className="flex flex-row gap-2">
                     <button
