@@ -302,4 +302,22 @@ public class AutomationService : IAutomationService
         }
         return labelData.OrderBy(barcode => barcode["barcode"]).ToList();
     }
+
+    public Task GeneratePDF(
+        string langauge, 
+        int ticketNumber, 
+        string company, 
+        string contactPerson, 
+        string contactPersonPrefix, 
+        List<string> dontSendItems, 
+        string model, 
+        string street, 
+        string problem1, 
+        string problem2, 
+        string place, 
+        int serieNumber, 
+        string warrenty
+    ) {
+        throw new NotImplementedException();
+    }
 }

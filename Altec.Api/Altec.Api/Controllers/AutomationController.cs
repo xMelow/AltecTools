@@ -83,8 +83,14 @@ public class AutomationController : ControllerBase
     }
 
     [HttpPost("testRoom")]
-    public async Task<IActionResult> PrintTestRoomLabel([FromForm] string sensorType, [FromForm] int speed, [FromForm] int density, [FromForm] bool cutter, [FromForm] bool userLabel, [FromForm] string printer)
-    {
+    public async Task<IActionResult> PrintTestRoomLabel(
+        [FromForm] string sensorType, 
+        [FromForm] int speed, 
+        [FromForm] int density, 
+        [FromForm] bool cutter, 
+        [FromForm] bool userLabel, 
+        [FromForm] string printer
+    ) {
         if (string.IsNullOrEmpty(sensorType)) return BadRequest("Sensor type must be present");
         // add more param checks
 
@@ -108,6 +114,33 @@ public class AutomationController : ControllerBase
         {
             await _automationService.PrintQlickPrintLicensie(dataFile);
             return Ok("Labels printed");
+        }
+        catch (Exception ex)
+        {
+            return BadRequest($"Error: {ex.Message}");
+        }
+    }
+
+    [HttpPost("generatePdf")]
+    public async Task<IActionResult> GeneratePDF(
+        [FromForm] string langauge,
+        [FromForm] int ticketNumber,
+        [FromForm] string company,
+        [FromForm] string contactPerson,
+        [FromForm] string contactPersonPrefix,
+        [FromForm] List<string> dontSendItems,
+        [FromForm] string model,
+        [FromForm] string street,
+        [FromForm] string problem1,
+        [FromForm] string problem2,
+        [FromForm] string place,
+        [FromForm] int serieNumber,
+        [FromForm] string warrenty
+    ) {
+        try
+        {
+            await _automationService.GeneratePDF(langauge, ticketNumber, company, contactPerson, contactPersonPrefix, dontSendItems, model, street, problem1, problem2, place, serieNumber, warrenty);
+            return Ok("PDF created");
         }
         catch (Exception ex)
         {

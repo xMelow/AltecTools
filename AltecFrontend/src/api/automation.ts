@@ -112,7 +112,7 @@ export async function generatePdf(body: GeneratePdfRequest): Promise<string> {
     formData.append('serienummer', body.serienummer.toString())
     formData.append('warrenty', body.warrenty)
 
-    const res = await fetch(`/api/automation/GeneratePdf`, {
+    const res = await fetch(`/api/automation/generatePdf`, {
         method: 'POST',
         body: formData
     })
