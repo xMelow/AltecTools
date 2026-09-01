@@ -1,6 +1,7 @@
 import { useState } from "react";
 import AutomationSpecs from "./AutomationSpecs";
 import { useFetch } from "../../hooks/useFetch";
+import { generatePdf } from "../../api/automation";
 
 const MODEL_OPTIONS = [
     "--",
@@ -133,7 +134,23 @@ export default function RmaSystem() {
     }
 
     async function createPdf() {
-        
+        if (ticketNumber == undefined || serienummer == undefined) return
+
+        await executePdf(() => generatePdf({
+            language: language,
+            ticketNumber: ticketNumber,
+            company: company,
+            contactPerson: contactPerson,
+            contactPersonPrefix: contactPersonPrefix,
+            dontSendItems: dontSendItems,
+            model: model,
+            street: street,
+            problem1: problem1,
+            problem2: problem2,
+            place: place,
+            serienummer: serienummer,
+            warrenty: warrenty
+        }))
     }
 
     function sendEmail() {

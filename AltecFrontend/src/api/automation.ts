@@ -1,4 +1,4 @@
-import { QlickPrintRequest, SdCardRequest, SerialNumberRequest, TestRoomRequest } from "../types/automation";
+import { GeneratePdfRequest, QlickPrintRequest, SdCardRequest, SerialNumberRequest, TestRoomRequest } from "../types/automation";
 
 export async function printSerialNumbers(body: SerialNumberRequest): Promise<string> {
     const formData = new FormData()
@@ -92,6 +92,32 @@ export async function printQlickPrintLicensie(body: QlickPrintRequest): Promise<
     })
 
     if (!res.ok) throw new Error("Failed to print QlickPrint licensies")
+
+    return await res.text()
+}
+
+export async function generatePdf(body: GeneratePdfRequest): Promise<string> {
+    const formData = new FormData()
+    formData.append('language', body.language)
+    formData.append('ticketNumber', body.ticketNumber.toString())
+    formData.append('company', body.company)
+    formData.append('contactPerson', body.contactPerson)
+    formData.append('contactPersonPrefix', body.contactPersonPrefix)
+    formData.append('dontSendItems', body.dontSendItems.toString())
+    formData.append('model', body.model)
+    formData.append('street', body.street)
+    formData.append('problem1', body.problem1)
+    formData.append('problem2', body.problem2)
+    formData.append('place', body.place)
+    formData.append('serienummer', body.serienummer.toString())
+    formData.append('warrenty', body.warrenty)
+
+    const res = await fetch(`/api/automation/GeneratePdf`, {
+        method: 'POST',
+        body: formData
+    })
+
+    if (!res.ok) throw new Error("Failed to print generate PDF file.")
 
     return await res.text()
 }
