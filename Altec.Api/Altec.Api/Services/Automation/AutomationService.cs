@@ -303,21 +303,79 @@ public class AutomationService : IAutomationService
         return labelData.OrderBy(barcode => barcode["barcode"]).ToList();
     }
 
-    public Task GeneratePDF(
-        string langauge, 
-        int ticketNumber, 
-        string company, 
-        string contactPerson, 
-        string contactPersonPrefix, 
-        List<string> dontSendItems, 
-        string model, 
-        string street, 
-        string problem1, 
-        string problem2, 
-        string place, 
-        int serieNumber, 
-        string warrenty
+    public async Task GeneratePDF(
+        string language,
+        int ticketNumber,
+        string company,
+        string contactPerson,
+        string contactPersonPrefix,
+        List<string> dontSendItems,
+        string model,
+        string street,
+        string problem1,
+        string problem2,
+        string place,
+        int serieNumber,
+        string warrenty,
+        bool multiplePrinters
     ) {
-        throw new NotImplementedException();
+        // rma label needs ticketnumber
+        
+        var rmaLabelPath = language switch
+        {
+            "NL" => _config[$"LabelPaths:RMALabelNL"],
+            "EN" => _config[$"LabelPaths:RMALabelEN"],
+            "FR" => _config[$"LabelPaths:RMALabelFR"],
+            _ => throw new ArgumentException($"Unsupported language: {language}")
+        };
+
+        var sendLabelPath = language switch
+        {
+            "NL" => _config[$"LabelPaths:ZendLabel"],
+            "EN" => _config[$"LabelPaths:ZendLabelENG"],
+            "FR" => _config[$"LabelPaths:ZendLabelFR"],
+            _ => throw new ArgumentException($"Unsupported language: {language}")
+        };
+
+        var fileOutputName = multiplePrinters ? $"\\ALTEC-FILE\\Data\\ALTLabels\\Nicelabel2017\\NLCustomSystems\\RMA\\PDF\\{ticketNumber}_{serieNumber}.pdf" 
+                                            : $"\\ALTEC-FILE\\Data\\ALTLabels\\Nicelabel2017\\NLCustomSystems\\RMA\\PDF\\{ticketNumber}.pdf";
+        
+        var RMAlabel = File.OpenRead(rmaLabelPath);
+        var SendLabel = File.OpenRead(sendLabelPath);
+
+        // create the request
+        var requestData = new MultipartFormDataContent();
+
+        StreamContent labelStream = new StreamContent(RMAlabel);
+        requestData.Add(labelStream, "label");
+
+        requestData.Add(new StringContent(fileOutputName));
+
+        var labelVariables = new Dictionary<string, string>
+        {
+          ["ticketNumber"] = ticketNumber.ToString(),
+          ["company"] = company,
+          ["contactPerson"] = contactPerson,
+          ["contactPersonPrefix"] = contactPersonPrefix,
+          ["model"] = model,
+          ["street"] = street,
+          ["problem1"] = problem1,
+          ["problem2"] = problem2,
+          ["place"] = place,
+          ["serieNumber"] = serieNumber.ToString(),
+          ["warrenty"] = warrenty,
+        };
+
+        var jsonVariables = JsonSerializer.Serialize(labelVariables);
+        requestData.Add(new StringContent(jsonVariables), "labelVariables");
+
+        // send the request to the nicelabel sdk api
+        var request = new HttpRequestMessage(HttpMethod.Post, "/api/nicelabel/printVariableLabel")
+        {
+            Content = requestData
+        };
+
+        var response = await _httpClient.SendAsync(request);
+        response.EnsureSuccessStatusCode();
     }
 }

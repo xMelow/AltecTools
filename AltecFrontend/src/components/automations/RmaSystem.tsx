@@ -115,11 +115,13 @@ export default function RmaSystem() {
     const [email, setEmail] = useState<string>("")
     const [street, setStreet] = useState<string>("")
     const [place, setPlace] = useState<string>("")
+    const [multiplePrinters, setMultiplePrinters] = useState<boolean>(false)
     const [model, setModel] = useState<string>("ATP-300PRO")
     const [serienummer, setSerienummer] = useState<number>()
     const [warrenty, setWarrenty] = useState<string>("Warranty")
     const [problem1, setProblem1] = useState<string>("")
     const [problem2, setProblem2] = useState<string>("")
+    const [overige, setOverige] = useState<string>("")
     const [dontSendItems, setDontSendItems] = useState<string[]>([])
     const { loading: loadingPdf, error: errorPdf, result: resultPdf, execute: executePdf } = useFetch<string>()
     const { loading: loadingEmail, error: errorEmail, result: resultEmail, execute: executeEmail } = useFetch<string>()
@@ -157,6 +159,8 @@ export default function RmaSystem() {
 
     }
 
+    const elementStyling = "text-sm border border-altec-teal rounded-lg px-2 py-1.5 bg-altec-white focus:outline-none focus:ring-1 focus:ring-altec-teal"
+
     return (
         <div className="shadow-md rounded-2xl p-3 bg-white w-1/4 border border-altec-teal">
             <h2 className="text-xl font-semibold pt-1 mb-2 text-center">RMA systeem</h2>
@@ -167,7 +171,7 @@ export default function RmaSystem() {
             <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide mb-1">Taal</p>
             <div className="flex flex-col gap-2 mb-4">
                 <select
-                    className="text-sm border border-altec-teal rounded-lg px-2 py-1.5 bg-altec-white focus:outline-none focus:ring-1 focus:ring-altec-teal"
+                    className={elementStyling}
                     name="language"
                     id="language"
                     value={language}
@@ -180,7 +184,7 @@ export default function RmaSystem() {
 
                 <label className="text-xs font-semibold text-altec-teal uppercase tracking-wide">Ticket nummer</label>
                 <input 
-                    className="text-sm border border-altec-teal rounded-lg px-2 py-1.5 bg-altec-white focus:outline-none focus:ring-1 focus:ring-altec-teal" 
+                    className={elementStyling} 
                     type="number"
                     id="ticketNumber" 
                     name="ticketNumber"
@@ -190,7 +194,7 @@ export default function RmaSystem() {
 
                 <label className="text-xs font-semibold text-altec-teal uppercase tracking-wide">Bedrijf</label>
                 <input 
-                    className="text-sm border border-altec-teal rounded-lg px-2 py-1.5 bg-altec-white focus:outline-none focus:ring-1 focus:ring-altec-teal" 
+                    className={elementStyling} 
                     type="text"
                     id="company" 
                     name="company"
@@ -211,7 +215,7 @@ export default function RmaSystem() {
                         <option value="Madam">Madam</option>
                     </select>
                     <input 
-                        className="text-sm border border-altec-teal rounded-lg px-2 py-1.5 bg-altec-white focus:outline-none focus:ring-1 focus:ring-altec-teal" 
+                        className={elementStyling} 
                         type="text"
                         id="contactPerson" 
                         name="contactPerson"
@@ -222,7 +226,7 @@ export default function RmaSystem() {
 
                 <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide">Email</p>
                 <input 
-                    className="text-sm border border-altec-teal rounded-lg px-2 py-1.5 bg-altec-white focus:outline-none focus:ring-1 focus:ring-altec-teal" 
+                    className={elementStyling} 
                     type="text"
                     id="email" 
                     name="email"
@@ -232,7 +236,7 @@ export default function RmaSystem() {
 
                 <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide">Straat</p>
                 <input 
-                    className="text-sm border border-altec-teal rounded-lg px-2 py-1.5 bg-altec-white focus:outline-none focus:ring-1 focus:ring-altec-teal" 
+                    className={elementStyling} 
                     type="text"
                     id="street" 
                     name="street"
@@ -242,12 +246,22 @@ export default function RmaSystem() {
 
                 <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide">Plaats</p>
                 <input 
-                    className="text-sm border border-altec-teal rounded-lg px-2 py-1.5 bg-altec-white focus:outline-none focus:ring-1 focus:ring-altec-teal" 
+                    className={elementStyling} 
                     type="text"
                     id="place" 
                     name="place"
                     value={place}
                     onChange={(e) => setPlace(e.target.value) } 
+                />
+
+                <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide">Meerdere printers</p>
+                <input
+                    className={elementStyling} 
+                    type="checkbox"
+                    id="multiplePrinters"
+                    name="multiplePrinters"
+                    checked={multiplePrinters}
+                    onChange={(e) => setMultiplePrinters(e.target.checked) }
                 />
 
                 <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide">Model</p>
@@ -265,7 +279,7 @@ export default function RmaSystem() {
 
                 <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide">Serienummer</p>
                 <input 
-                    className="text-sm border border-altec-teal rounded-lg px-2 py-1.5 bg-altec-white focus:outline-none focus:ring-1 focus:ring-altec-teal" 
+                    className={elementStyling} 
                     type="number"
                     id="serienummer" 
                     name="serienummer"
@@ -288,7 +302,7 @@ export default function RmaSystem() {
 
                 <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide">Probleem 1</p>
                 <input
-                    className="text-sm border border-altec-teal rounded-lg px-2 py-1.5 bg-altec-white focus:outline-none focus:ring-1 focus:ring-altec-teal" 
+                    className={elementStyling} 
                     type="text"
                     id="problem1"
                     name="problem1"
@@ -298,7 +312,7 @@ export default function RmaSystem() {
 
                 <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide">Probleem 2</p>
                 <input 
-                    className="text-sm border border-altec-teal rounded-lg px-2 py-1.5 bg-altec-white focus:outline-none focus:ring-1 focus:ring-altec-teal" 
+                    className={elementStyling} 
                     type="text"
                     id="problem2"
                     name="problem2"
@@ -324,6 +338,16 @@ export default function RmaSystem() {
                         )
                     })}
                 </div>
+
+                <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide">Overige</p>
+                <input 
+                    className={elementStyling} 
+                    type="text"
+                    id="overige"
+                    name="overige"
+                    value={overige}
+                    onChange={(e) => setOverige(e.target.value) }
+                />
 
                 <div className="flex flex-row gap-2">
                     <button
