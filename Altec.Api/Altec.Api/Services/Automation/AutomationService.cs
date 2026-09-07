@@ -310,6 +310,7 @@ public class AutomationService : IAutomationService
         string contactPerson,
         string contactPersonPrefix,
         List<string> dontSendItems,
+        string extra,
         string model,
         string street,
         string problem1,
@@ -377,5 +378,10 @@ public class AutomationService : IAutomationService
 
         var response = await _httpClient.SendAsync(request);
         response.EnsureSuccessStatusCode();
+    }
+
+    public Task GeneratePDF(string langauge, int ticketNumber, string company, string contactPerson, string contactPersonPrefix, List<string> dontSendItems, string model, string street, string problem1, string problem2, string place, int serieNumber, string warrenty)
+    {
+        throw new NotImplementedException();
     }
 }

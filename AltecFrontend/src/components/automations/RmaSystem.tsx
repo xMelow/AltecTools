@@ -145,6 +145,8 @@ export default function RmaSystem() {
             contactPerson: contactPerson,
             contactPersonPrefix: contactPersonPrefix,
             dontSendItems: dontSendItems,
+            multiplePrinters: multiplePrinters,
+            overige: overige,
             model: model,
             street: street,
             problem1: problem1,

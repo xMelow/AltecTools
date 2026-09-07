@@ -30,6 +30,8 @@ export type GeneratePdfRequest = {
     contactPerson: string,
     contactPersonPrefix: string,
     dontSendItems: string[],
+    overige: string,
+    multiplePrinters: boolean,
     model: string,
     street: string,
     problem1: string,

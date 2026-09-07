@@ -104,6 +104,8 @@ export async function generatePdf(body: GeneratePdfRequest): Promise<string> {
     formData.append('contactPerson', body.contactPerson)
     formData.append('contactPersonPrefix', body.contactPersonPrefix)
     formData.append('dontSendItems', body.dontSendItems.toString())
+    formData.append('overige', body.overige)
+    formData.append('multiplePrintes', body.multiplePrinters.toString())
     formData.append('model', body.model)
     formData.append('street', body.street)
     formData.append('problem1', body.problem1)
