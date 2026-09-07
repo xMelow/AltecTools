@@ -129,6 +129,8 @@ public class AutomationController : ControllerBase
         [FromForm] string contactPerson,
         [FromForm] string contactPersonPrefix,
         [FromForm] List<string> dontSendItems,
+        [FromForm] string overig,
+        [FromForm] bool multiplePrinters,
         [FromForm] string model,
         [FromForm] string street,
         [FromForm] string problem1,
@@ -139,7 +141,7 @@ public class AutomationController : ControllerBase
     ) {
         try
         {
-            await _automationService.GeneratePDF(langauge, ticketNumber, company, contactPerson, contactPersonPrefix, dontSendItems, model, street, problem1, problem2, place, serieNumber, warrenty);
+            await _automationService.GeneratePDF(langauge, ticketNumber, company, contactPerson, contactPersonPrefix, dontSendItems, overig, multiplePrinters, model, street, problem1, problem2, place, serieNumber, warrenty);
             return Ok("PDF created");
         }
         catch (Exception ex)

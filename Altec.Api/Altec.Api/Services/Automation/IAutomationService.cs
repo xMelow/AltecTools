@@ -8,5 +8,5 @@ public interface IAutomationService
     Task<string> SdCardLabelPreview(string orderNumber, string version);
     Task PrintTestRoomLabel(string sensorType, int speed, int density, bool cutter, bool userLabel, string printer);
     Task PrintQlickPrintLicensie(IFormFile dataFile);
-    Task GeneratePDF(string langauge, int ticketNumber, string company, string contactPerson, string contactPersonPrefix, List<string> dontSendItems, string model, string street, string problem1, string problem2, string place, int serieNumber, string warrenty);
+    Task GeneratePDF(string langauge, int ticketNumber, string company, string contactPerson, string contactPersonPrefix, List<string> dontSendItems, string overig, bool multiplePrinters, string model, string street, string problem1, string problem2, string place, int serieNumber, string warrenty);
 }
