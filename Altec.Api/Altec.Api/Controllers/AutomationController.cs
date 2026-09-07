@@ -123,13 +123,13 @@ public class AutomationController : ControllerBase
 
     [HttpPost("generatePdf")]
     public async Task<IActionResult> GeneratePDF(
-        [FromForm] string langauge,
+        [FromForm] string language,
         [FromForm] int ticketNumber,
         [FromForm] string company,
         [FromForm] string contactPerson,
         [FromForm] string contactPersonPrefix,
         [FromForm] List<string> dontSendItems,
-        [FromForm] string overig,
+        [FromForm] string overige,
         [FromForm] bool multiplePrinters,
         [FromForm] string model,
         [FromForm] string street,
@@ -141,7 +141,7 @@ public class AutomationController : ControllerBase
     ) {
         try
         {
-            await _automationService.GeneratePDF(langauge, ticketNumber, company, contactPerson, contactPersonPrefix, dontSendItems, overig, multiplePrinters, model, street, problem1, problem2, place, serieNumber, warrenty);
+            await _automationService.GeneratePDF(language, ticketNumber, company, contactPerson, contactPersonPrefix, dontSendItems, overige, multiplePrinters, model, street, problem1, problem2, place, serieNumber, warrenty);
             return Ok("PDF created");
         }
         catch (Exception ex)

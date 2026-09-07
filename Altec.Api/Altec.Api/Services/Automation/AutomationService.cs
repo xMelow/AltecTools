@@ -320,8 +320,6 @@ public class AutomationService : IAutomationService
         int serieNumber,
         string warrenty
     ) {
-        // rma label needs ticketnumber
-        
         var rmaLabelPath = language switch
         {
             "NL" => _config[$"LabelPaths:RMALabelNL"],
@@ -341,42 +339,47 @@ public class AutomationService : IAutomationService
         var fileOutputName = multiplePrinters ? $"\\ALTEC-FILE\\Data\\ALTLabels\\Nicelabel2017\\NLCustomSystems\\RMA\\PDF\\{ticketNumber}_{serieNumber}.pdf" 
                                             : $"\\ALTEC-FILE\\Data\\ALTLabels\\Nicelabel2017\\NLCustomSystems\\RMA\\PDF\\{ticketNumber}.pdf";
         
-        var RMAlabel = File.OpenRead(rmaLabelPath);
-        var SendLabel = File.OpenRead(sendLabelPath);
-
-        // create the request
-        var requestData = new MultipartFormDataContent();
-
-        StreamContent labelStream = new StreamContent(RMAlabel);
-        requestData.Add(labelStream, "label");
-
-        requestData.Add(new StringContent(fileOutputName));
-
+        // if overige1 is not empty overige = true
         var labelVariables = new Dictionary<string, string>
         {
-          ["ticketNumber"] = ticketNumber.ToString(),
-          ["company"] = company,
-          ["contactPerson"] = contactPerson,
-          ["contactPersonPrefix"] = contactPersonPrefix,
-          ["model"] = model,
-          ["street"] = street,
-          ["problem1"] = problem1,
-          ["problem2"] = problem2,
-          ["place"] = place,
+          ["Ticketnummer"] = ticketNumber.ToString(),
+          ["Naam bedrijf"] = company,
+          ["Contactpersoon"] = contactPerson,
+          ["heer/vrouw"] = contactPersonPrefix,
+          ["Model"] = model,
+          ["Straat"] = street,
+          ["probregel1"] = problem1,
+          ["probregel2"] = problem2,
+          ["Plaats"] = place,
           ["serieNumber"] = serieNumber.ToString(),
-          ["warrenty"] = warrenty,
+          ["Warranty"] = warrenty,
+          ["overige1"] = overige,
+        };
+
+        // create the request
+        var requestData = new MultipartFormDataContent
+        {
+            { new StreamContent(File.OpenRead(rmaLabelPath)), "labels" },
+            { new StreamContent(File.OpenRead(sendLabelPath)), "labels" }
         };
 
         var jsonVariables = JsonSerializer.Serialize(labelVariables);
-        requestData.Add(new StringContent(jsonVariables), "labelVariables");
+        requestData.Add(new StringContent(jsonVariables), "variables");
+
+        requestData.Add(new StringContent(fileOutputName), "outputFileName");
+        requestData.Add(new StringContent(true.ToString()), "appendToFile");
 
         // send the request to the nicelabel sdk api
-        var request = new HttpRequestMessage(HttpMethod.Post, "/api/nicelabel/printVariableLabel")
+        var request = new HttpRequestMessage(HttpMethod.Post, "/api/nicelabel/printLabelsOutputFile")
         {
             Content = requestData
         };
 
         var response = await _httpClient.SendAsync(request);
-        response.EnsureSuccessStatusCode();
+        if (!response.IsSuccessStatusCode)
+        {
+            var body = await response.Content.ReadAsStringAsync();
+            throw new HttpRequestException($"NiceLabel API returned {(int)response.StatusCode} {response.StatusCode}: {body}");
+        }
     }
 }
