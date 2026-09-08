@@ -157,7 +157,22 @@ export default function RmaSystem() {
     }
 
     function sendEmail() {
+        const spaceIndex = contactPerson.indexOf(" ")
+        const firstName = spaceIndex > 0 ? contactPerson.slice(0, spaceIndex) : contactPerson
+        const lastName = spaceIndex > 0 ? contactPerson.slice(spaceIndex + 1) : contactPerson
 
+        const subject = `Support #${ticketNumber} - RMA`
+
+        let body: string
+        if (language === "NL") {
+            body = `Beste ${firstName},\n\nZoals telefonisch besproken moet uw printer binnenkomen voor nazicht en/of herstelling.\nHierbij in bijlage het RMA document. Zodra de printer is binnengekomen houden we je op de hoogte!`
+        } else if (language === "EN") {
+            body = `Dear ${firstName},\n\nAs mentioned on the phone your printer needs to come in for reparation.\nAttached to this email you will find the RMA document. As soon as we get your printer we will keep you posted!`
+        } else {
+            body = `Cher/Chère ${contactPersonPrefix} ${lastName},\n\nComme évoqué par téléphone, votre imprimante doit être retournée dans nos locaux pour réparation.\nVous trouverez le document à joindre à l'envoi en pièce jointe, et nous vous tiendrons informé(e) dès sa réception!`
+        }
+
+        window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
     }
 
     const elementStyling = "text-sm border border-altec-teal rounded-lg px-2 py-1.5 bg-altec-white focus:outline-none focus:ring-1 focus:ring-altec-teal"
