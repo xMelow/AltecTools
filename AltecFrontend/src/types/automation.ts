@@ -22,3 +22,21 @@ export type TestRoomRequest = {
 export type QlickPrintRequest = {
     dataFile: File
 }
+
+export type GeneratePdfRequest = {
+    language: string,
+    ticketNumber: string,
+    company: string,
+    contactPerson: string,
+    contactPersonPrefix: string,
+    dontSendItems: string[],
+    overige: string | undefined,
+    multiplePrinters: boolean,
+    model: string,
+    street: string,
+    problem1: string,
+    problem2: string | undefined,
+    place: string,
+    serienummer: string,
+    warrenty: string
+}

@@ -36,7 +36,6 @@ export default function TestRoom() {
                 setPrinter(response.find(p => p.name === "Altec ATP-300 Pro")?.name ?? response[0]?.name)
             }
         }
-        
         getPrinters()
     }, [])
 

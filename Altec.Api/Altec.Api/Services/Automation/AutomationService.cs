@@ -302,4 +302,88 @@ public class AutomationService : IAutomationService
         }
         return labelData.OrderBy(barcode => barcode["barcode"]).ToList();
     }
+
+    public async Task GeneratePDF(
+        string language,
+        string ticketNumber,
+        string company,
+        string contactPerson,
+        string contactPersonPrefix,
+        List<string> dontSendItems,
+        string? overige,
+        bool multiplePrinters,
+        string model,
+        string street,
+        string problem1,
+        string? problem2,
+        string place,
+        string serieNumber,
+        string warrenty
+    ) {
+        var rmaLabelPath = language switch
+        {
+            "NL" => _config[$"LabelPaths:RMALabelNL"],
+            "EN" => _config[$"LabelPaths:RMALabelEN"],
+            "FR" => _config[$"LabelPaths:RMALabelFR"],
+            _ => throw new ArgumentException($"Unsupported language: {language}")
+        };
+
+        var sendLabelPath = language switch
+        {
+            "NL" => _config[$"LabelPaths:ZendLabel"],
+            "EN" => _config[$"LabelPaths:ZendLabelENG"],
+            "FR" => _config[$"LabelPaths:ZendLabelFR"],
+            _ => throw new ArgumentException($"Unsupported language: {language}")
+        };
+
+        var fileOutputName = multiplePrinters ? $"I:\\ALTLabels\\Nicelabel2017\\NLCustomSystems\\RMA\\PDF\\{ticketNumber}_{serieNumber}.pdf" 
+                                            : $"I:\\ALTLabels\\Nicelabel2017\\NLCustomSystems\\RMA\\PDF\\{ticketNumber}.pdf";
+        
+        var labelVariables = new Dictionary<string, string>
+        {
+          ["Ticketnummer"] = ticketNumber,
+          ["Naam bedrijf"] = company,
+          ["Contactpersoon"] = contactPerson,
+          ["heer/vrouw"] = contactPersonPrefix,
+          ["Model"] = model,
+          ["Straat"] = street,
+          ["probregel1"] = problem1,
+          ["probregel2"] = problem2,
+          ["Plaats"] = place,
+          ["Serienummer"] = serieNumber,
+          ["Warranty"] = warrenty,
+          ["overige1"] = overige,
+          ["overige"] = string.IsNullOrEmpty(overige) ? "False" : "True",
+        };
+
+        foreach (var item in dontSendItems)
+        {
+            var labelVariable = item is "Inkt folie" or "Inkt cartridge" ? "Inktlint" : item;
+            labelVariables[labelVariable] = "True";
+        }
+
+        var requestData = new MultipartFormDataContent
+        {
+            { new StreamContent(File.OpenRead(rmaLabelPath)), "labels" },
+            { new StreamContent(File.OpenRead(sendLabelPath)), "labels" }
+        };
+
+        var jsonVariables = JsonSerializer.Serialize(labelVariables);
+        requestData.Add(new StringContent(jsonVariables), "variables");
+
+        requestData.Add(new StringContent(fileOutputName), "outputFileName");
+        requestData.Add(new StringContent(true.ToString()), "appendToFile");
+
+        var request = new HttpRequestMessage(HttpMethod.Post, "/api/nicelabel/printLabelsOutputFile")
+        {
+            Content = requestData
+        };
+
+        var response = await _httpClient.SendAsync(request);
+        if (!response.IsSuccessStatusCode)
+        {
+            var body = await response.Content.ReadAsStringAsync();
+            throw new HttpRequestException($"NiceLabel API returned {(int)response.StatusCode} {response.StatusCode}: {body}");
+        }
+    }
 }
