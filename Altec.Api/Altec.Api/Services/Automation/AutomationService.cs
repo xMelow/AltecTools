@@ -310,12 +310,12 @@ public class AutomationService : IAutomationService
         string contactPerson,
         string contactPersonPrefix,
         List<string> dontSendItems,
-        string overige,
+        string? overige,
         bool multiplePrinters,
         string model,
         string street,
         string problem1,
-        string problem2,
+        string? problem2,
         string place,
         string serieNumber,
         string warrenty
@@ -336,8 +336,8 @@ public class AutomationService : IAutomationService
             _ => throw new ArgumentException($"Unsupported language: {language}")
         };
 
-        var fileOutputName = multiplePrinters ? $"\\ALTEC-FILE\\Data\\ALTLabels\\Nicelabel2017\\NLCustomSystems\\RMA\\PDF\\{ticketNumber}_{serieNumber}.pdf" 
-                                            : $"\\ALTEC-FILE\\Data\\ALTLabels\\Nicelabel2017\\NLCustomSystems\\RMA\\PDF\\{ticketNumber}.pdf";
+        var fileOutputName = multiplePrinters ? $"{ticketNumber}_{serieNumber}.pdf" 
+                                            : $"{ticketNumber}.pdf";
         
         var labelVariables = new Dictionary<string, string>
         {
