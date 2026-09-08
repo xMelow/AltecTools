@@ -107,8 +107,8 @@ const DONT_SEND_OPTIONS = [
 ]
 
 export default function RmaSystem() {
-    const [language, setLanguage] = useState<string>("Nederlands")
-    const [ticketNumber, setTicketNumber] = useState<number>()
+    const [language, setLanguage] = useState<string>("NL")
+    const [ticketNumber, setTicketNumber] = useState<string>("")
     const [company, setCompany] = useState<string>("")
     const [contactPerson, setContactPerson] = useState<string>("")
     const [contactPersonPrefix, setContactPersonPrefix] = useState<string>("Mr")
@@ -117,7 +117,7 @@ export default function RmaSystem() {
     const [place, setPlace] = useState<string>("")
     const [multiplePrinters, setMultiplePrinters] = useState<boolean>(false)
     const [model, setModel] = useState<string>("ATP-300PRO")
-    const [serienummer, setSerienummer] = useState<number>()
+    const [serienummer, setSerienummer] = useState<string>("")
     const [warrenty, setWarrenty] = useState<string>("Warranty")
     const [problem1, setProblem1] = useState<string>("")
     const [problem2, setProblem2] = useState<string>("")
@@ -129,14 +129,14 @@ export default function RmaSystem() {
     function toggleDontSendItem(item: string) {
         if (dontSendItems.includes(item)) {
             setDontSendItems(dontSendItems.filter(el => el !== item))
-        } 
+        }
         else {
             setDontSendItems([...dontSendItems, item])
         }
     }
 
     async function createPdf() {
-        if (ticketNumber == undefined || serienummer == undefined) return
+        if (!ticketNumber || !serienummer) return
 
         await executePdf(() => generatePdf({
             language: language,
@@ -186,12 +186,12 @@ export default function RmaSystem() {
 
                 <label className="text-xs font-semibold text-altec-teal uppercase tracking-wide">Ticket nummer</label>
                 <input 
-                    className={elementStyling} 
-                    type="number"
-                    id="ticketNumber" 
+                    className={elementStyling}
+                    type="text"
+                    id="ticketNumber"
                     name="ticketNumber"
                     value={ticketNumber}
-                    onChange={(e) => setTicketNumber(Number(e.target.value)) }
+                    onChange={(e) => setTicketNumber(e.target.value) }
                 />
 
                 <label className="text-xs font-semibold text-altec-teal uppercase tracking-wide">Bedrijf</label>
@@ -281,12 +281,12 @@ export default function RmaSystem() {
 
                 <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide">Serienummer</p>
                 <input 
-                    className={elementStyling} 
-                    type="number"
-                    id="serienummer" 
+                    className={elementStyling}
+                    type="text"
+                    id="serienummer"
                     name="serienummer"
                     value={serienummer}
-                    onChange={(e) => setSerienummer(Number(e.target.value)) }
+                    onChange={(e) => setSerienummer(e.target.value) }
                 />
 
                 <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide">Warrenty</p>

@@ -124,7 +124,7 @@ public class AutomationController : ControllerBase
     [HttpPost("generatePdf")]
     public async Task<IActionResult> GeneratePDF(
         [FromForm] string language,
-        [FromForm] int ticketNumber,
+        [FromForm] string ticketNumber,
         [FromForm] string company,
         [FromForm] string contactPerson,
         [FromForm] string contactPersonPrefix,
@@ -136,7 +136,7 @@ public class AutomationController : ControllerBase
         [FromForm] string problem1,
         [FromForm] string problem2,
         [FromForm] string place,
-        [FromForm] int serieNumber,
+        [FromForm] string serieNumber,
         [FromForm] string warrenty
     ) {
         try

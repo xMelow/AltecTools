@@ -305,7 +305,7 @@ public class AutomationService : IAutomationService
 
     public async Task GeneratePDF(
         string language,
-        int ticketNumber,
+        string ticketNumber,
         string company,
         string contactPerson,
         string contactPersonPrefix,
@@ -317,7 +317,7 @@ public class AutomationService : IAutomationService
         string problem1,
         string problem2,
         string place,
-        int serieNumber,
+        string serieNumber,
         string warrenty
     ) {
         var rmaLabelPath = language switch
@@ -339,10 +339,9 @@ public class AutomationService : IAutomationService
         var fileOutputName = multiplePrinters ? $"\\ALTEC-FILE\\Data\\ALTLabels\\Nicelabel2017\\NLCustomSystems\\RMA\\PDF\\{ticketNumber}_{serieNumber}.pdf" 
                                             : $"\\ALTEC-FILE\\Data\\ALTLabels\\Nicelabel2017\\NLCustomSystems\\RMA\\PDF\\{ticketNumber}.pdf";
         
-        // if overige1 is not empty overige = true
         var labelVariables = new Dictionary<string, string>
         {
-          ["Ticketnummer"] = ticketNumber.ToString(),
+          ["Ticketnummer"] = ticketNumber,
           ["Naam bedrijf"] = company,
           ["Contactpersoon"] = contactPerson,
           ["heer/vrouw"] = contactPersonPrefix,
@@ -351,12 +350,18 @@ public class AutomationService : IAutomationService
           ["probregel1"] = problem1,
           ["probregel2"] = problem2,
           ["Plaats"] = place,
-          ["serieNumber"] = serieNumber.ToString(),
+          ["Serienummer"] = serieNumber,
           ["Warranty"] = warrenty,
           ["overige1"] = overige,
+          ["overige"] = string.IsNullOrEmpty(overige) ? "False" : "True",
         };
 
-        // create the request
+        foreach (var item in dontSendItems)
+        {
+            var labelVariable = item is "Inkt folie" or "Inkt cartridge" ? "Inktlint" : item;
+            labelVariables[labelVariable] = "True";
+        }
+
         var requestData = new MultipartFormDataContent
         {
             { new StreamContent(File.OpenRead(rmaLabelPath)), "labels" },
@@ -369,7 +374,6 @@ public class AutomationService : IAutomationService
         requestData.Add(new StringContent(fileOutputName), "outputFileName");
         requestData.Add(new StringContent(true.ToString()), "appendToFile");
 
-        // send the request to the nicelabel sdk api
         var request = new HttpRequestMessage(HttpMethod.Post, "/api/nicelabel/printLabelsOutputFile")
         {
             Content = requestData

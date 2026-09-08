@@ -99,19 +99,19 @@ export async function printQlickPrintLicensie(body: QlickPrintRequest): Promise<
 export async function generatePdf(body: GeneratePdfRequest): Promise<string> {
     const formData = new FormData()
     formData.append('language', body.language)
-    formData.append('ticketNumber', body.ticketNumber.toString())
+    formData.append('ticketNumber', body.ticketNumber)
     formData.append('company', body.company)
     formData.append('contactPerson', body.contactPerson)
     formData.append('contactPersonPrefix', body.contactPersonPrefix)
-    formData.append('dontSendItems', body.dontSendItems.toString())
+    body.dontSendItems.forEach(item => formData.append('dontSendItems', item))
     formData.append('overige', body.overige)
-    formData.append('multiplePrintes', body.multiplePrinters.toString())
+    formData.append('multiplePrinters', body.multiplePrinters.toString())
     formData.append('model', body.model)
     formData.append('street', body.street)
     formData.append('problem1', body.problem1)
     formData.append('problem2', body.problem2)
     formData.append('place', body.place)
-    formData.append('serienummer', body.serienummer.toString())
+    formData.append('serieNumber', body.serienummer)
     formData.append('warrenty', body.warrenty)
 
     const res = await fetch(`/api/automation/generatePdf`, {

@@ -25,7 +25,7 @@ export type QlickPrintRequest = {
 
 export type GeneratePdfRequest = {
     language: string,
-    ticketNumber: number,
+    ticketNumber: string,
     company: string,
     contactPerson: string,
     contactPersonPrefix: string,
@@ -37,6 +37,6 @@ export type GeneratePdfRequest = {
     problem1: string,
     problem2: string,
     place: string,
-    serienummer: number,
+    serienummer: string,
     warrenty: string
 }
