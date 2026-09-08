@@ -102,8 +102,7 @@ const DONT_SEND_OPTIONS = [
     "Labels",
     "Inkt folie",
     "Inkt cartridge",
-    "Toetsenboard",
-    "Scanner"
+    "Toetsenboard"
 ]
 
 export default function RmaSystem() {
@@ -350,6 +349,11 @@ export default function RmaSystem() {
                     value={overige}
                     onChange={(e) => setOverige(e.target.value) }
                 />
+
+                {errorPdf && <p className="text-red-500">{errorPdf}</p>}
+                {resultPdf && <p className="text-green-500">{resultPdf}</p>}
+                {errorEmail && <p className="text-red-500">{errorEmail}</p>}
+                {resultEmail && <p className="text-green-500">{resultEmail}</p>}
 
                 <div className="flex flex-row gap-2">
                     <button

@@ -336,8 +336,8 @@ public class AutomationService : IAutomationService
             _ => throw new ArgumentException($"Unsupported language: {language}")
         };
 
-        var fileOutputName = multiplePrinters ? $"{ticketNumber}_{serieNumber}.pdf" 
-                                            : $"{ticketNumber}.pdf";
+        var fileOutputName = multiplePrinters ? $"I:\\ALTLabels\\Nicelabel2017\\NLCustomSystems\\RMA\\PDF\\{ticketNumber}_{serieNumber}.pdf" 
+                                            : $"I:\\ALTLabels\\Nicelabel2017\\NLCustomSystems\\RMA\\PDF\\{ticketNumber}.pdf";
         
         var labelVariables = new Dictionary<string, string>
         {
