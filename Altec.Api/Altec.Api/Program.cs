@@ -40,18 +40,7 @@ builder.Services.AddHttpClient<INiceLabelClient, NiceLabelClient>(client =>
         HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
 });
 
-builder.Services.AddHttpClient<IAutomationService, AutomationService>(client =>
-{
-    client.BaseAddress =  new Uri(builder.Configuration["NiceLabelApi:BaseUrl"]);
-    client.DefaultRequestVersion = new Version(1, 1);
-    client.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionExact;
-})
-
-.ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
-{
-    ServerCertificateCustomValidationCallback = 
-        HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
-});
+builder.Services.AddScoped<IAutomationService, AutomationService>();
 
 
 var app = builder.Build();
