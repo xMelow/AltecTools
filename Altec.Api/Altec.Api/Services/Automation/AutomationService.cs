@@ -183,20 +183,35 @@ public class AutomationService : IAutomationService
     public async Task PrintTestRoomLabel(string sensorType, int speed, int density, bool cutter, bool userLabel, string printer)
     {
         var (totalLabels, labelVariables, printSettings) = BuildTestRoomData(speed, density, cutter, userLabel, printer);
+        var requestData = new MultipartFormDataContent();
 
         for (int i = 0; i < totalLabels; i++)
         {
             var labelNumber = i + 1;
             var sensorLabel = AssignLabelSensor(sensorType, labelNumber);
-            using var requestData = BuildPrintTestRoomRequestData(sensorLabel, labelNumber, printer, labelVariables, printSettings);
+            var fileStream = File.OpenRead(_config[$"LabelPaths:Testlabel-{sensorLabel}-{labelNumber}"]);
+            StreamContent labelStream = new StreamContent(fileStream);
+            requestData.Add(labelStream, "labels");
+        }
 
-            var request = new HttpRequestMessage(HttpMethod.Post, "/api/nicelabel/printLabelWithSettings")
-            {
-                Content = requestData
-            };
+        var jsonVariables = JsonSerializer.Serialize(labelVariables);
+        requestData.Add(new StringContent(jsonVariables), "variables");
 
-            var response = await _httpClient.SendAsync(request);
-            response.EnsureSuccessStatusCode();
+        var jsonPrinterSettings = JsonSerializer.Serialize(printSettings);
+        requestData.Add(new StringContent(jsonPrinterSettings), "printerSettings");
+
+        requestData.Add(new StringContent(printer), "printerName");
+
+        var request = new HttpRequestMessage(HttpMethod.Post, "/api/nicelabel/printLabelBatch")
+        {
+            Content = requestData
+        };
+
+        var response = await _httpClient.SendAsync(request);
+        if (!response.IsSuccessStatusCode)
+        {
+            var body = await response.Content.ReadAsStringAsync();
+            throw new HttpRequestException($"NiceLabel API returned {(int)response.StatusCode} {response.StatusCode}: {body}");
         }
     }
 
@@ -226,25 +241,6 @@ public class AutomationService : IAutomationService
         }
 
         return sensor;
-    }
-
-    private MultipartFormDataContent BuildPrintTestRoomRequestData(string sensorLabel, int labelNumber, string printerName, Dictionary<string, string> labelVariables, Dictionary<string, string> printSettings)
-    {
-        var requestData = new MultipartFormDataContent();
-        var fileStream = File.OpenRead(_config[$"LabelPaths:Testlabel-{sensorLabel}-{labelNumber}"]);
-
-        StreamContent labelStream = new StreamContent(fileStream);
-        requestData.Add(labelStream, "label");
-
-        requestData.Add(new StringContent(printerName), "printerName");
-
-        var jsonSettings = JsonSerializer.Serialize(printSettings);
-        requestData.Add(new StringContent(jsonSettings), "printSettings");
-
-        var jsonVariables = JsonSerializer.Serialize(labelVariables);
-        requestData.Add(new StringContent(jsonVariables), "labelVariables");
-
-        return requestData;
     }
 
     public async Task PrintQlickPrintLicensie(IFormFile dataFile)
@@ -374,7 +370,7 @@ public class AutomationService : IAutomationService
         requestData.Add(new StringContent(fileOutputName), "outputFileName");
         requestData.Add(new StringContent(true.ToString()), "appendToFile");
 
-        var request = new HttpRequestMessage(HttpMethod.Post, "/api/nicelabel/printLabelsOutputFile")
+        var request = new HttpRequestMessage(HttpMethod.Post, "/api/nicelabel/printToPdf")
         {
             Content = requestData
         };
