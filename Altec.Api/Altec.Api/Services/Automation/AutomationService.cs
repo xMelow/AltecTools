@@ -64,8 +64,8 @@ public class AutomationService : IAutomationService
     {
         var variables = ReadBarcodeData(dataFile);
 
-        await _niceLabel.PrintVariableLabelAsync(_config["LabelPaths:QlickPrintATP"], variables);
-        await _niceLabel.PrintVariableLabelAsync(_config["LabelPaths:QlickPrintA4"], variables);
+        await _niceLabel.PrintVariableLabelAsync(GetLabelPath("LabelPaths:QlickPrintATP"), variables);
+        await _niceLabel.PrintVariableLabelAsync(GetLabelPath("LabelPaths:QlickPrintA4"), variables);
     }
 
     public async Task GeneratePDF(RmaLabelData data)
@@ -79,8 +79,11 @@ public class AutomationService : IAutomationService
             [rmaLabelPath, sendLabelPath], labelVariables, outputFileName, appendToFile: true);
     }
 
-    private string SerialNumbersLabelPath => _config["LabelPaths:SerialNewPrintersLabel"];
-    private string SdCardLabelPath => _config["LabelPaths:SdCard"];
+    private string SerialNumbersLabelPath => GetLabelPath("LabelPaths:SerialNewPrintersLabel");
+    private string SdCardLabelPath => GetLabelPath("LabelPaths:SdCard");
+
+    private string GetLabelPath(string configKey) =>
+        _config[configKey] ?? throw new InvalidOperationException($"Missing configuration value: '{configKey}'");
 
     private static List<Dictionary<string, string>> BuildSerialNumberVariables(List<SerialNumberData> serialNumbers) =>
         serialNumbers.Select(serialData => new Dictionary<string, string>
@@ -194,7 +197,7 @@ public class AutomationService : IAutomationService
         for (int labelNumber = 1; labelNumber <= totalLabels; labelNumber++)
         {
             var sensorLabel = AssignLabelSensor(sensorType, labelNumber);
-            labelPaths.Add(_config[$"LabelPaths:Testlabel-{sensorLabel}-{labelNumber}"]);
+            labelPaths.Add(GetLabelPath($"LabelPaths:Testlabel-{sensorLabel}-{labelNumber}"));
         }
         return labelPaths;
     }
@@ -212,17 +215,17 @@ public class AutomationService : IAutomationService
 
     private string ResolveRmaLabelPath(string language) => language switch
     {
-        "NL" => _config["LabelPaths:RMALabelNL"],
-        "EN" => _config["LabelPaths:RMALabelEN"],
-        "FR" => _config["LabelPaths:RMALabelFR"],
+        "NL" => GetLabelPath("LabelPaths:RMALabelNL"),
+        "EN" => GetLabelPath("LabelPaths:RMALabelEN"),
+        "FR" => GetLabelPath("LabelPaths:RMALabelFR"),
         _ => throw new ArgumentException($"Unsupported language: {language}")
     };
 
     private string ResolveSendLabelPath(string language) => language switch
     {
-        "NL" => _config["LabelPaths:ZendLabel"],
-        "EN" => _config["LabelPaths:ZendLabelENG"],
-        "FR" => _config["LabelPaths:ZendLabelFR"],
+        "NL" => GetLabelPath("LabelPaths:ZendLabel"),
+        "EN" => GetLabelPath("LabelPaths:ZendLabelENG"),
+        "FR" => GetLabelPath("LabelPaths:ZendLabelFR"),
         _ => throw new ArgumentException($"Unsupported language: {language}")
     };
 
@@ -244,11 +247,11 @@ public class AutomationService : IAutomationService
             ["Model"] = data.Model,
             ["Straat"] = data.Street,
             ["probregel1"] = data.Problem1,
-            ["probregel2"] = data.Problem2,
+            ["probregel2"] = data.Problem2 ?? "",
             ["Plaats"] = data.Place,
             ["Serienummer"] = data.SerieNumber,
             ["Warranty"] = data.Warranty,
-            ["overige1"] = data.Overige,
+            ["overige1"] = data.Overige ?? "",
             ["overige"] = string.IsNullOrEmpty(data.Overige) ? "False" : "True"
         };
 
