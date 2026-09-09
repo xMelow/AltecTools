@@ -7,7 +7,6 @@ public class NiceLabelClient : INiceLabelClient
 {
     private const string VariablesPart = "variables";
     private enum LabelPart { Single, Multiple }
-
     private readonly HttpClient _httpClient;
 
     public NiceLabelClient(HttpClient httpClient, IConfiguration config)
@@ -15,13 +14,15 @@ public class NiceLabelClient : INiceLabelClient
         _httpClient = httpClient;
     }
 
-    public async Task<IReadOnlyList<string>> GetVariables(IFormFile labelFile)
+    public async Task<IReadOnlyList<string>> GetVariables(IFormFile labelFile) 
     {
         var fileStream = labelFile.OpenReadStream();
         StreamContent streamContent = new StreamContent(fileStream);
 
-        var request = new HttpRequestMessage(HttpMethod.Post, "/api/nicelabel/variables");
-        request.Content = streamContent;
+        var request = new HttpRequestMessage(HttpMethod.Post, "/api/nicelabel/variables")
+        {
+            Content = streamContent
+        };
 
         var response = await _httpClient.SendAsync(request);
         response.EnsureSuccessStatusCode();
@@ -45,8 +46,10 @@ public class NiceLabelClient : INiceLabelClient
         if (printerName != null)
             content.Add(new StringContent(printerName), "printerName");
 
-        var request = new HttpRequestMessage(HttpMethod.Post, "/api/nicelabel/printLabel");
-        request.Content = content;
+        var request = new HttpRequestMessage(HttpMethod.Post, "/api/nicelabel/printLabel")
+        {
+            Content = content
+        };
 
         var response = await _httpClient.SendAsync(request);
         response.EnsureSuccessStatusCode();
@@ -93,14 +96,12 @@ public class NiceLabelClient : INiceLabelClient
         return result;
     }
 
-    public async Task PrintVariableLabelAsync(
-        string labelPath,
-        List<Dictionary<string, string>> variables,
-        string? printerName = null)
+    public async Task PrintVariableLabelAsync(string labelPath, List<Dictionary<string, string>> variables, int quantity = 1, string? printerName = null)
     {
         var textParts = new Dictionary<string, string>
         {
-            [VariablesPart] = JsonSerializer.Serialize(variables)
+            [VariablesPart] = JsonSerializer.Serialize(variables),
+            ["quantity"] = quantity.ToString()
         };
         if (printerName != null)
             textParts["printerName"] = printerName;
@@ -109,9 +110,7 @@ public class NiceLabelClient : INiceLabelClient
             "/api/nicelabel/printVariableLabel", LabelPart.Single, [labelPath], textParts);
     }
 
-    public async Task<List<byte[]>> PreviewVariableLabelsAsync(
-        string labelPath,
-        List<Dictionary<string, string>> variables)
+    public async Task<List<byte[]>> PreviewVariableLabelsAsync(string labelPath, List<Dictionary<string, string>> variables)
     {
         var textParts = new Dictionary<string, string>
         {
@@ -128,11 +127,7 @@ public class NiceLabelClient : INiceLabelClient
         return result;
     }
 
-    public async Task PrintBatchAsync(
-        IEnumerable<string> labelPaths,
-        Dictionary<string, string> variables,
-        Dictionary<string, string> printerSettings,
-        string printerName)
+    public async Task PrintBatchAsync(IEnumerable<string> labelPaths, Dictionary<string, string> variables, Dictionary<string, string> printerSettings, string printerName)
     {
         var textParts = new Dictionary<string, string>
         {
@@ -145,11 +140,7 @@ public class NiceLabelClient : INiceLabelClient
             "/api/nicelabel/printLabelBatch", LabelPart.Multiple, labelPaths, textParts);
     }
 
-    public async Task PrintToPdfAsync(
-        IEnumerable<string> labelPaths,
-        Dictionary<string, string> variables,
-        string outputFileName,
-        bool appendToFile)
+    public async Task PrintToPdfAsync(IEnumerable<string> labelPaths, Dictionary<string, string> variables, string outputFileName, bool appendToFile)
     {
         var textParts = new Dictionary<string, string>
         {
@@ -162,11 +153,7 @@ public class NiceLabelClient : INiceLabelClient
             "/api/nicelabel/printToPdf", LabelPart.Multiple, labelPaths, textParts);
     }
 
-    private async Task<HttpResponseMessage> PostMultipartAsync(
-        string endpoint,
-        LabelPart labelPart,
-        IEnumerable<string> labelPaths,
-        IReadOnlyDictionary<string, string> textParts)
+    private async Task<HttpResponseMessage> PostMultipartAsync(string endpoint, LabelPart labelPart, IEnumerable<string> labelPaths, IReadOnlyDictionary<string, string> textParts)
     {
         var partName = labelPart == LabelPart.Single ? "label" : "labels";
 

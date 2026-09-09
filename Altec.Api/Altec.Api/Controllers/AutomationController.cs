@@ -1,5 +1,5 @@
-﻿using Altec.Api.Services.Automation;
-using DocumentFormat.OpenXml.Drawing.Charts;
+﻿using Altec.Api.Record.NiceLabel;
+using Altec.Api.Services.Automation;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Altec.Api.Controllers;
@@ -141,7 +141,24 @@ public class AutomationController : ControllerBase
     ) {
         try
         {
-            await _automationService.GeneratePDF(language, ticketNumber, company, contactPerson, contactPersonPrefix, dontSendItems, overige, multiplePrinters, model, street, problem1, problem2, place, serieNumber, warrenty);
+            var data = new RmaLabelData(
+                Language: language,
+                TicketNumber: ticketNumber,
+                Company: company,
+                ContactPerson: contactPerson,
+                ContactPersonPrefix: contactPersonPrefix,
+                DontSendItems: dontSendItems,
+                Overige: overige,
+                MultiplePrinters: multiplePrinters,
+                Model: model,
+                Street: street,
+                Problem1: problem1,
+                Problem2: problem2,
+                Place: place,
+                SerieNumber: serieNumber,
+                Warranty: warrenty);
+
+            await _automationService.GeneratePDF(data);
             return Ok("PDF created");
         }
         catch (Exception ex)

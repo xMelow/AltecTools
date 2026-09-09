@@ -22,7 +22,7 @@ public class AutomationService : IAutomationService
         var serialNumbers = ReadCsvData(csvFile, printerType);
         var variables = BuildSerialNumberVariables(serialNumbers);
 
-        await _niceLabel.PrintVariableLabelAsync(SerialNumbersLabelPath, variables, printerName);
+        await _niceLabel.PrintVariableLabelAsync(SerialNumbersLabelPath, variables, printerName: printerName);
     }
 
     public async Task<List<string>> PreviewSerialNumbers(IFormFile csvFile, string printerType)
@@ -38,9 +38,9 @@ public class AutomationService : IAutomationService
 
     public async Task PrintSdCardLabel(string orderNumber, string version, int amount)
     {
-        var variables = Enumerable.Repeat(BuildSdCardVariables(orderNumber, version), amount).ToList();
+        var variables = new List<Dictionary<string, string>> { BuildSdCardVariables(orderNumber, version) };
 
-        await _niceLabel.PrintVariableLabelAsync(SdCardLabelPath, variables);
+        await _niceLabel.PrintVariableLabelAsync(SdCardLabelPath, variables, quantity: amount);
     }
 
     public async Task<string> SdCardLabelPreview(string orderNumber, string version)
@@ -68,29 +68,12 @@ public class AutomationService : IAutomationService
         await _niceLabel.PrintVariableLabelAsync(_config["LabelPaths:QlickPrintA4"], variables);
     }
 
-    public async Task GeneratePDF(
-        string language,
-        string ticketNumber,
-        string company,
-        string contactPerson,
-        string contactPersonPrefix,
-        List<string> dontSendItems,
-        string? overige,
-        bool multiplePrinters,
-        string model,
-        string street,
-        string problem1,
-        string? problem2,
-        string place,
-        string serieNumber,
-        string warrenty
-    ) {
-        var rmaLabelPath = ResolveRmaLabelPath(language);
-        var sendLabelPath = ResolveSendLabelPath(language);
-        var outputFileName = BuildRmaPdfPath(multiplePrinters, ticketNumber, serieNumber);
-        var labelVariables = BuildRmaLabelVariables(
-            ticketNumber, company, contactPerson, contactPersonPrefix, model, street,
-            problem1, problem2, place, serieNumber, warrenty, overige, dontSendItems);
+    public async Task GeneratePDF(RmaLabelData data)
+    {
+        var rmaLabelPath = ResolveRmaLabelPath(data.Language);
+        var sendLabelPath = ResolveSendLabelPath(data.Language);
+        var outputFileName = BuildRmaPdfPath(data.MultiplePrinters, data.TicketNumber, data.SerieNumber);
+        var labelVariables = BuildRmaLabelVariables(data);
 
         await _niceLabel.PrintToPdfAsync(
             [rmaLabelPath, sendLabelPath], labelVariables, outputFileName, appendToFile: true);
@@ -250,29 +233,26 @@ public class AutomationService : IAutomationService
         return Path.Combine(pdfDirectory, fileName);
     }
 
-    private static Dictionary<string, string> BuildRmaLabelVariables(
-        string ticketNumber, string company, string contactPerson, string contactPersonPrefix,
-        string model, string street, string problem1, string? problem2, string place,
-        string serieNumber, string warrenty, string? overige, List<string> dontSendItems)
+    private static Dictionary<string, string> BuildRmaLabelVariables(RmaLabelData data)
     {
         var labelVariables = new Dictionary<string, string>
         {
-            ["Ticketnummer"] = ticketNumber,
-            ["Naam bedrijf"] = company,
-            ["Contactpersoon"] = contactPerson,
-            ["heer/vrouw"] = contactPersonPrefix,
-            ["Model"] = model,
-            ["Straat"] = street,
-            ["probregel1"] = problem1,
-            ["probregel2"] = problem2,
-            ["Plaats"] = place,
-            ["Serienummer"] = serieNumber,
-            ["Warranty"] = warrenty,
-            ["overige1"] = overige,
-            ["overige"] = string.IsNullOrEmpty(overige) ? "False" : "True"
+            ["Ticketnummer"] = data.TicketNumber,
+            ["Naam bedrijf"] = data.Company,
+            ["Contactpersoon"] = data.ContactPerson,
+            ["heer/vrouw"] = data.ContactPersonPrefix,
+            ["Model"] = data.Model,
+            ["Straat"] = data.Street,
+            ["probregel1"] = data.Problem1,
+            ["probregel2"] = data.Problem2,
+            ["Plaats"] = data.Place,
+            ["Serienummer"] = data.SerieNumber,
+            ["Warranty"] = data.Warranty,
+            ["overige1"] = data.Overige,
+            ["overige"] = string.IsNullOrEmpty(data.Overige) ? "False" : "True"
         };
 
-        foreach (var item in dontSendItems)
+        foreach (var item in data.DontSendItems)
         {
             var labelVariable = item is "Inkt folie" or "Inkt cartridge" ? "Inktlint" : item;
             labelVariables[labelVariable] = "True";
