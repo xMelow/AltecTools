@@ -175,6 +175,7 @@ export default function RmaSystem() {
     }
 
     const elementStyling = "text-sm border border-altec-teal rounded-lg px-2 py-1.5 bg-altec-white focus:outline-none focus:ring-1 focus:ring-altec-teal"
+    const labelStyling = "text-xs font-semibold text-altec-teal uppercase tracking-wide"
 
     return (
         <div className="shadow-md rounded-2xl p-3 bg-white w-1/4 border border-altec-teal">
@@ -197,7 +198,7 @@ export default function RmaSystem() {
                     <option value="FR">Frans</option>
                 </select>
 
-                <label className="text-xs font-semibold text-altec-teal uppercase tracking-wide">Ticket nummer</label>
+                <label className={labelStyling}>Ticket nummer</label>
                 <input 
                     className={elementStyling}
                     type="text"
@@ -207,7 +208,7 @@ export default function RmaSystem() {
                     onChange={(e) => setTicketNumber(e.target.value) }
                 />
 
-                <label className="text-xs font-semibold text-altec-teal uppercase tracking-wide">Bedrijf</label>
+                <label className={labelStyling}>Bedrijf</label>
                 <input 
                     className={elementStyling} 
                     type="text"
@@ -219,27 +220,29 @@ export default function RmaSystem() {
 
                 <div>
                     <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide mb-1">Contact persoon</p>
-                    <select
-                        className="mr-2 text-sm border border-altec-teal rounded-lg px-2 py-1.5 bg-altec-white focus:outline-none focus:ring-1 focus:ring-altec-teal"
-                        name="contactPersonPrefix"
-                        id="contactPersonPrefix"
-                        value={contactPersonPrefix}
-                        onChange={(e) => setContactPersonPrefix(e.target.value) }
-                    >
-                        <option value="Mr">Mr</option>
-                        <option value="Madam">Madam</option>
-                    </select>
-                    <input 
-                        className={elementStyling} 
-                        type="text"
-                        id="contactPerson" 
-                        name="contactPerson"
-                        value={contactPerson}
-                        onChange={(e) => setContactPerson(e.target.value) }
-                    />
+                    <div className="flex gap-2">
+                        <select
+                            className={elementStyling}
+                            name="contactPersonPrefix"
+                            id="contactPersonPrefix"
+                            value={contactPersonPrefix}
+                            onChange={(e) => setContactPersonPrefix(e.target.value) }
+                        >
+                            <option value="Mr">Mr</option>
+                            <option value="Madam">Madam</option>
+                        </select>
+                        <input
+                            className={`${elementStyling} flex-1`}
+                            type="text"
+                            id="contactPerson"
+                            name="contactPerson"
+                            value={contactPerson}
+                            onChange={(e) => setContactPerson(e.target.value) }
+                        />
+                    </div>
                 </div>
 
-                <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide">Email</p>
+                <p className={labelStyling}>Email</p>
                 <input 
                     className={elementStyling} 
                     type="text"
@@ -249,7 +252,7 @@ export default function RmaSystem() {
                     onChange={(e) => setEmail(e.target.value) }
                 />
 
-                <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide">Straat</p>
+                <p className={labelStyling}>Straat</p>
                 <input 
                     className={elementStyling} 
                     type="text"
@@ -259,7 +262,7 @@ export default function RmaSystem() {
                     onChange={(e) => setStreet(e.target.value) }
                 />
 
-                <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide">Plaats</p>
+                <p className={labelStyling}>Plaats</p>
                 <input 
                     className={elementStyling} 
                     type="text"
@@ -269,7 +272,7 @@ export default function RmaSystem() {
                     onChange={(e) => setPlace(e.target.value) } 
                 />
                 
-                <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide">Meerdere printers</p>
+                <p className={labelStyling}>Meerdere printers</p>
                 <button
                     type="button"
                     id="multiplePrinters"
@@ -280,13 +283,13 @@ export default function RmaSystem() {
                         multiplePrinters ? "bg-altec-teal text-altec-white" : "bg-altec-white"
                     }`}
                 >
-                    Meerdere printers
+                   {multiplePrinters ? "Ja" : "Nee"}
                 </button>
                
 
-                <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide">Model</p>
+                <p className={labelStyling}>Model</p>
                 <select
-                    className="mr-2 text-sm border border-altec-teal rounded-lg px-2 py-1.5 bg-altec-white focus:outline-none focus:ring-1 focus:ring-altec-teal"
+                    className={`${elementStyling} mr-2`}
                     name="model"
                     id="model"
                     value={model}
@@ -297,7 +300,7 @@ export default function RmaSystem() {
                     ))}
                 </select>
 
-                <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide">Serienummer</p>
+                <p className={labelStyling}>Serienummer</p>
                 <input 
                     className={elementStyling}
                     type="text"
@@ -307,9 +310,9 @@ export default function RmaSystem() {
                     onChange={(e) => setSerienummer(e.target.value) }
                 />
 
-                <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide">Warrenty</p>
+                <p className={labelStyling}>Warrenty</p>
                 <select
-                    className="mr-2 text-sm border border-altec-teal rounded-lg px-2 py-1.5 bg-altec-white focus:outline-none focus:ring-1 focus:ring-altec-teal"
+                    className={`${elementStyling} mr-2`}
                     name="warrenty"
                     id="warrenty"
                     value={warrenty}
@@ -320,7 +323,7 @@ export default function RmaSystem() {
                     <option value="In evaluation">In evaluation</option>
                 </select>
 
-                <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide">Probleem 1</p>
+                <p className={labelStyling}>Probleem 1</p>
                 <input
                     className={elementStyling} 
                     type="text"
@@ -330,7 +333,7 @@ export default function RmaSystem() {
                     onChange={(e) => setProblem1(e.target.value) }
                 />
 
-                <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide">Probleem 2</p>
+                <p className={labelStyling}>Probleem 2</p>
                 <input 
                     className={elementStyling} 
                     type="text"
@@ -340,7 +343,7 @@ export default function RmaSystem() {
                     onChange={(e) => setProblem2(e.target.value) }
                 />
 
-                <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide">Niet mee sturen</p>
+                <p className={labelStyling}>Niet mee sturen</p>
                 <div className="flex flex-wrap gap-2 mb-2">
                     {DONT_SEND_OPTIONS.map((option) => {
                         const isSelected = dontSendItems.includes(option)
@@ -359,7 +362,7 @@ export default function RmaSystem() {
                     })}
                 </div>
 
-                <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide">Overige</p>
+                <p className={labelStyling}>Overige</p>
                 <input 
                     className={elementStyling} 
                     type="text"
