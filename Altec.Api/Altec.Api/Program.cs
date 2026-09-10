@@ -10,7 +10,6 @@ using Altec.Api.Services.Printers;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
@@ -27,9 +26,11 @@ builder.Services.AddScoped<UsbDiscovery>();
 builder.Services.AddScoped<IPrinterService, PrinterService>();
 builder.Services.AddScoped<PrinterResponseParser>();
 
+var baseUrl = builder.Configuration["NiceLabelApi:BaseUrl"] ?? throw new InvalidOperationException("Missing configuration value: 'NiceLabelApi:BaseUrl'");
+
 builder.Services.AddHttpClient<INiceLabelClient, NiceLabelClient>(client =>
 {
-    client.BaseAddress =  new Uri(builder.Configuration["NiceLabelApi:BaseUrl"]);
+    client.BaseAddress = new Uri(baseUrl);
     client.DefaultRequestVersion = new Version(1, 1);
     client.DefaultVersionPolicy = HttpVersionPolicy.RequestVersionExact;
 })
@@ -45,7 +46,6 @@ builder.Services.AddScoped<IAutomationService, AutomationService>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();

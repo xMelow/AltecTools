@@ -425,8 +425,7 @@ public class TsplRender
         using var paint = new SKPaint
         {
             Color = SKColors.Black,
-            IsAntialias = true,
-            TextAlign = textAlign
+            IsAntialias = true
         };
 
         using var font = new SKFont
@@ -435,8 +434,7 @@ public class TsplRender
             Size = 12
         };
 
-        var textBounds = new SKRect();
-        paint.MeasureText(content, ref textBounds);
+        font.MeasureText(content, out var textBounds, paint);
 
         var textX = textAlign switch
         {
@@ -447,7 +445,7 @@ public class TsplRender
         };
         var textY = y + barcodeBitMap.Height + textBounds.Height;
 
-        canvas.DrawText(content, textX, textY, font, paint);
+        canvas.DrawText(content, textX, textY, textAlign, font, paint);
     }
     
     private void DrawBmpCommand(TsplDrawCommand command, SKCanvas canvas, Dictionary<string, string> images)

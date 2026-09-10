@@ -17,10 +17,10 @@ public class TsplService : ITsplService
         _tsplValidator = tsplValidator;
     }
     
-    public (byte[], float, float) RenderPreview(string tspl, bool showBlockOuline, Dictionary<string, string> images)
+    public (byte[], float, float) RenderPreview(string tspl, bool showBlockOutline, Dictionary<string, string>? images)
     {
         var tsplCommands = _tsplParser.Parse(tspl);
-        return _tsplRender.Render(tsplCommands, showBlockOuline, images);
+        return _tsplRender.Render(tsplCommands, showBlockOutline, images ?? []);
     }
 
     public IReadOnlyList<TsplDrawCommand> Parse(string tspl)
