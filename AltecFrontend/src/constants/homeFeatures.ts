@@ -85,13 +85,35 @@ export const features: Feature[] = [
                 ],
             },
             {
-                title: "Testruimte systeem",
+                title: "Testruimte Systeem",
                 route: "/automations",
                 description: "Print testruimte label with configurable sensor type, speed, and density settings.",
                 bullets: [
                     "Cutter and user label toggles for extra options",
                     "Select a printer from the NiceLabel installed printers"
                 ]
+            },
+            {
+                title: "RMA Systeem",
+                route: "/automations",
+                description:
+                    "Generate an RMA PDF and a prefilled support email when a customer's printer needs to come in for repair.",
+                bullets: [
+                    "RMA PDF with customer, model, serial & problem details",
+                    "Prefilled mailto in Dutch, English or French",
+                    "Mark warranty status and items not to send back",
+                ],
+            },
+            {
+                title: "QlickPrint Licensies",
+                route: "/automations",
+                description:
+                    "Print QlickPrint license tags in bulk from an exported text file.",
+                bullets: [
+                    "Reads licenses straight from a .txt data file",
+                    "Prints on Altec ATP-300 Pro with AWH-20 ink foil",
+                    "Prints an A4 sheet with every code & barcode",
+                ],
             }
         ],
     },
