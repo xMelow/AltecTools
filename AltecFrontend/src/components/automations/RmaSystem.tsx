@@ -160,7 +160,6 @@ export default function RmaSystem() {
         const spaceIndex = contactPerson.indexOf(" ")
         const firstName = spaceIndex > 0 ? contactPerson.slice(0, spaceIndex) : contactPerson
         const lastName = spaceIndex > 0 ? contactPerson.slice(spaceIndex + 1) : contactPerson
-
         const subject = `Support #${ticketNumber} - RMA`
 
         let body: string
@@ -269,16 +268,21 @@ export default function RmaSystem() {
                     value={place}
                     onChange={(e) => setPlace(e.target.value) } 
                 />
-
+                
                 <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide">Meerdere printers</p>
-                <input
-                    className={elementStyling} 
-                    type="checkbox"
+                <button
+                    type="button"
                     id="multiplePrinters"
                     name="multiplePrinters"
-                    checked={multiplePrinters}
-                    onChange={(e) => setMultiplePrinters(e.target.checked) }
-                />
+                    aria-pressed={multiplePrinters}
+                    onClick={() => setMultiplePrinters(!multiplePrinters)}
+                    className={`self-start text-sm px-2 py-1.5 rounded-lg border border-altec-teal focus:outline-none focus:ring-1 focus:ring-altec-teal ${
+                        multiplePrinters ? "bg-altec-teal text-altec-white" : "bg-altec-white"
+                    }`}
+                >
+                    Meerdere printers
+                </button>
+               
 
                 <p className="text-xs font-semibold text-altec-teal uppercase tracking-wide">Model</p>
                 <select
