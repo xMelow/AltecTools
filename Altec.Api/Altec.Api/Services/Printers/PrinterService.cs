@@ -9,14 +9,14 @@ namespace Altec.Api.Services.Printers;
 public class PrinterService : IPrinterService
 {
     private readonly UsbDiscovery _usbDiscovery;
-    private readonly WifiDiscovery _wifiDiscovery;
+    private readonly NetworkDiscovery _networkDiscovery;
 
     private readonly PrinterResponseParser _parser;
 
-    public PrinterService(UsbDiscovery usbDiscovery, WifiDiscovery wifiDiscovery, PrinterResponseParser parser)
+    public PrinterService(UsbDiscovery usbDiscovery, NetworkDiscovery wifiDiscovery, PrinterResponseParser parser)
     {
         _usbDiscovery = usbDiscovery;
-        _wifiDiscovery = wifiDiscovery;
+        _networkDiscovery = wifiDiscovery;
         _parser = parser;
     }
     
@@ -25,7 +25,7 @@ public class PrinterService : IPrinterService
         IReadOnlyList<Printer> result = connectionType switch
         {
             PrinterConnectionType.Usb => await _usbDiscovery.Discover(),
-            PrinterConnectionType.Wifi => await _wifiDiscovery.Discover(),
+            PrinterConnectionType.Wifi => await _networkDiscovery.Discover(subnets),
             _ => throw new ArgumentException("Unknown connection type")
         };
 
