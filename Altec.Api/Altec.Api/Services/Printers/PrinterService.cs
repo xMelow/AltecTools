@@ -1,5 +1,4 @@
-﻿using System.Net;
-using Altec.Api.Domain.Printers.Communication;
+﻿using Altec.Api.Domain.Printers.Communication;
 using Altec.Api.Domain.Printers.Connections;
 using Altec.Api.Domain.Printers.Discovery;
 using Altec.Api.Domain.Printers.Parsing;
@@ -10,11 +9,14 @@ namespace Altec.Api.Services.Printers;
 public class PrinterService : IPrinterService
 {
     private readonly UsbDiscovery _usbDiscovery;
+    private readonly WifiDiscovery _wifiDiscovery;
+
     private readonly PrinterResponseParser _parser;
 
-    public PrinterService(UsbDiscovery usbDiscovery, PrinterResponseParser parser)
+    public PrinterService(UsbDiscovery usbDiscovery, WifiDiscovery wifiDiscovery, PrinterResponseParser parser)
     {
         _usbDiscovery = usbDiscovery;
+        _wifiDiscovery = wifiDiscovery;
         _parser = parser;
     }
     
@@ -23,6 +25,7 @@ public class PrinterService : IPrinterService
         IReadOnlyList<Printer> result = connectionType switch
         {
             PrinterConnectionType.Usb => await _usbDiscovery.Discover(),
+            PrinterConnectionType.Wifi => await _wifiDiscovery.Discover(),
             _ => throw new ArgumentException("Unknown connection type")
         };
 
@@ -31,7 +34,6 @@ public class PrinterService : IPrinterService
 
     public async Task<PrinterInfo> GetPrinterInfo(PrinterConnectionType connectionType, string address)
     {
-
         var connection = CreateConnection(connectionType, address);
         using var client = new PrinterClient(connection);
         var result = await client.SendCommand(PrinterCommands.GetAllSettings(), "END\r\n");
