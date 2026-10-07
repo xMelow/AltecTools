@@ -4,6 +4,7 @@ using System.Net.Sockets;
 using Altec.Api.Domain.Printers.Communication;
 using Altec.Api.Domain.Printers.Parsing;
 using Altec.Api.Record.Printers;
+using Altec.Api.Services.Printers;
 using DocumentFormat.OpenXml.InkML;
 
 namespace Altec.Api.Domain.Printers.Discovery;
@@ -73,39 +74,25 @@ public class NetworkDiscovery
 
     private async Task<List<Printer>> ListenForResponses(UdpClient client)
     {
-        // TODO: Loop calling client.ReceiveAsync() until ListenTimeout elapses.
-        // - A single ReceiveAsync() call can hang forever if no more replies
-        //   come in, so you need a way to cancel it after the timeout
-        //   (CancellationTokenSource + ReceiveAsync(token), or Task.WhenAny
-        //   with a Task.Delay).
-        // - For each datagram received: result.RemoteEndPoint.Address gives
-        //   you the printer's IP directly (no need to parse it out of the
-        //   payload). Pass result.Buffer to _parser.Parse(...) to get the
-        //   rest (name, model, MAC).
-        // - Catch the timeout/cancellation and just return what you have —
-        //   not every printer on the subnet needs to reply.
-
         var printers = new List<Printer>();
         using var cts = new CancellationTokenSource(ListenTimeout);
 
         try
         {
-            while (ListenTimeout != TimeSpan.Zero)
+            while (!cts.IsCancellationRequested)
             {
                 var response = await client.ReceiveAsync(cts.Token);
-                if (response.Buffer != null)
-                {
-                    var printerIp = response.RemoteEndPoint.Address;
-                    var printer = _parser.Parse(response.Buffer, response.RemoteEndPoint);
-                    if (printer != null) 
-                        printers.Add(printer);
-                }
+                var printer = _parser.Parse(response.Buffer, response.RemoteEndPoint);
+
+                if (printer != null) 
+                    printers.Add(printer);
             }
-            return printers;
         } 
-        catch (OperationCanceledException ex)
+        catch (OperationCanceledException)
         {
-            throw new OperationCanceledException(ex.Message);
+            return printers;
         }
+
+        return printers;
     }
 }
