@@ -1,11 +1,8 @@
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
-using Altec.Api.Domain.Printers.Communication;
 using Altec.Api.Domain.Printers.Parsing;
 using Altec.Api.Record.Printers;
-using Altec.Api.Services.Printers;
-using DocumentFormat.OpenXml.InkML;
 
 namespace Altec.Api.Domain.Printers.Discovery;
 
@@ -18,29 +15,29 @@ public class NetworkDiscovery
 
     public async Task<IReadOnlyList<Printer>> Discover(List<string>? subnets)
     {
-        // TODO: Get the list of local IPv4 addresses to broadcast from.
-        // - If `subnets` is null/empty, use every active IPv4 interface on the
-        //   machine (NetworkInterface.GetAllNetworkInterfaces(), filter to
-        //   OperationalStatus.Up + NetworkInterfaceType != Loopback).
-        // - If `subnets` is given, only use interfaces whose address falls in
-        //   one of those subnets.
         var localAddresses = GetLocalIPv4Addresses(subnets);
-
         var printers = new List<Printer>();
 
-        // TODO: For each local address:
-        //   1. Create a UdpClient bound to that local address (so the
-        //      broadcast goes out the correct NIC, not whatever the OS
-        //      default route picks).
-        //   2. Enable EnableBroadcast on the socket.
-        //   3. Send BuildDiscoveryRequest() to IPAddress.Broadcast (255.255.255.255), DiscoveryPort.
-        //   4. Call ListenForResponses(client) and merge results into `printers`
-        //      (watch out for duplicates if a printer answers on more than
-        //      one interface).
-        //
-        // Remember: UsbDiscovery wraps device failures in try/catch so one
-        // bad device doesn't kill the whole scan. Same idea applies per
-        // interface here — one NIC failing to bind shouldn't abort the rest.
+        try
+        {
+            foreach (var address in localAddresses)
+            {
+                var client = new UdpClient(address.AddressFamily)
+                {
+                    EnableBroadcast = true
+                };
+
+                var request = BuildDiscoveryRequest();
+                await client.SendAsync(request);
+
+                var printerResponses = await ListenForResponses(client);
+                printers.AddRange(printerResponses);
+            }
+        }
+        catch (Exception ex) // what is the deeper exception of this? 
+        {
+            throw new Exception(ex.Message);
+        }
 
         return printers;
     }
