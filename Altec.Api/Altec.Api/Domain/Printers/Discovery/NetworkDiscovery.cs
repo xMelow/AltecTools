@@ -16,30 +16,39 @@ public class NetworkDiscovery
     public async Task<IReadOnlyList<Printer>> Discover(List<string>? subnets)
     {
         var localAddresses = GetLocalIPv4Addresses(subnets);
-        var printers = new List<Printer>();
+        if (localAddresses.Count == 0)
+            throw new InvalidOperationException("Unable to find NIC");
 
-        try
+        var printers = new List<Printer>();
+        var exceptions = new List<Exception>();
+
+        foreach (var address in localAddresses)
         {
-            foreach (var address in localAddresses)
-            {
-                var client = new UdpClient(address.AddressFamily)
+            try
+            {       
+                var ipEndPoint = new IPEndPoint(address, 0);
+                using var client = new UdpClient(ipEndPoint)
                 {
                     EnableBroadcast = true
                 };
 
                 var request = BuildDiscoveryRequest();
-                await client.SendAsync(request);
+                var destination = new IPEndPoint(IPAddress.Broadcast, DiscoveryPort);
+                await client.SendAsync(request, destination);
 
                 var printerResponses = await ListenForResponses(client);
                 printers.AddRange(printerResponses);
             }
-        }
-        catch (Exception ex) // what is the deeper exception of this? 
-        {
-            throw new Exception(ex.Message);
+            catch (SocketException ex)
+            {
+                exceptions.Add(ex);
+            }
         }
 
-        return printers;
+        if (exceptions.Count == localAddresses.Count)
+            throw new AggregateException(exceptions);
+
+        return printers.DistinctBy(p => p.Address).ToList().AsReadOnly();
     }
 
     private List<IPAddress> GetLocalIPv4Addresses(List<string>? subnets)
