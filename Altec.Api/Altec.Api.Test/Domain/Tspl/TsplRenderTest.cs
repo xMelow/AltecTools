@@ -20,8 +20,8 @@ public class TsplRenderTest
     {
         var commands = new List<TsplDrawCommand>
         {
-            new("SIZE", new List<string> { "103", "110" }),
-            new("TEXT", new List<string> { "10", "10", "0", "0", "16", "16", "Hello Altec" })
+            new("SIZE",1, new List<string> { "103", "110" }),
+            new("TEXT",2, new List<string> { "10", "10", "0", "0", "16", "16", "Hello Altec" })
         };
 
         var (imageBytes, _, _) = _render.Render(commands, false, null);
@@ -64,20 +64,20 @@ public class TsplRenderTest
     {
         var commands = new List<TsplDrawCommand>
         {
-            new("SIZE", new List<string> { "103", "103" }),
-            new("TEXT", new List<string> { "427", "47", "0", "0", "16", "16", "Hello World" }),
-            new("BAR", new List<string> { "33", "135", "1199", "7" }),
-            new("BOX", new List<string> { "33", "178", "1232", "890", "6" }),
-            new("QRCODE", new List<string> { "938", "951", "L", "14", "A", "0", "M2", "S7", "123456789012" }),
-            new("CIRCLE", new List<string> { "933", "590", "260", "12" }),
-            new("TEXT", new List<string> { "77", "234", "0", "0", "16", "16", "Name:" }),
-            new("TEXT", new List<string> { "77", "322", "0", "0", "16", "16", "Phone number:" }),
-            new("TEXT", new List<string> { "77", "413", "0", "0", "16", "16", "Email:" }),
-            new("TEXT", new List<string> { "77", "505", "0", "0", "16", "16", "Company:" }),
-            new("TEXT", new List<string> { "295", "231", "0", "0", "16", "16", "flor" }),
-            new("TEXT", new List<string> { "509", "320", "0", "0", "16", "16", "+32468294226" }),
-            new("TEXT", new List<string> { "295", "410", "0", "0", "16", "16", "flor@altec.be" }),
-            new("TEXT", new List<string> { "396", "502", "0", "0", "16", "16", "Altec" }),
+            new("SIZE",1, new List<string> { "103", "103" }),
+            new("TEXT",2, new List<string> { "427", "47", "0", "0", "16", "16", "Hello World" }),
+            new("BAR", 3, new List<string> { "33", "135", "1199", "7" }),
+            new("BOX", 4, new List<string> { "33", "178", "1232", "890", "6" }),
+            new("QRCODE", 5, new List<string> { "938", "951", "L", "14", "A", "0", "M2", "S7", "123456789012" }),
+            new("CIRCLE", 6, new List<string> { "933", "590", "260", "12" }),
+            new("TEXT", 7, new List<string> { "77", "234", "0", "0", "16", "16", "Name:" }),
+            new("TEXT", 8, new List<string> { "77", "322", "0", "0", "16", "16", "Phone number:" }),
+            new("TEXT", 9, new List<string> { "77", "413", "0", "0", "16", "16", "Email:" }),
+            new("TEXT", 10, new List<string> { "77", "505", "0", "0", "16", "16", "Company:" }),
+            new("TEXT", 11, new List<string> { "295", "231", "0", "0", "16", "16", "flor" }),
+            new("TEXT", 12, new List<string> { "509", "320", "0", "0", "16", "16", "+32468294226" }),
+            new("TEXT", 13, new List<string> { "295", "410", "0", "0", "16", "16", "flor@altec.be" }),
+            new("TEXT", 14, new List<string> { "396", "502", "0", "0", "16", "16", "Altec" }),
         };
 
         var (imageBytes, _, _) = _render.Render(commands, false, null);
@@ -91,13 +91,13 @@ public class TsplRenderTest
     {
         var commands = new List<TsplDrawCommand>
         {
-            new("SIZE", new List<string> { "80", "101" }),
-            new("BLOCK", new List<string> { "45", "300", "800", "60", "0", "0", "50", "60", "0", "2", "100" }),
-            new("BLOCK", new List<string> { "32", "550", "800", "50", "0", "0", "26", "26", "Altec" }),
-            new("BLOCK", new List<string> { "32", "680", "800", "250", "0", "0", "26", "26", "0", "1", "1", "Poduim boom altec"}),
-            new("TEXT", new List<string> { "32", "960", "0", "0", "12", "14", "DATUM IN:" }),
-            new("BLOCK", new List<string> { "32", "1025", "800", "50", "0", "0", "22", "22", "01/01/2026" }),
-            new("QRCODE", new List<string> { "700", "900", "L", "10", "A", "0", "M2", "S7", "132465789" }),
+            new("SIZE", 1, new List<string> { "80", "101" }),
+            new("BLOCK", 2, new List<string> { "45", "300", "800", "60", "0", "0", "50", "60", "0", "2", "100" }),
+            new("BLOCK", 3, new List<string> { "32", "550", "800", "50", "0", "0", "26", "26", "Altec" }),
+            new("BLOCK", 4, new List<string> { "32", "680", "800", "250", "0", "0", "26", "26", "0", "1", "1", "Poduim boom altec"}),
+            new("TEXT", 5, new List<string> { "32", "960", "0", "0", "12", "14", "DATUM IN:" }),
+            new("BLOCK", 6, new List<string> { "32", "1025", "800", "50", "0", "0", "22", "22", "01/01/2026" }),
+            new("QRCODE", 7, new List<string> { "700", "900", "L", "10", "A", "0", "M2", "S7", "132465789" }),
         };
 
         var (imageBytes, _, _) = _render.Render(commands, true, null);
@@ -111,15 +111,15 @@ public class TsplRenderTest
     {
         var commands = new List<TsplDrawCommand>
         {
-            new("SIZE", new List<string> { "100", "50" }),
-            new("BAR", new List<string> { "12", "89", "1158", "5" }),
-            new("BOX", new List<string> { "12", "104", "1170", "515", "5" }),
-            new("TEXT", new List<string> { "1073", "30", "0", "0", "10", "10", "1" }),
-            new("TEXT", new List<string> { "26", "30", "0", "0", "10", "10", "Flor Stellamans" }),
-            new("TEXT", new List<string> { "26", "139", "0", "0", "10", "10", "Kerkstraat 55" }),
-            new("TEXT", new List<string> { "26", "248", "0", "0", "12", "12", "1851 Humbeek" }),
-            new("BARCODE", new List<string> { "33", "389", "128", "79", "2", "0", "4", "8", "+32468294226" }),
-            new("QRCODE", new List<string> { "867", "218", "L", "11", "A", "0", "M2", "S7", "flor@stellamans.be" }),
+            new("SIZE", 1, new List<string> { "100", "50" }),
+            new("BAR", 2, new List<string> { "12", "89", "1158", "5" }),
+            new("BOX", 3, new List<string> { "12", "104", "1170", "515", "5" }),
+            new("TEXT", 4, new List<string> { "1073", "30", "0", "0", "10", "10", "1" }),
+            new("TEXT", 5, new List<string> { "26", "30", "0", "0", "10", "10", "Flor Stellamans" }),
+            new("TEXT", 6, new List<string> { "26", "139", "0", "0", "10", "10", "Kerkstraat 55" }),
+            new("TEXT", 7, new List<string> { "26", "248", "0", "0", "12", "12", "1851 Humbeek" }),
+            new("BARCODE", 8, new List<string> { "33", "389", "128", "79", "2", "0", "4", "8", "+32468294226" }),
+            new("QRCODE", 9, new List<string> { "867", "218", "L", "11", "A", "0", "M2", "S7", "flor@stellamans.be" }),
         };
 
         var (imageBytes, _, _) = _render.Render(commands, true, null);

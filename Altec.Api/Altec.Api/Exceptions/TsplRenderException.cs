@@ -1,4 +1,4 @@
-namespace Altec.Api.Domain.Tspl;
+namespace Altec.Api.Exceptions;
 
 class TsplRenderException : Exception
 {

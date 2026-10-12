@@ -5,7 +5,6 @@ namespace Altec.Api.Services.NiceLabel;
 
 public class NiceLabelClient : INiceLabelClient
 {
-    private const string VariablesPart = "variables";
     private enum LabelPart { Single, Multiple }
     private readonly HttpClient _httpClient;
 
@@ -100,7 +99,7 @@ public class NiceLabelClient : INiceLabelClient
     {
         var textParts = new Dictionary<string, string>
         {
-            [VariablesPart] = JsonSerializer.Serialize(variables),
+            ["variables"] = JsonSerializer.Serialize(variables),
             ["quantity"] = quantity.ToString()
         };
         if (printerName != null)
@@ -114,7 +113,7 @@ public class NiceLabelClient : INiceLabelClient
     {
         var textParts = new Dictionary<string, string>
         {
-            [VariablesPart] = JsonSerializer.Serialize(variables)
+            ["variables"] = JsonSerializer.Serialize(variables)
         };
 
         using var response = await PostMultipartAsync(
@@ -131,7 +130,7 @@ public class NiceLabelClient : INiceLabelClient
     {
         var textParts = new Dictionary<string, string>
         {
-            [VariablesPart] = JsonSerializer.Serialize(variables),
+            ["variables"] = JsonSerializer.Serialize(variables),
             ["printerSettings"] = JsonSerializer.Serialize(printerSettings),
             ["printerName"] = printerName
         };
@@ -144,7 +143,7 @@ public class NiceLabelClient : INiceLabelClient
     {
         var textParts = new Dictionary<string, string>
         {
-            [VariablesPart] = JsonSerializer.Serialize(variables),
+            ["variables"] = JsonSerializer.Serialize(variables),
             ["outputFileName"] = outputFileName,
             ["appendToFile"] = appendToFile.ToString()
         };

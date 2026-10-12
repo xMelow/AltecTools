@@ -44,7 +44,6 @@ builder.Services.AddHttpClient<INiceLabelClient, NiceLabelClient>(client =>
 
 builder.Services.AddScoped<IAutomationService, AutomationService>();
 
-
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
