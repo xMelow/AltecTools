@@ -1,0 +1,103 @@
+using System.Net;
+using System.Net.NetworkInformation;
+using System.Net.Sockets;
+using Altec.Api.Domain.Printers.Parsing;
+using Altec.Api.Record.Printers;
+
+namespace Altec.Api.Domain.Printers.Discovery;
+
+public class NetworkDiscovery
+{
+    private const int DiscoveryPort = 22368;
+    private static readonly TimeSpan ListenTimeout = TimeSpan.FromSeconds(3);
+    private readonly NetworkDiscoveryResponseParser _parser = new();
+
+    public async Task<IReadOnlyList<Printer>> Discover(List<string>? subnets)
+    {
+        var localAddresses = GetLocalIPv4Addresses(subnets);
+        if (localAddresses.Count == 0)
+            throw new InvalidOperationException("Unable to find NIC");
+
+        var printers = new List<Printer>();
+        var exceptions = new List<Exception>();
+
+        foreach (var address in localAddresses)
+        {
+            try
+            {       
+                var ipEndPoint = new IPEndPoint(address, 0);
+                using var client = new UdpClient(ipEndPoint)
+                {
+                    EnableBroadcast = true
+                };
+
+                var request = BuildDiscoveryRequest();
+                var destination = new IPEndPoint(IPAddress.Broadcast, DiscoveryPort);
+                await client.SendAsync(request, destination);
+
+                var printerResponses = await ListenForResponses(client);
+                printers.AddRange(printerResponses);
+            }
+            catch (SocketException ex)
+            {
+                exceptions.Add(ex);
+            }
+        }
+
+        if (exceptions.Count == localAddresses.Count)
+            throw new AggregateException(exceptions);
+
+        return printers.DistinctBy(p => p.Address).ToList().AsReadOnly();
+    }
+
+    private List<IPAddress> GetLocalIPv4Addresses(List<string>? subnets)
+    {
+        List<IPAddress> ipAddresses = new List<IPAddress>{};
+        var networkInterfaceList = NetworkInterface.GetAllNetworkInterfaces().Where(ni => ni.OperationalStatus == OperationalStatus.Up && ni.NetworkInterfaceType != NetworkInterfaceType.Loopback);
+
+        foreach (var networkInterface in networkInterfaceList)
+        {
+            foreach (var ip in networkInterface.GetIPProperties().UnicastAddresses)
+            {
+                if (ip.Address.AddressFamily == AddressFamily.InterNetwork && (subnets == null || subnets.Count == 0 || subnets.Any(s => ip.Address.ToString().StartsWith(s + "."))))
+                    ipAddresses.Add(ip.Address);
+            }
+        }
+        return ipAddresses;
+    }
+
+    private byte[] BuildDiscoveryRequest()
+    {
+        return
+        [
+            0x00, 0x20, 0x00, 0x01, 0x00, 0x01, 0x08, 0x00,
+            0x00, 0x02, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00,
+            0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff, 0xff,
+            0xff, 0xff, 0xff, 0xff, 0x00, 0x00, 0x00, 0x00
+        ];
+    }
+
+    private async Task<List<Printer>> ListenForResponses(UdpClient client)
+    {
+        var printers = new List<Printer>();
+        using var cts = new CancellationTokenSource(ListenTimeout);
+
+        try
+        {
+            while (!cts.IsCancellationRequested)
+            {
+                var response = await client.ReceiveAsync(cts.Token);
+                var printer = _parser.Parse(response.Buffer, response.RemoteEndPoint);
+
+                if (printer != null) 
+                    printers.Add(printer);
+            }
+        } 
+        catch (OperationCanceledException)
+        {
+            return printers;
+        }
+
+        return printers;
+    }
+}
