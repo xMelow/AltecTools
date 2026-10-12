@@ -1,6 +1,6 @@
 namespace Altec.Api.Exceptions;
 
-class TsplRenderException : Exception
+public class TsplRenderException : Exception
 {
     public int LineNumber { get; }
 
