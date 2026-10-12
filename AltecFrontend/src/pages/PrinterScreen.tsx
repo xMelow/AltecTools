@@ -76,25 +76,37 @@ export default function PrinterScreen() {
 
                 <div className="flex gap-2">
                     {connectionType === "Wifi" && (
-                        <>
-                            <input
-                                type="text"
-                                className="border border-altec-teal rounded-xl px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-altec-teal w-64"
-                                placeholder={"Enter printer Hostname or IP Address ..."}
-                                value={address}
-                                onChange={e => { setAddress(e.target.value); setConnectError(null) }}
-                                onKeyDown={handleIpKeyDown}
-                                disabled={isDiscovering}
-                            />
+                        <div>
+                            <div>
+                                <input
+                                    type="text"
+                                    className="mr-2 border border-altec-teal rounded-xl px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-1 focus:ring-altec-teal w-64"
+                                    placeholder={"Enter printer Hostname or IP Address ..."}
+                                    value={address}
+                                    onChange={e => { setAddress(e.target.value); setConnectError(null) }}
+                                    onKeyDown={handleIpKeyDown}
+                                    disabled={isDiscovering}
+                                />
+                                
+                                <button
+                                    className="bg-altec-teal text-white px-3 py-1.5 rounded-xl text-sm disabled:opacity-50"
+                                    onClick={connectToIp}
+                                    disabled={!address.trim() || isDiscovering}
+                                >
+                                    {connecting ? "Connecting..." : "Connect"}
+                                </button>
+                            </div>
                             
-                            <button
-                                className="bg-altec-teal text-white px-3 py-1.5 rounded-xl text-sm disabled:opacity-50"
-                                onClick={connectToIp}
-                                disabled={!address.trim() || isDiscovering}
-                            >
-                                {connecting ? "Connecting..." : "Connect"}
-                            </button>
-                        </>
+                            <div className="flex justify-center mt-4">
+                                <button
+                                    className="bg-altec-teal text-white px-3 py-1.5 rounded-xl text-sm disabled:opacity-50"
+                                    onClick={discoverPrinters}
+                                    disabled={isDiscovering}
+                                >
+                                    {loading ? "Loading..." : "Discover"}
+                                </button>
+                            </div>
+                        </div>
                     )}
                 </div>
 
@@ -109,16 +121,16 @@ export default function PrinterScreen() {
             </div>
             <div className="flex justify-center">
                 {connectionType == "Usb" && (
-                        <>
-                            <button
+                    <>
+                        <button
                             className="bg-altec-teal text-white px-3 py-1.5 rounded-xl text-sm disabled:opacity-50"
                             onClick={discoverPrinters}
                             disabled={isDiscovering}
-                            >
-                                {loading ? "Loading..." : "Discover"}
-                            </button>
-                        </>
-                    )}
+                        >
+                            {loading ? "Loading..." : "Discover"}
+                        </button>
+                    </>
+                )}
             </div>
         </div>
     )

@@ -10,7 +10,6 @@ public class NetworkDiscovery
 {
     private const int DiscoveryPort = 22368;
     private static readonly TimeSpan ListenTimeout = TimeSpan.FromSeconds(3);
-
     private readonly NetworkDiscoveryResponseParser _parser = new();
 
     public async Task<IReadOnlyList<Printer>> Discover(List<string>? subnets)
@@ -60,7 +59,7 @@ public class NetworkDiscovery
         {
             foreach (var ip in networkInterface.GetIPProperties().UnicastAddresses)
             {
-                if (ip.Address.AddressFamily == AddressFamily.InterNetwork && (subnets == null || subnets.Any(s => ip.Address.ToString().StartsWith(s + "."))))
+                if (ip.Address.AddressFamily == AddressFamily.InterNetwork && (subnets == null || subnets.Count == 0 || subnets.Any(s => ip.Address.ToString().StartsWith(s + "."))))
                     ipAddresses.Add(ip.Address);
             }
         }
