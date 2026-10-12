@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Altec.Api.Exceptions;
 using Altec.Api.Record.Printers;
 
 namespace Altec.Api.Services.NiceLabel;
@@ -167,11 +168,11 @@ public class NiceLabelClient : INiceLabelClient
         if (!response.IsSuccessStatusCode)
         {
             var body = await response.Content.ReadAsStringAsync();
-            var message = $"NiceLabel API {endpoint} returned {(int)response.StatusCode} {response.StatusCode}: {body}";
-            response.Dispose();
-            throw new HttpRequestException(message);
+            var statusCode = response.StatusCode;
+            response.Dispose(); 
+            throw new UpstreamServiceException(statusCode, endpoint, body);           
         }
-
+        
         return response;
     }
 }
