@@ -9,7 +9,7 @@ public class NiceLabelClient : INiceLabelClient
     private enum LabelPart { Single, Multiple }
     private readonly HttpClient _httpClient;
 
-    public NiceLabelClient(HttpClient httpClient, IConfiguration config)
+    public NiceLabelClient(HttpClient httpClient)
     {
         _httpClient = httpClient;
     }
@@ -89,9 +89,8 @@ public class NiceLabelClient : INiceLabelClient
 
         response.EnsureSuccessStatusCode();
 
-        var result = await response.Content.ReadFromJsonAsync<List<Printer>>();
-
-        if (result == null) throw new InvalidOperationException("Failed to deserialize printers response");
+        var result = await response.Content.ReadFromJsonAsync<List<Printer>>() 
+                    ?? throw new InvalidOperationException("Failed to deserialize printers response");
 
         return result;
     }
