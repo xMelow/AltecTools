@@ -3,13 +3,12 @@ using Altec.Api.Record.Printers;
 
 namespace Altec.Api.Services.NiceLabel;
 
-public class NiceLabelClient : INiceLabelClient
+public class NicelabelService : INiceLabelService
 {
-    private const string VariablesPart = "variables";
     private enum LabelPart { Single, Multiple }
     private readonly HttpClient _httpClient;
 
-    public NiceLabelClient(HttpClient httpClient, IConfiguration config)
+    public NicelabelService(HttpClient httpClient)
     {
         _httpClient = httpClient;
     }
@@ -100,7 +99,7 @@ public class NiceLabelClient : INiceLabelClient
     {
         var textParts = new Dictionary<string, string>
         {
-            [VariablesPart] = JsonSerializer.Serialize(variables),
+            ["variables"] = JsonSerializer.Serialize(variables),
             ["quantity"] = quantity.ToString()
         };
         if (printerName != null)
@@ -114,7 +113,7 @@ public class NiceLabelClient : INiceLabelClient
     {
         var textParts = new Dictionary<string, string>
         {
-            [VariablesPart] = JsonSerializer.Serialize(variables)
+            ["variables"] = JsonSerializer.Serialize(variables)
         };
 
         using var response = await PostMultipartAsync(
@@ -131,7 +130,7 @@ public class NiceLabelClient : INiceLabelClient
     {
         var textParts = new Dictionary<string, string>
         {
-            [VariablesPart] = JsonSerializer.Serialize(variables),
+            ["variables"] = JsonSerializer.Serialize(variables),
             ["printerSettings"] = JsonSerializer.Serialize(printerSettings),
             ["printerName"] = printerName
         };
@@ -144,7 +143,7 @@ public class NiceLabelClient : INiceLabelClient
     {
         var textParts = new Dictionary<string, string>
         {
-            [VariablesPart] = JsonSerializer.Serialize(variables),
+            ["variables"] = JsonSerializer.Serialize(variables),
             ["outputFileName"] = outputFileName,
             ["appendToFile"] = appendToFile.ToString()
         };
@@ -158,6 +157,7 @@ public class NiceLabelClient : INiceLabelClient
         var partName = labelPart == LabelPart.Single ? "label" : "labels";
 
         using var content = new MultipartFormDataContent();
+
         foreach (var path in labelPaths)
             content.Add(new StreamContent(File.OpenRead(path)), partName);
 
@@ -174,5 +174,24 @@ public class NiceLabelClient : INiceLabelClient
         }
 
         return response;
+    }
+
+    public async Task<NiceLabelLabel> GetLabelDetails(IFormFile label)
+    {
+        var fileStream = label.OpenReadStream();
+        StreamContent streamContent = new StreamContent(fileStream);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, "/api/nicelabel/getLabelDetails")
+        {
+            Content = streamContent
+        };
+
+        var response = await _httpClient.SendAsync(request);
+        response.EnsureSuccessStatusCode();
+
+        var result = await response.Content.ReadFromJsonAsync<NiceLabelLabel>() 
+                    ?? throw new InvalidOperationException("Unable to parse NiceLabel label");
+                    
+        return result;
     }
 }

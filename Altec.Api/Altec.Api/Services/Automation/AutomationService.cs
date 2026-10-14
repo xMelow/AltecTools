@@ -9,9 +9,9 @@ namespace Altec.Api.Services.Automation;
 public class AutomationService : IAutomationService
 {
     private readonly IConfiguration _config;
-    private readonly INiceLabelClient _niceLabel;
+    private readonly INiceLabelService _niceLabel;
 
-    public AutomationService(IConfiguration config, INiceLabelClient niceLabel)
+    public AutomationService(IConfiguration config, INiceLabelService niceLabel)
     {
         _config = config;
         _niceLabel = niceLabel;
