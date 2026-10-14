@@ -1,3 +1,4 @@
+using Altec.Api.Record.NiceLabel;
 using Altec.Api.Record.Printers;
 
 namespace Altec.Api.Services.NiceLabel;

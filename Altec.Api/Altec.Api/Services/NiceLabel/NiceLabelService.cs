@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Altec.Api.Record.NiceLabel;
 using Altec.Api.Record.Printers;
 
 namespace Altec.Api.Services.NiceLabel;
@@ -191,7 +192,7 @@ public class NicelabelService : INiceLabelService
 
         var result = await response.Content.ReadFromJsonAsync<NiceLabelLabel>() 
                     ?? throw new InvalidOperationException("Unable to parse NiceLabel label");
-                    
+
         return result;
     }
 }

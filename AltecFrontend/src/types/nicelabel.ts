@@ -36,7 +36,7 @@ export type NiceLabelLabelPageLayout = {
 
 export type NiceLabelLabelDataSet = {
     isFileDatabase: boolean,
-    fileDataBaseFileName: string,
+    fileDatabaseFileName: string,
     connectionString: string, // is this secure???
     tableName: string,
     isCustomSql: boolean,
