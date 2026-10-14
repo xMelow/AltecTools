@@ -28,6 +28,10 @@ const links = [
         name: 'Automations',
         path: '/automations'
     },
+    {
+        name: 'Nicelabel',
+        path: '/nicelabel'
+    }
 ]
 
 export default function Navbar() {

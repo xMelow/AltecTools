@@ -11,6 +11,7 @@ import ToolsScreen from "./pages/ToolsScreen"
 import { TsplProvider } from "./context/TsplContext"
 import { InktFolieProvider } from "./context/InktFolieContext"
 import { PrinterProvider } from "./context/PrinterContext"
+import NicelabelScreen from "./pages/NicelabelScreen"
 
 export default function App() {
     return (
@@ -36,6 +37,7 @@ export default function App() {
                             <Route path="/tools/tspl-preview" element={ <TsplScreen/> } />
                             <Route path="/tools/ink-calculator" element={<InktFolieCalculatorScreen />} />
                             <Route path="/tools" element={<ToolsScreen />} />
+                            <Route path="/nicelabel" element={<NicelabelScreen />} />
                         </Routes>
                     </TsplProvider>
                     </InktFolieProvider>
