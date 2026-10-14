@@ -29,7 +29,7 @@ const links = [
         path: '/automations'
     },
     {
-        name: 'Nicelabel',
+        name: 'NiceLabel',
         path: '/nicelabel'
     }
 ]

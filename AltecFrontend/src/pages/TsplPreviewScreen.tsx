@@ -57,7 +57,6 @@ export default function TsplScreen() {
     }
 
     function handleClear() {
-        console.log("test")
         setLabelTspl("")
         setLabelPreview(undefined)
     }
