@@ -184,10 +184,14 @@ public class NicelabelService : INiceLabelService
 
         var request = new HttpRequestMessage(HttpMethod.Post, "/api/nicelabel/getLabelDetails")
         {
-            Content = streamContent
+            Content = new MultipartFormDataContent
+                    {
+                        { streamContent, "label" },
+                    }
         };
 
         var response = await _httpClient.SendAsync(request);
+
         response.EnsureSuccessStatusCode();
 
         var result = await response.Content.ReadFromJsonAsync<NiceLabelLabel>() 

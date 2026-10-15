@@ -12,15 +12,16 @@ export async function getPrintersList(): Promise<Printer[]> {
 
 export async function getNiceLabelLabelDetails(file: File): Promise<NiceLabelLabel> {
     const formData = new FormData()
-    formData.append("niceLabelLabelFile", file)
+    formData.append("label", file)
     
-    const res = await fetch(`/api/nicelabel/labelDetails`, {
-        method: 'GET',
+    const res = await fetch(`/api/NiceLabel/labelDetails`, {
+        method: 'POST',
         body: formData
     })
 
     if (!res.ok) throw new Error("Failed to get label details")
 
     const data = await res.json()
+    console.log(data)
     return data
 }

@@ -89,7 +89,7 @@ public class NiceLabelController : ControllerBase
         }
     }
 
-    [HttpGet("labelDetails")]
+    [HttpPost("labelDetails")]
     public async Task<IActionResult> GetLabelDetails(IFormFile label)
     {
         if (label == null || label.Length == 0) return BadRequest("Label file needs to be present");
@@ -101,7 +101,7 @@ public class NiceLabelController : ControllerBase
         }
         catch (Exception ex)
         {
-            return BadRequest($"Error getting detialed label data : {ex.Message}" );
+            return BadRequest($"Error getting detailed label data : {ex.Message}" );
         }
     }
 }
