@@ -1,7 +1,7 @@
 namespace Altec.Api.Record.NiceLabel;
 
 public record NiceLabelLabel(
-    NiceLabelLabelSettings LabelSetting,
+    NiceLabelLabelSettings LabelSettings,
     List<string> ConversionIssues,
     List<string> Variables,
     List<string> Functions,
@@ -17,6 +17,7 @@ public record NiceLabelLabelSettings(
     int Height,
     string OriginalPrinterName,
     string OriginalPrinterDriver,
+    int DimensionUnit,
     NiceLabelLabelPageLayout PageLayout
 );
 
@@ -36,7 +37,6 @@ public record NiceLabelLabelPageLayout(
 public record NiceLabelDataSet(
     bool IsFileDatabase,
     string FileDatabaseFileName,
-    string ConnectionString,
     string TableName,
     bool IsCustomSql,
     string CustomSql,

@@ -2,7 +2,6 @@
 
 export type NiceLabelLabel = {
     labelSettings: NiceLabelLabelSettings,
-    // printerSettings: NiceLabelPrinterSettings [i want to get density, speed, etc but not sure if the Nicelabel SDK returns these values from the label]
     conversionIssues: string[],
     variables: string[],
     functions: string[],
@@ -18,6 +17,7 @@ export type NiceLabelLabelSettings = {
     height: number,
     originalPrinterName: string,
     originalPrinterDriver: string,
+    dimensionUnit: number,
     pageLayout: NiceLabelLabelPageLayout
 }
 
@@ -37,7 +37,6 @@ export type NiceLabelLabelPageLayout = {
 export type NiceLabelLabelDataSet = {
     isFileDatabase: boolean,
     fileDatabaseFileName: string,
-    connectionString: string, // is this secure???
     tableName: string,
     isCustomSql: boolean,
     customSql: string,
