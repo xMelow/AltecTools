@@ -25,3 +25,5 @@ export async function getNiceLabelLabelDetails(file: File): Promise<NiceLabelLab
     console.log(data)
     return data
 }
+
+

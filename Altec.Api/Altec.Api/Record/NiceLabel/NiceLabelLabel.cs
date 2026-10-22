@@ -1,12 +1,13 @@
 namespace Altec.Api.Record.NiceLabel;
 
 public record NiceLabelLabel(
+    string FileName,
     NiceLabelLabelSettings LabelSettings,
     List<string> ConversionIssues,
     List<string> Variables,
     List<string> Functions,
     List<string> LabelObjects,
-    NiceLabelDataSet DataSet,
+    List<NiceLabelDataSet> DataSets,
     string FilePath,
     string Author,
     string Title

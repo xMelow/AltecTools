@@ -1,5 +1,5 @@
 import { useRef } from "react"
-import { getLabelPreview } from "../api/labels"
+import { getTSPLLabelPreview } from "../api/labels"
 import { useFetch } from "../hooks/useFetch"
 import CodeEditorField from "../components/CodeEditorField"
 import { useTsplContext } from "../context/TsplContext"
@@ -13,7 +13,7 @@ export default function TsplScreen() {
     const inchToMm = 25.4
 
     async function handlePreview() {
-        const preview = await execute(() => getLabelPreview({
+        const preview = await execute(() => getTSPLLabelPreview({
             tspl: labelTspl,
             showBlockOutlines: showBlockOutline,
             images: labelImages

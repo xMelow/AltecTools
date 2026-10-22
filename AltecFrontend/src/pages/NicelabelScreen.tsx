@@ -1,26 +1,32 @@
-import { useRef } from "react"
+import { useRef, useState } from "react"
 import { useFetch } from "../hooks/useFetch"
 import { getNiceLabelLabelDetails } from "../api/nicelabel"
 import { NiceLabelLabel } from "../types/nicelabel"
+import { getTSPLLabelPreview } from "../api/labels"
 
 export default function NicelabelScreen() {
     const addLabelInputRef = useRef<HTMLInputElement>(null)
-    const { loading, error, execute } = useFetch<NiceLabelLabel>()
+    const { result, loading, error, execute } = useFetch<NiceLabelLabel>()
+    const [labelData, setLabelData] = useState<NiceLabelLabel>()
 
     async function handleLabelRequest(e: React.ChangeEvent<HTMLInputElement>) {
         let label = e.target.files?.item(0)
 
         if (!label) return
 
-        const data = await execute(() => getNiceLabelLabelDetails(label))
-        console.log(data)
+        const labelData = await execute(() => getNiceLabelLabelDetails(label))
+        setLabelData(labelData)
+
+
     }
+
+    // function to assign dimetions because dimenstion from the api is a number that needs to be comverted to a unit
 
     return (
         <div>
             <h1 className="text-center text-3xl font-bold text-altec-teal mb-3">NiceLabel</h1>
 
-            <div className="w-xl">
+            <div className="w-1/2">
                 <input
                     type="file"
                     accept="nlbl/*"
@@ -36,16 +42,45 @@ export default function NicelabelScreen() {
                 </button>
             </div>
 
-            <div className="mt-5 flex items-start gap-5">
+            <div className="mt-5 flex items-start justify-between">
                 <div className="shadow-md rounded-2xl p-3 bg-white w-1/4 border border-altec-teal">
-                    <h2 className="text-xl font-semibold pt-1 mb-2 text-center">Label variables</h2>
+                    <h2 className="text-xl font-semibold pt-1 mb-2 text-center">Label Information</h2>
 
                     <hr className="border-b border-altec-teal mb-3" />
 
+                    <h3 className="font-bold">Variables</h3>
+                    {labelData?.variables.map(el => (
+                        <p>{el}</p>
+                    ))}
+
+                    <h3 className="mt-2 font-bold">Functions</h3>
+                    {labelData?.functions.map(el => (
+                        <p>{el}</p>
+                    ))}
+
+                    <h3 className="mt-2 font-bold">Label objects</h3>
+                    {labelData?.labelObjects.map(el => (
+                        <p>{el}</p>
+                    ))}
+                    
+                    <h3 className="font-bold">Dataset</h3>
+                    {labelData?.dataSets.map(el => (
+                        <div>
+                            <p>{el.customSql}</p>
+                            <p>{el.isFileDatabase}</p>
+                            <p>{el.fileDatabaseFileName}</p>
+                            <p>{el.isCustomSql}</p>
+                            <p>{el.tableName}</p>
+                            <p className="font-bold">Fields</p>
+                            {el.fields.map(f => (
+                                <p>{f}</p>
+                            ))}
+                        </div>
+                    ))}
                 </div>
 
                 <div className="shadow-md rounded-2xl p-3 bg-white w-1/4 border border-altec-teal">
-                    <h2 className="text-xl font-semibold pt-1 mb-2 text-center">printer settings</h2>
+                    <h2 className="text-xl font-semibold pt-1 mb-2 text-center">Label preview</h2>
 
                     <hr className="border-b border-altec-teal mb-3" />
                 </div>
@@ -54,9 +89,30 @@ export default function NicelabelScreen() {
                     <h2 className="text-xl font-semibold pt-1 mb-2 text-center">label settings</h2>
 
                     <hr className="border-b border-altec-teal mb-3" />
+
+                    <h3 className="mt-2 font-bold">Settings</h3>
+                    <div className="flex gap-2">
+                        <p>Width: </p>
+                        <p>{labelData?.labelSettings.width}</p>
+                    </div>
+                    <div className="flex gap-2">
+                        <p>Height: </p>
+                        <p>{labelData?.labelSettings.height}</p>
+                    </div>
+                    <div className="flex gap-2">
+                        <p>Original printer: </p>
+                        <p>{labelData?.labelSettings.originalPrinterName}</p>
+                    </div>
+                    <div className="flex gap-2">
+                        <p>Original printer driver: </p>
+                        <p>{labelData?.labelSettings.originalPrinterDriver}</p>
+                    </div>
+
+                    <p>Dimensions</p>
+                    <p>{labelData?.labelSettings.dimensionUnit}</p>
+
                 </div>
             </div>
-            
         </div>
     )
 }
