@@ -1,4 +1,4 @@
-import { NiceLabelLabel } from "../types/nicelabel"
+import { NiceLabelLabel, NiceLabelPreview } from "../types/nicelabel"
 import { Printer } from "../types/printer"
 
 export async function getPrintersList(): Promise<Printer[]> {
@@ -22,8 +22,22 @@ export async function getNiceLabelLabelDetails(file: File): Promise<NiceLabelLab
     if (!res.ok) throw new Error("Failed to get label details")
 
     const data = await res.json()
-    console.log(data)
     return data
 }
 
+export async function getLabelPreview(data: NiceLabelPreview): Promise<string> {
+    const formData = new FormData()
+    formData.append("label", data.file)
+    formData.append("width", data.width.toString())
+    formData.append("height", data.height.toString())
+    
+    const res = await fetch(`/api/NiceLabel/labelPreview`, {
+        method: 'POST',
+        body: formData
+    })
 
+    if (!res.ok) throw new Error("Failed to get label preview")
+
+    const result = await res.json()
+    return result
+}

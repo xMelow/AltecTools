@@ -46,7 +46,6 @@ public class AutomationService : IAutomationService
     public async Task<string> SdCardLabelPreview(string orderNumber, string version)
     {
         var variables = new List<Dictionary<string, string>> { BuildSdCardVariables(orderNumber, version) };
-
         var labelImages = await _niceLabel.PreviewVariableLabelsAsync(SdCardLabelPath, variables);
 
         return Convert.ToBase64String(labelImages[0]);

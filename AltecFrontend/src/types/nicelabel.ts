@@ -41,3 +41,9 @@ export type NiceLabelLabelDataSet = {
     customSql: string,
     fields: string[]
 }
+
+export type NiceLabelPreview = {
+    file: File,
+    width: number,
+    height: number
+}

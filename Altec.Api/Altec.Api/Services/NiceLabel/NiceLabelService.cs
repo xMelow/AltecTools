@@ -55,17 +55,14 @@ public class NicelabelService : INiceLabelService
         response.EnsureSuccessStatusCode();
     }
 
-    public async Task<byte[]> GetLabelPreview(IFormFile labelFile, Dictionary<string, string> variables, int width, int height)
+    public async Task<byte[]> GetLabelPreview(IFormFile labelFile, int width, int height)
     {
         var fileStream = labelFile.OpenReadStream();
         StreamContent streamContent = new StreamContent(fileStream);
 
-        var json = JsonSerializer.Serialize(variables);
-
         var content = new MultipartFormDataContent
         {
             { streamContent, "label" },
-            { new StringContent(json), "variables" },
             { new StringContent(width.ToString()), "width" },
             { new StringContent(height.ToString()), "height" }
         };

@@ -48,26 +48,14 @@ public class NiceLabelController : ControllerBase
     }
 
     [HttpPost("labelPreview")]
-    public async Task<IActionResult> LabelPreview(IFormFile label, [FromForm] string variablesJson, [FromForm] int width, [FromForm] int height)
+    public async Task<IActionResult> LabelPreview(IFormFile label, [FromForm] int width, [FromForm] int height)
     {
         if (width <= 0 || height <= 0) return BadRequest("Width and height must be greater then 0");
-        Dictionary<string, string>? variables;
 
         try
         {
-            variables = JsonSerializer.Deserialize<Dictionary<string, string>>(variablesJson);
-        }
-        catch (JsonException)
-        {
-            return BadRequest("Invalid label variable data");
-        }
-
-        if (variables == null) return BadRequest("Invalid label variable data");
-
-        try
-        {
-            var previewBytes = await _niceLabelService.GetLabelPreview(label, variables, width, height);
-            return File(previewBytes, "image/png");
+            var previewBytes = await _niceLabelService.GetLabelPreview(label, width, height);
+            return Ok(previewBytes);
         }
         catch (Exception ex)
         {

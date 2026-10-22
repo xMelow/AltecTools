@@ -1,13 +1,14 @@
 import { useRef, useState } from "react"
 import { useFetch } from "../hooks/useFetch"
-import { getNiceLabelLabelDetails } from "../api/nicelabel"
+import { getLabelPreview, getNiceLabelLabelDetails } from "../api/nicelabel"
 import { NiceLabelLabel } from "../types/nicelabel"
-import { getTSPLLabelPreview } from "../api/labels"
 
 export default function NicelabelScreen() {
     const addLabelInputRef = useRef<HTMLInputElement>(null)
     const { result, loading, error, execute } = useFetch<NiceLabelLabel>()
+    const { result: previewResult, loading: previewLoading, error: previewError, execute: previewExecute } = useFetch<string>()
     const [labelData, setLabelData] = useState<NiceLabelLabel>()
+    const [labelPreviewBytes, setLabelPreviewBytes] = useState<string>()
 
     async function handleLabelRequest(e: React.ChangeEvent<HTMLInputElement>) {
         let label = e.target.files?.item(0)
@@ -17,7 +18,12 @@ export default function NicelabelScreen() {
         const labelData = await execute(() => getNiceLabelLabelDetails(label))
         setLabelData(labelData)
 
-
+        const labelPreview = await previewExecute(() => getLabelPreview({
+            file: label,
+            width: 1000,
+            height: 1000
+        }))
+        setLabelPreviewBytes(labelPreview)
     }
 
     // function to assign dimetions because dimenstion from the api is a number that needs to be comverted to a unit
@@ -83,6 +89,16 @@ export default function NicelabelScreen() {
                     <h2 className="text-xl font-semibold pt-1 mb-2 text-center">Label preview</h2>
 
                     <hr className="border-b border-altec-teal mb-3" />
+
+                    {previewError && <p className="text-sm text-red-500">{previewError}</p>}
+                        {labelPreviewBytes
+                            ? <img 
+                                className="border-2 border-altec-blue rounded-sm"
+                                src={`data:image/png;base64,${labelPreviewBytes}`} 
+                                alt="Label preview" 
+                            />
+                            : <p className="text-xs text-gray-400">Preview will appear here...</p>
+                        }
                 </div>
 
                 <div className="shadow-md rounded-2xl p-3 bg-white w-1/4 border border-altec-teal">
