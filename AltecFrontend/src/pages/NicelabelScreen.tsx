@@ -9,6 +9,7 @@ export default function NicelabelScreen() {
     const { result: previewResult, loading: previewLoading, error: previewError, execute: previewExecute } = useFetch<string>()
     const [labelData, setLabelData] = useState<NiceLabelLabel>()
     const [labelPreviewBytes, setLabelPreviewBytes] = useState<string>()
+    const [unit, setUnit] = useState<string>()
 
     async function handleLabelRequest(e: React.ChangeEvent<HTMLInputElement>) {
         let label = e.target.files?.item(0)
@@ -17,6 +18,7 @@ export default function NicelabelScreen() {
 
         const labelData = await execute(() => getNiceLabelLabelDetails(label))
         setLabelData(labelData)
+        assignUnit(labelData?.labelSettings.dimensionUnit)
 
         const labelPreview = await previewExecute(() => getLabelPreview({
             file: label,
@@ -26,13 +28,26 @@ export default function NicelabelScreen() {
         setLabelPreviewBytes(labelPreview)
     }
 
-    // function to assign dimetions because dimenstion from the api is a number that needs to be comverted to a unit
+    function assignUnit(number: number | undefined) {
+        switch (number) {
+            case 1:
+                setUnit("inch")
+            case 2: 
+                setUnit("mm")
+            case 3:
+                setUnit("cm")
+            case 4:
+                setUnit("dots")
+            default:
+                break;
+        }
+    }
 
     return (
         <div>
             <h1 className="text-center text-3xl font-bold text-altec-teal mb-3">NiceLabel</h1>
 
-            <div className="w-1/2">
+            <div className="w-1/2 center">
                 <input
                     type="file"
                     accept="nlbl/*"
@@ -109,11 +124,11 @@ export default function NicelabelScreen() {
                     <h3 className="mt-2 font-bold">Settings</h3>
                     <div className="flex gap-2">
                         <p>Width: </p>
-                        <p>{labelData?.labelSettings.width}</p>
+                        <p>{labelData?.labelSettings.width} {unit}</p>
                     </div>
                     <div className="flex gap-2">
                         <p>Height: </p>
-                        <p>{labelData?.labelSettings.height}</p>
+                        <p>{labelData?.labelSettings.height} {unit}</p>
                     </div>
                     <div className="flex gap-2">
                         <p>Original printer: </p>
@@ -123,10 +138,6 @@ export default function NicelabelScreen() {
                         <p>Original printer driver: </p>
                         <p>{labelData?.labelSettings.originalPrinterDriver}</p>
                     </div>
-
-                    <p>Dimensions</p>
-                    <p>{labelData?.labelSettings.dimensionUnit}</p>
-
                 </div>
             </div>
         </div>
