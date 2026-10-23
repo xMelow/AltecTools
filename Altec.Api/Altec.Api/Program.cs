@@ -29,7 +29,7 @@ builder.Services.AddScoped<PrinterResponseParser>();
 
 var baseUrl = builder.Configuration["NiceLabelApi:BaseUrl"] ?? throw new InvalidOperationException("Missing configuration value: 'NiceLabelApi:BaseUrl'");
 
-builder.Services.AddHttpClient<INiceLabelClient, NiceLabelClient>(client =>
+builder.Services.AddHttpClient<INiceLabelService, NicelabelService>(client =>
 {
     client.BaseAddress = new Uri(baseUrl);
     client.DefaultRequestVersion = new Version(1, 1);

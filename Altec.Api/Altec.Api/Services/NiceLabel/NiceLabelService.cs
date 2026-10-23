@@ -1,15 +1,16 @@
 using System.Text.Json;
 using Altec.Api.Exceptions;
+using Altec.Api.Record.NiceLabel;
 using Altec.Api.Record.Printers;
 
 namespace Altec.Api.Services.NiceLabel;
 
-public class NiceLabelClient : INiceLabelClient
+public class NicelabelService : INiceLabelService
 {
     private enum LabelPart { Single, Multiple }
     private readonly HttpClient _httpClient;
 
-    public NiceLabelClient(HttpClient httpClient)
+    public NicelabelService(HttpClient httpClient)
     {
         _httpClient = httpClient;
     }
@@ -55,17 +56,14 @@ public class NiceLabelClient : INiceLabelClient
         response.EnsureSuccessStatusCode();
     }
 
-    public async Task<byte[]> GetLabelPreview(IFormFile labelFile, Dictionary<string, string> variables, int width, int height)
+    public async Task<byte[]> GetLabelPreview(IFormFile labelFile, int width, int height)
     {
         var fileStream = labelFile.OpenReadStream();
         StreamContent streamContent = new StreamContent(fileStream);
 
-        var json = JsonSerializer.Serialize(variables);
-
         var content = new MultipartFormDataContent
         {
             { streamContent, "label" },
-            { new StringContent(json), "variables" },
             { new StringContent(width.ToString()), "width" },
             { new StringContent(height.ToString()), "height" }
         };
@@ -157,6 +155,7 @@ public class NiceLabelClient : INiceLabelClient
         var partName = labelPart == LabelPart.Single ? "label" : "labels";
 
         using var content = new MultipartFormDataContent();
+
         foreach (var path in labelPaths)
             content.Add(new StreamContent(File.OpenRead(path)), partName);
 
@@ -173,5 +172,28 @@ public class NiceLabelClient : INiceLabelClient
         }
         
         return response;
+    }
+
+    public async Task<NiceLabelLabel> GetLabelDetails(IFormFile label)
+    {
+        var fileStream = label.OpenReadStream();
+        StreamContent streamContent = new StreamContent(fileStream);
+
+        var request = new HttpRequestMessage(HttpMethod.Post, "/api/nicelabel/getLabelDetails")
+        {
+            Content = new MultipartFormDataContent
+                    {
+                        { streamContent, "label" },
+                    }
+        };
+
+        var response = await _httpClient.SendAsync(request);
+
+        response.EnsureSuccessStatusCode();
+
+        var result = await response.Content.ReadFromJsonAsync<NiceLabelLabel>() 
+                    ?? throw new InvalidOperationException("Unable to parse NiceLabel label");
+
+        return result;
     }
 }

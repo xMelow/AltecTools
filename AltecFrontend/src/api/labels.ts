@@ -1,6 +1,6 @@
 import { LabelPreview, LabelPreviewRequest } from "../types/label";
 
-export async function getLabelPreview(data: LabelPreviewRequest): Promise<LabelPreview> {
+export async function getTSPLLabelPreview(data: LabelPreviewRequest): Promise<LabelPreview> {
     const res = await fetch('/api/tspl/preview', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
