@@ -1,14 +1,10 @@
 export type NiceLabelLabel = {
-    fileName: string,
     labelSettings: NiceLabelLabelSettings,
     conversionIssues: string[],
     variables: string[],
     functions: string[],
     labelObjects: string[],
     dataSets: NiceLabelLabelDataSet[],
-    filePath: string,
-    author: string,
-    title: string
 }
 
 export type NiceLabelLabelSettings = {

@@ -47,7 +47,7 @@ export default function NicelabelScreen() {
         <div>
             <h1 className="text-center text-3xl font-bold text-altec-teal mb-3">NiceLabel</h1>
 
-            <div className="w-1/2 center">
+            <div className="w-1/4 mx-auto flex items-center">
                 <input
                     type="file"
                     accept="nlbl/*"
@@ -71,17 +71,17 @@ export default function NicelabelScreen() {
 
                     <h3 className="font-bold">Variables</h3>
                     {labelData?.variables.map(el => (
-                        <p>{el}</p>
+                        <p key={el}>{el}</p>
                     ))}
 
                     <h3 className="mt-2 font-bold">Functions</h3>
                     {labelData?.functions.map(el => (
-                        <p>{el}</p>
+                        <p key={el}>{el}</p>
                     ))}
 
                     <h3 className="mt-2 font-bold">Label objects</h3>
                     {labelData?.labelObjects.map(el => (
-                        <p>{el}</p>
+                        <p key={el}>{el}</p>
                     ))}
                     
                     <h3 className="font-bold">Dataset</h3>
@@ -94,7 +94,7 @@ export default function NicelabelScreen() {
                             <p>{el.tableName}</p>
                             <p className="font-bold">Fields</p>
                             {el.fields.map(f => (
-                                <p>{f}</p>
+                                <p key={f}>{f}</p>
                             ))}
                         </div>
                     ))}
