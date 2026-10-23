@@ -8,11 +8,11 @@ namespace Altec.Api.Controllers;
 [Route("api/[controller]")]
 public class NiceLabelController : ControllerBase
 {
-    private readonly INiceLabelClient _niceLabelClient;
+    private readonly INiceLabelService _niceLabelService;
 
-    public NiceLabelController(INiceLabelClient niceLabelClient)
+    public NiceLabelController(INiceLabelService niceLabelClient)
     {
-        _niceLabelClient = niceLabelClient;
+        _niceLabelService = niceLabelClient;
     }
 
     [HttpPost("variables")]
@@ -21,7 +21,7 @@ public class NiceLabelController : ControllerBase
         if (label == null || label.Length == 0) return BadRequest("Label can't be empty");
         try
         {
-             var variables = await _niceLabelClient.GetVariables(label);
+             var variables = await _niceLabelService.GetVariables(label);
              return Ok(variables);
         }
         catch (Exception ex)
@@ -38,7 +38,7 @@ public class NiceLabelController : ControllerBase
         
         try
         {
-            await _niceLabelClient.PrintLabel(label, quantity, printerName);
+            await _niceLabelService.PrintLabel(label, quantity, printerName);
             return Ok("Printing label...");
         }
         catch (Exception ex)
@@ -48,26 +48,14 @@ public class NiceLabelController : ControllerBase
     }
 
     [HttpPost("labelPreview")]
-    public async Task<IActionResult> LabelPreview(IFormFile label, [FromForm] string variablesJson, [FromForm] int width, [FromForm] int height)
+    public async Task<IActionResult> LabelPreview(IFormFile label, [FromForm] int width, [FromForm] int height)
     {
         if (width <= 0 || height <= 0) return BadRequest("Width and height must be greater then 0");
-        Dictionary<string, string>? variables;
 
         try
         {
-            variables = JsonSerializer.Deserialize<Dictionary<string, string>>(variablesJson);
-        }
-        catch (JsonException)
-        {
-            return BadRequest("Invalid label variable data");
-        }
-
-        if (variables == null) return BadRequest("Invalid label variable data");
-
-        try
-        {
-            var previewBytes = await _niceLabelClient.GetLabelPreview(label, variables, width, height);
-            return File(previewBytes, "image/png");
+            var previewBytes = await _niceLabelService.GetLabelPreview(label, width, height);
+            return Ok(previewBytes);
         }
         catch (Exception ex)
         {
@@ -80,12 +68,28 @@ public class NiceLabelController : ControllerBase
     {
         try
         {
-            var printers = await _niceLabelClient.GetPrinters();
+            var printers = await _niceLabelService.GetPrinters();
             return Ok(printers);
         }
         catch (Exception ex)
         {
             return BadRequest($"Error getting label variables : {ex.Message}" );
+        }
+    }
+
+    [HttpPost("labelDetails")]
+    public async Task<IActionResult> GetLabelDetails(IFormFile label)
+    {
+        if (label == null || label.Length == 0) return BadRequest("Label file needs to be present");
+
+        try
+        {
+            var data = await _niceLabelService.GetLabelDetails(label);
+            return Ok(data);
+        }
+        catch (Exception ex)
+        {
+            return BadRequest($"Error getting detailed label data : {ex.Message}" );
         }
     }
 }

@@ -9,9 +9,9 @@ namespace Altec.Api.Services.Automation;
 public class AutomationService : IAutomationService
 {
     private readonly IConfiguration _config;
-    private readonly INiceLabelClient _niceLabel;
+    private readonly INiceLabelService _niceLabel;
 
-    public AutomationService(IConfiguration config, INiceLabelClient niceLabel)
+    public AutomationService(IConfiguration config, INiceLabelService niceLabel)
     {
         _config = config;
         _niceLabel = niceLabel;
@@ -46,7 +46,6 @@ public class AutomationService : IAutomationService
     public async Task<string> SdCardLabelPreview(string orderNumber, string version)
     {
         var variables = new List<Dictionary<string, string>> { BuildSdCardVariables(orderNumber, version) };
-
         var labelImages = await _niceLabel.PreviewVariableLabelsAsync(SdCardLabelPath, variables);
 
         return Convert.ToBase64String(labelImages[0]);

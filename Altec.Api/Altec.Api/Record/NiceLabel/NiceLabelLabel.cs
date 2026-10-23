@@ -1,0 +1,45 @@
+namespace Altec.Api.Record.NiceLabel;
+
+public record NiceLabelLabel(
+    string FileName,
+    NiceLabelLabelSettings LabelSettings,
+    List<string> ConversionIssues,
+    List<string> Variables,
+    List<string> Functions,
+    List<string> LabelObjects,
+    List<NiceLabelDataSet> DataSets,
+    string FilePath,
+    string Author,
+    string Title
+);
+
+public record NiceLabelLabelSettings(
+    int Width,
+    int Height,
+    string OriginalPrinterName,
+    string OriginalPrinterDriver,
+    int DimensionUnit,
+    NiceLabelLabelPageLayout PageLayout
+);
+
+public record NiceLabelLabelPageLayout(
+    int MediaWidth,
+    int MediaHeight,
+    int Columns,
+    int Rows,
+    int HorizontalGap,
+    int VerticalGap,
+    int HorizontalOffset,
+    int VerticalOffset,
+    int HorizontalRadius,
+    int VerticalRadius
+);
+
+public record NiceLabelDataSet(
+    bool IsFileDatabase,
+    string FileDatabaseFileName,
+    string TableName,
+    bool IsCustomSql,
+    string CustomSql,
+    List<string> Fields
+);
