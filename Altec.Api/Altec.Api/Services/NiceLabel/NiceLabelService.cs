@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Altec.Api.Exceptions;
 using Altec.Api.Record.NiceLabel;
 using Altec.Api.Record.Printers;
 
@@ -86,9 +87,8 @@ public class NicelabelService : INiceLabelService
 
         response.EnsureSuccessStatusCode();
 
-        var result = await response.Content.ReadFromJsonAsync<List<Printer>>();
-
-        if (result == null) throw new InvalidOperationException("Failed to deserialize printers response");
+        var result = await response.Content.ReadFromJsonAsync<List<Printer>>() 
+                    ?? throw new InvalidOperationException("Failed to deserialize printers response");
 
         return result;
     }
@@ -166,11 +166,11 @@ public class NicelabelService : INiceLabelService
         if (!response.IsSuccessStatusCode)
         {
             var body = await response.Content.ReadAsStringAsync();
-            var message = $"NiceLabel API {endpoint} returned {(int)response.StatusCode} {response.StatusCode}: {body}";
-            response.Dispose();
-            throw new HttpRequestException(message);
+            var statusCode = response.StatusCode;
+            response.Dispose(); 
+            throw new UpstreamServiceException(statusCode, endpoint, body);           
         }
-
+        
         return response;
     }
 

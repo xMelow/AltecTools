@@ -1,5 +1,5 @@
-﻿using Altec.Api.Records;
-using Microsoft.Extensions.Options;
+﻿using Altec.Api.Exceptions;
+using Altec.Api.Records;
 using SkiaSharp;
 using ZXing;
 using ZXing.Common;

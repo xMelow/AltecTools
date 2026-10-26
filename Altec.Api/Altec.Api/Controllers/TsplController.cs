@@ -1,4 +1,4 @@
-﻿using Altec.Api.Domain.Tspl;
+﻿using Altec.Api.Exceptions;
 using Altec.Api.Interface;
 using Altec.Api.Records;
 using Microsoft.AspNetCore.Mvc;

@@ -82,14 +82,7 @@ public class NiceLabelController : ControllerBase
     {
         if (label == null || label.Length == 0) return BadRequest("Label file needs to be present");
 
-        try
-        {
-            var data = await _niceLabelService.GetLabelDetails(label);
-            return Ok(data);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest($"Error getting detailed label data : {ex.Message}" );
-        }
+        var data = await _niceLabelService.GetLabelDetails(label);
+        return Ok(data);
     }
 }
