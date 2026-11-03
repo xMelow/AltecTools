@@ -28,7 +28,6 @@ public class TsplController : ControllerBase
         {
             return BadRequest(new TsplErrorResponse(ex.LineNumber, ex.Message));
         }
-        
     }
 
     [HttpPost("parse")]
