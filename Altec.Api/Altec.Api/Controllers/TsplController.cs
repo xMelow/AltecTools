@@ -13,21 +13,14 @@ public class TsplController : ControllerBase
 
     public TsplController(ITsplService tsplService)
     {
-        _tsplService = tsplService; 
+        _tsplService = tsplService;
     }
 
     [HttpPost("preview")]
     public IActionResult Preview([FromBody] TsplPreviewRequest request)
     {
-        try
-        {
-            var (imageBytes, imageWidth, imageHeight) = _tsplService.RenderPreview(request.Tspl, request.ShowBlockOutlines, request.Images);
-            return Ok(new TsplPreviewResponse(imageBytes, imageWidth, imageHeight));
-        }
-        catch (TsplRenderException ex)
-        {
-            return BadRequest(new TsplErrorResponse(ex.LineNumber, ex.Message));
-        }
+        var (imageBytes, imageWidth, imageHeight) = _tsplService.RenderPreview(request.Tspl, request.ShowBlockOutlines, request.Images);
+        return Ok(new TsplPreviewResponse(imageBytes, imageWidth, imageHeight));
     }
 
     [HttpPost("parse")]
