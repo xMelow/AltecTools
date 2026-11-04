@@ -9,7 +9,7 @@ export async function getTSPLLabelPreview(data: LabelPreviewRequest): Promise<La
 
     if (!res.ok) {
         const error = await res.json();
-        throw new Error(error.message)
+        throw new Error(error.detail)
     }
 
     const response = await res.json()

@@ -22,29 +22,31 @@ public class GlobalExceptionHandler : IExceptionHandler
             exception.Message
         );
 
-        var statusCode = HttpStatusCode.InternalServerError;
-        var title = "An unexpected error occurred.";
-        var detail = "We're sorry, an error occurred. Please try again later or contact support.";
-
-        if (exception is UpstreamServiceException) {
-            statusCode = HttpStatusCode.BadGateway;
-            title = "External API failed";
-            detail = "NiceLabel API returned an error";
-        }
-
         var problemDetails = new ProblemDetails
         {
-            Status = (int)statusCode,
-            Title = title,
-            Detail = detail,
+            Status = (int) HttpStatusCode.InternalServerError,
+            Title = "An unexpected error occurred.",
+            Detail = "We're sorry, an error occurred. Please try again later or contact support.",
             Instance = httpContext.Request.Path,
-            Extensions =
-            {
-                {"traceId", httpContext.TraceIdentifier}
-            }
         };
+        problemDetails.Extensions["traceId"] = httpContext.TraceIdentifier;
+
+        switch (exception)
+        {
+            case UpstreamServiceException:
+                problemDetails.Status = (int) HttpStatusCode.BadGateway;
+                problemDetails.Title = "External API failed";
+                problemDetails.Detail = "NiceLabel API returned an error";
+                break;
+            case TsplRenderException tsplRender:
+                problemDetails.Status = (int) HttpStatusCode.UnprocessableContent;
+                problemDetails.Title = "Unable to parse TSPL";
+                problemDetails.Detail = tsplRender.Message;
+                problemDetails.Extensions["lineNumber"] = tsplRender.LineNumber;
+                break;
+        }
         
-        httpContext.Response.StatusCode = (int)statusCode;
+        httpContext.Response.StatusCode = (int) problemDetails.Status;
         await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
         return true;
     }

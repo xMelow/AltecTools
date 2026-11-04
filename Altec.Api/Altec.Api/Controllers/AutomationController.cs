@@ -21,15 +21,8 @@ public class AutomationController : ControllerBase
         if (csvFile == null || csvFile.Length == 0) return BadRequest("Csv file must be present");
         if (printerType == null) return BadRequest("Printer Type must be present");
 
-        try
-        {
-            await _automationService.PrintSerialNumbers(csvFile, printerType, printerName);
-            return Ok("Labels printed");
-        }
-        catch (Exception ex)
-        {
-            return BadRequest($"Error: {ex.Message}");
-        }
+        await _automationService.PrintSerialNumbers(csvFile, printerType, printerName);
+        return Ok("Labels printed");
     }
 
     [HttpPost("serialNumbersLabelPreview")]
@@ -38,15 +31,8 @@ public class AutomationController : ControllerBase
         if (csvFile == null || csvFile.Length == 0) return BadRequest("Excel file must be present");
         if (printerType == null) return BadRequest("Printer Type must be present");
 
-        try
-        {
-            var imageList = await _automationService.PreviewSerialNumbers(csvFile, printerType);
-            return Ok(imageList);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest($"Error: {ex.Message}");
-        }
+        var imageList = await _automationService.PreviewSerialNumbers(csvFile, printerType);
+        return Ok(imageList);
     }
 
     [HttpPost("sdCard")]
@@ -55,15 +41,8 @@ public class AutomationController : ControllerBase
         if (string.IsNullOrEmpty(orderNumber)) return BadRequest("Order number must be present");
         if (amount == 0) return BadRequest("Amount can't be zero");
 
-        try
-        {
-            await _automationService.PrintSdCardLabel(orderNumber, version, amount);
-            return Ok("Labels printed");
-        }
-        catch (Exception ex)
-        {
-            return BadRequest($"Error: {ex.Message}");
-        }
+        await _automationService.PrintSdCardLabel(orderNumber, version, amount);
+        return Ok("Labels printed");
     }
 
     [HttpPost("sdCardPreview")]
@@ -71,15 +50,8 @@ public class AutomationController : ControllerBase
     {
         if (string.IsNullOrEmpty(orderNumber)) return BadRequest("Order number must be present");
 
-        try
-        {
-            var labelPreview = await _automationService.SdCardLabelPreview(orderNumber, version);
-            return Ok(new { image = labelPreview });
-        }
-        catch (Exception ex)
-        {
-            return BadRequest($"Error: {ex.Message}");
-        }
+        var labelPreview = await _automationService.SdCardLabelPreview(orderNumber, version);
+        return Ok(new { image = labelPreview });
     }
 
     [HttpPost("testRoom")]
@@ -92,17 +64,9 @@ public class AutomationController : ControllerBase
         [FromForm] string printer
     ) {
         if (string.IsNullOrEmpty(sensorType)) return BadRequest("Sensor type must be present");
-        // add more param checks
 
-        try
-        {
-            await _automationService.PrintTestRoomLabel(sensorType, speed, density, cutter, userLabel, printer);
-            return Ok("Labels printed");
-        }
-        catch (Exception ex)
-        {
-            return BadRequest($"Error: {ex.Message}");
-        }
+        await _automationService.PrintTestRoomLabel(sensorType, speed, density, cutter, userLabel, printer);
+        return Ok("Labels printed");
     }
 
     [HttpPost("qlickPrintLicensie")]
@@ -110,15 +74,8 @@ public class AutomationController : ControllerBase
     {
         if (dataFile == null) return BadRequest("Data file must be present");
 
-        try
-        {
-            await _automationService.PrintQlickPrintLicensie(dataFile);
-            return Ok("Labels printed");
-        }
-        catch (Exception ex)
-        {
-            return BadRequest($"Error: {ex.Message}");
-        }
+        await _automationService.PrintQlickPrintLicensie(dataFile);
+        return Ok("Labels printed");
     }
 
     [HttpPost("generatePdf")]
@@ -139,31 +96,25 @@ public class AutomationController : ControllerBase
         [FromForm] string serieNumber,
         [FromForm] string warrenty
     ) {
-        try
-        {
-            var data = new RmaLabelData(
-                Language: language,
-                TicketNumber: ticketNumber,
-                Company: company,
-                ContactPerson: contactPerson,
-                ContactPersonPrefix: contactPersonPrefix,
-                DontSendItems: dontSendItems,
-                Overige: overige,
-                MultiplePrinters: multiplePrinters,
-                Model: model,
-                Street: street,
-                Problem1: problem1,
-                Problem2: problem2,
-                Place: place,
-                SerieNumber: serieNumber,
-                Warranty: warrenty);
 
-            await _automationService.GeneratePDF(data);
-            return Ok("PDF created");
-        }
-        catch (Exception ex)
-        {
-            return BadRequest($"Error: {ex.Message}");
-        }
+        var data = new RmaLabelData(
+            Language: language,
+            TicketNumber: ticketNumber,
+            Company: company,
+            ContactPerson: contactPerson,
+            ContactPersonPrefix: contactPersonPrefix,
+            DontSendItems: dontSendItems,
+            Overige: overige,
+            MultiplePrinters: multiplePrinters,
+            Model: model,
+            Street: street,
+            Problem1: problem1,
+            Problem2: problem2,
+            Place: place,
+            SerieNumber: serieNumber,
+            Warranty: warrenty);
+
+        await _automationService.GeneratePDF(data);
+        return Ok("PDF created");
     }
 }
