@@ -1,4 +1,5 @@
-﻿using Altec.Api.Record.NiceLabel;
+﻿using Altec.Api.Exceptions;
+using Altec.Api.Record.NiceLabel;
 using Altec.Api.Services.NiceLabel;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
@@ -104,14 +105,14 @@ public class AutomationService : IAutomationService
         var serialNumbersList = new List<SerialNumberData>();
         string? line;
         bool isFirstLine = true;
-        var lineNumber = 0;
+        int lineNumber = 0;
 
         while ((line = reader.ReadLine()) != null)
         {
             lineNumber++;
             if (isFirstLine) { isFirstLine = false; continue; }
             var parts = line.Split(";");
-            if (parts.Length < 2) throw new ArgumentException($"Unable to parse: line:{lineNumber}");
+            if (parts.Length < 2) throw new InvalidInputException($"Unable to parse csv data on line: {lineNumber}");
 
             serialNumbersList.Add(new SerialNumberData(parts[0].Trim(), parts[1].Trim(), printerType));
         }
@@ -130,14 +131,10 @@ public class AutomationService : IAutomationService
         while ((line = reader.ReadLine()) != null)
         {
             lineNumber++;
-            try
-            {
-                barcodes.Add(long.Parse(line));
-            }
-            catch (FormatException ex)
-            {
-                throw new FormatException($"Unable to parse barcode: {lineNumber}", ex);
-            }
+            if (!long.TryParse(line, out var parsedNumber))
+                throw new InvalidInputException($"unable to parse barcode on line: {lineNumber}");
+            
+            barcodes.Add(parsedNumber);               
         }
 
         return barcodes
@@ -215,9 +212,9 @@ public class AutomationService : IAutomationService
     private string ResolveRmaLabelPath(string language) => language switch
     {
         "NL" => GetLabelPath("LabelPaths:RMALabelNL"),
-        "EN" => GetLabelPath("LabelPaths:RMALabelEN"),
+        "EN" => GetLabelPath("LabelPaths:RMALabelENG"),
         "FR" => GetLabelPath("LabelPaths:RMALabelFR"),
-        _ => throw new ArgumentException($"Unsupported language: {language}")
+        _ => throw new InvalidInputException($"Unsupported language: {language}")
     };
 
     private string ResolveSendLabelPath(string language) => language switch
@@ -225,7 +222,7 @@ public class AutomationService : IAutomationService
         "NL" => GetLabelPath("LabelPaths:ZendLabel"),
         "EN" => GetLabelPath("LabelPaths:ZendLabelENG"),
         "FR" => GetLabelPath("LabelPaths:ZendLabelFR"),
-        _ => throw new ArgumentException($"Unsupported language: {language}")
+        _ => throw new InvalidInputException($"Unsupported language: {language}")
     };
 
     private string BuildRmaPdfPath(bool multiplePrinters, string ticketNumber, string serieNumber)

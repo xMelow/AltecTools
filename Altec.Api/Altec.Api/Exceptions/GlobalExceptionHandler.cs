@@ -44,6 +44,11 @@ public class GlobalExceptionHandler : IExceptionHandler
                 problemDetails.Detail = tsplRender.Message;
                 problemDetails.Extensions["lineNumber"] = tsplRender.LineNumber;
                 break;
+            case InvalidInputException:
+                problemDetails.Status = (int) HttpStatusCode.UnprocessableContent;
+                problemDetails.Title = "Invalid input";
+                problemDetails.Detail = exception.Message;
+                break;
         }
         
         httpContext.Response.StatusCode = (int) problemDetails.Status;
