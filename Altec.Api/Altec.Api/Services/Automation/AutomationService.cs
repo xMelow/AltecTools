@@ -212,7 +212,7 @@ public class AutomationService : IAutomationService
     private string ResolveRmaLabelPath(string language) => language switch
     {
         "NL" => GetLabelPath("LabelPaths:RMALabelNL"),
-        "EN" => GetLabelPath("LabelPaths:RMALabelEN"),
+        "EN" => GetLabelPath("LabelPaths:RMALabelENG"),
         "FR" => GetLabelPath("LabelPaths:RMALabelFR"),
         _ => throw new InvalidInputException($"Unsupported language: {language}")
     };
